@@ -30,7 +30,7 @@ export function InfoCarousel() {
   }, [api]);
 
   return (
-    <section className="border-b border-slate-200 bg-slate-200">
+    <section className="bg-slate-100">
       <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
         <Carousel
           setApi={setApi}
