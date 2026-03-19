@@ -14,12 +14,12 @@ export function ShowcaseHero() {
           <Badge variant="success">Design System</Badge>
           <Badge variant="info">v1.0</Badge>
         </div>
-        <h2 className="mb-4 max-w-2xl text-balance font-['Sansita',sans-serif] text-[32px] leading-10 text-white">
+        <h2 className="mb-4 max-w-2xl text-balance font-['Big Shoulders',sans-serif] text-[32px] leading-10 text-white">
           Sistema de Design Profissional para Ecommerce de Futebol
         </h2>
         <P className="mb-8 max-w-2xl text-blue-200">
           Uma biblioteca de componentes completa, pronta para produção,
-          construída com React e Tailwind CSS. Tipografia Sansita e Poppins,
+          construída com React e Tailwind CSS. Tipografia Big Shoulders e Poppins,
           paleta Copa do Mundo e ícones para ecommerce esportivo.
         </P>
         <div className="flex flex-wrap gap-3">

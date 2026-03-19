@@ -8,7 +8,7 @@ interface TypographyProps {
 function H1({ children, className = "" }: TypographyProps) {
   return (
     <h1
-      className={`font-['Sansita',sans-serif] text-[57px] leading-16 tracking-[-0.25px] ${className}`}
+      className={`font-['Big Shoulders',sans-serif] text-[57px] leading-16 tracking-[-0.25px] ${className}`}
     >
       {children}
     </h1>
@@ -18,7 +18,7 @@ function H1({ children, className = "" }: TypographyProps) {
 function H2({ children, className = "" }: TypographyProps) {
   return (
     <h2
-      className={`font-['Sansita',sans-serif] text-[28px] leading-9 ${className}`}
+      className={`font-['Big Shoulders',sans-serif] text-[28px] leading-9 ${className}`}
     >
       {children}
     </h2>

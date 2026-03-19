@@ -95,8 +95,9 @@ export const iconTiles: IconTile[] = [
   { icon: User, label: "Usuário", hoverColorClass: "hover:bg-blue-700" },
 ];
 
-export const formatCurrency = (value: number) =>
-  new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(value);
+const brlCurrencyFormatter = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+});
+
+export const formatCurrency = (value: number) => brlCurrencyFormatter.format(value);

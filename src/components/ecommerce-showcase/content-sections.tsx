@@ -1,11 +1,15 @@
-import { useMemo } from "react";
 import { AtSign, CircleCheck, Info, ShoppingCart, Star } from "lucide-react";
 
 import { H1, H2, H3, P, LabelMedium, BodySmall } from "@/components/typography";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import {
@@ -20,37 +24,133 @@ import { tailwindColors } from "@/lib/tailwind-colors";
 
 import { iconTiles } from "./data";
 
-export function ContentSections() {
-  const colorGroups = useMemo(
-    () => [
-      {
-        name: "Azul - Cor Principal",
-        colors: tailwindColors.blue,
-        chip: "bg-blue-700",
-        badge: "info" as const,
-      },
-      {
-        name: "Vermelho - Perigo / Destaque",
-        colors: tailwindColors.red,
-        chip: "bg-red-700",
-        badge: "error" as const,
-      },
-      {
-        name: "Verde - Sucesso / Campo",
-        colors: tailwindColors.green,
-        chip: "bg-green-700",
-        badge: "success" as const,
-      },
-      {
-        name: "Slate - Neutros",
-        colors: tailwindColors.slate,
-        chip: "bg-slate-500",
-        badge: "default" as const,
-      },
-    ],
-    [],
-  );
+const colorGroups = [
+  {
+    name: "Azul - Cor Principal",
+    colors: tailwindColors.blue,
+    chip: "bg-blue-700",
+    badge: "info" as const,
+  },
+  {
+    name: "Vermelho - Perigo / Destaque",
+    colors: tailwindColors.red,
+    chip: "bg-red-700",
+    badge: "error" as const,
+  },
+  {
+    name: "Verde - Sucesso / Campo",
+    colors: tailwindColors.green,
+    chip: "bg-green-700",
+    badge: "success" as const,
+  },
+  {
+    name: "Slate - Neutros",
+    colors: tailwindColors.slate,
+    chip: "bg-slate-500",
+    badge: "default" as const,
+  },
+];
 
+const TABS_RATING_STARS = [0, 1, 2, 3, 4];
+const TABS_REVIEW_DISTRIBUTION = [
+  { star: 5, width: "82%" },
+  { star: 4, width: "10%" },
+  { star: 3, width: "5%" },
+  { star: 2, width: "2%" },
+  { star: 1, width: "1%" },
+];
+
+const badgeLabels = {
+  default: "Neutral",
+  info: "Primary",
+  error: "Danger",
+  success: "Success",
+} as const;
+
+const showcaseTabs = [
+  {
+    label: "Visão Geral",
+    content: (
+      <div>
+        <H3 className="mb-3 text-slate-900">Visão Geral</H3>
+        <P className="text-slate-500">
+          As tabs organizam conteúdo em abas dentro de um mesmo contexto, sem
+          navegação de página.
+        </P>
+      </div>
+    ),
+  },
+  {
+    label: "Especificações",
+    content: (
+      <div className="grid grid-cols-2 gap-4">
+        <div className="rounded-xl bg-slate-50 p-4">
+          <BodySmall className="mb-1 text-slate-400">Material</BodySmall>
+          <H3 className="text-slate-900">Microfibra Técnica</H3>
+        </div>
+        <div className="rounded-xl bg-slate-50 p-4">
+          <BodySmall className="mb-1 text-slate-400">Tecnologia</BodySmall>
+          <H3 className="text-slate-900">Dri-FIT Pro</H3>
+        </div>
+        <div className="rounded-xl bg-slate-50 p-4">
+          <BodySmall className="mb-1 text-slate-400">Certificado</BodySmall>
+          <H3 className="text-slate-900">FIFA Quality Pro</H3>
+        </div>
+        <div className="rounded-xl bg-slate-50 p-4">
+          <BodySmall className="mb-1 text-slate-400">Origem</BodySmall>
+          <H3 className="text-slate-900">Edição Especial 2026</H3>
+        </div>
+      </div>
+    ),
+  },
+  {
+    label: "Avaliações",
+    content: (
+      <div>
+        <div className="mb-4 flex items-center gap-4">
+          <div className="text-center">
+            <div className="font-['Big Shoulders',sans-serif] text-[48px] leading-none text-slate-900">
+              4.8
+            </div>
+            <div className="mt-1 flex justify-center gap-1">
+              {TABS_RATING_STARS.map((index) => (
+                <Star
+                  key={index}
+                  aria-hidden="true"
+                  className="size-3 text-amber-500"
+                  fill="currentColor"
+                />
+              ))}
+            </div>
+            <BodySmall className="mt-1 text-slate-400">
+              248 avaliações
+            </BodySmall>
+          </div>
+          <div className="flex-1">
+            {TABS_REVIEW_DISTRIBUTION.map((review) => (
+              <div key={review.star} className="mb-1 flex items-center gap-2">
+                <BodySmall className="w-3 text-slate-400">
+                  {review.star}
+                </BodySmall>
+                <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-200">
+                  <div
+                    className="h-full rounded-full bg-amber-500"
+                    style={{ width: review.width }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <P className="text-slate-500">
+          Avaliações reais de clientes verificados.
+        </P>
+      </div>
+    ),
+  },
+];
+
+export function ContentSections() {
   return (
     <div className="mx-auto max-w-7xl space-y-16 px-4 py-12 sm:px-6 lg:px-8">
       <section className="space-y-4">
@@ -191,8 +291,7 @@ export function ContentSections() {
             </CardHeader>
             <CardContent>
               <P className="text-slate-500">
-                Componente base de card com header, body e variantes de
-                layout.
+                Componente base de card com header, body e variantes de layout.
               </P>
             </CardContent>
           </Card>
@@ -207,8 +306,8 @@ export function ContentSections() {
             </CardHeader>
             <CardContent>
               <P className="text-slate-500">
-                Card com efeito hover, elevando e destacando a borda ao passar
-                o cursor.
+                Card com efeito hover, elevando e destacando a borda ao passar o
+                cursor.
               </P>
             </CardContent>
             <CardFooter>
@@ -254,103 +353,7 @@ export function ContentSections() {
         </div>
         <Card>
           <CardContent>
-            <Tabs
-              tabs={[
-                {
-                  label: "Visão Geral",
-                  content: (
-                    <div>
-                      <H3 className="mb-3 text-slate-900">Visão Geral</H3>
-                      <P className="text-slate-500">
-                        As tabs organizam conteúdo em abas dentro de um mesmo
-                        contexto, sem navegação de página.
-                      </P>
-                    </div>
-                  ),
-                },
-                {
-                  label: "Especificações",
-                  content: (
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="rounded-xl bg-slate-50 p-4">
-                        <BodySmall className="mb-1 text-slate-400">
-                          Material
-                        </BodySmall>
-                        <H3 className="text-slate-900">Microfibra Técnica</H3>
-                      </div>
-                      <div className="rounded-xl bg-slate-50 p-4">
-                        <BodySmall className="mb-1 text-slate-400">
-                          Tecnologia
-                        </BodySmall>
-                        <H3 className="text-slate-900">Dri-FIT Pro</H3>
-                      </div>
-                      <div className="rounded-xl bg-slate-50 p-4">
-                        <BodySmall className="mb-1 text-slate-400">
-                          Certificado
-                        </BodySmall>
-                        <H3 className="text-slate-900">FIFA Quality Pro</H3>
-                      </div>
-                      <div className="rounded-xl bg-slate-50 p-4">
-                        <BodySmall className="mb-1 text-slate-400">
-                          Origem
-                        </BodySmall>
-                        <H3 className="text-slate-900">Edição Especial 2026</H3>
-                      </div>
-                    </div>
-                  ),
-                },
-                {
-                  label: "Avaliações",
-                  content: (
-                    <div>
-                      <div className="mb-4 flex items-center gap-4">
-                        <div className="text-center">
-                          <div className="font-['Sansita',sans-serif] text-[48px] leading-none text-slate-900">
-                            4.8
-                          </div>
-                          <div className="mt-1 flex justify-center gap-1">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                aria-hidden="true"
-                                className="size-3 text-amber-500"
-                                fill="currentColor"
-                              />
-                            ))}
-                          </div>
-                          <BodySmall className="mt-1 text-slate-400">
-                            248 avaliações
-                          </BodySmall>
-                        </div>
-                        <div className="flex-1">
-                          {[5, 4, 3, 2, 1].map((star, i) => (
-                            <div
-                              key={star}
-                              className="mb-1 flex items-center gap-2"
-                            >
-                              <BodySmall className="w-3 text-slate-400">
-                                {star}
-                              </BodySmall>
-                              <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-200">
-                                <div
-                                  className="h-full rounded-full bg-amber-500"
-                                  style={{
-                                    width: ["82%", "10%", "5%", "2%", "1%"][i],
-                                  }}
-                                />
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      <P className="text-slate-500">
-                        Avaliações reais de clientes verificados.
-                      </P>
-                    </div>
-                  ),
-                },
-              ]}
-            />
+            <Tabs tabs={showcaseTabs} />
           </CardContent>
         </Card>
       </section>
@@ -358,19 +361,19 @@ export function ContentSections() {
       <section className="space-y-4">
         <div className="flex items-center gap-3">
           <H2 className="text-slate-900">Tipografia</H2>
-          <Badge variant="default">Sansita · Poppins · Escalas</Badge>
+          <Badge variant="default">Big Shoulders · Poppins · Escalas</Badge>
         </div>
         <Card className="border-slate-200 bg-white shadow-sm">
           <CardContent className="space-y-6 pt-6">
             <div className="border-b border-slate-200 pb-5">
               <p className="mb-2 font-['Poppins',sans-serif] text-[12px] text-slate-400">
-                Display Large · Sansita 57px/64px
+                Display Large · Big Shoulders 57px/64px
               </p>
               <H1 className="text-slate-900">Copa do Mundo</H1>
             </div>
             <div className="border-b border-slate-200 pb-5">
               <p className="mb-2 font-['Poppins',sans-serif] text-[12px] text-slate-400">
-                Headline Medium · Sansita 28px/36px
+                Headline Medium · Big Shoulders 28px/36px
               </p>
               <H2 className="text-red-700">Coleção Oficial 2026</H2>
             </div>
@@ -449,15 +452,7 @@ export function ContentSections() {
               <div className="mb-4 flex items-center gap-3">
                 <div className={`size-5 rounded-full ${group.chip}`} />
                 <H3 className="text-slate-900">{group.name}</H3>
-                <Badge variant={group.badge}>
-                  {group.badge === "default"
-                    ? "Neutral"
-                    : group.badge === "info"
-                      ? "Primary"
-                      : group.badge === "error"
-                        ? "Danger"
-                        : "Success"}
-                </Badge>
+                <Badge variant={group.badge}>{badgeLabels[group.badge]}</Badge>
               </div>
               <div className="flex flex-wrap gap-2">
                 {Object.entries(group.colors).map(([label, color]) => (
@@ -486,7 +481,10 @@ export function ContentSections() {
           <CardContent className="pt-6">
             <div className="grid grid-cols-4 gap-6 sm:grid-cols-6 md:grid-cols-8">
               {iconTiles.map((item) => (
-                <div key={item.label} className="flex flex-col items-center gap-2">
+                <div
+                  key={item.label}
+                  className="flex flex-col items-center gap-2"
+                >
                   <div
                     className={`flex size-12 items-center justify-center rounded-xl bg-slate-50 text-slate-600 transition-colors duration-200 hover:text-white ${item.hoverColorClass}`}
                   >

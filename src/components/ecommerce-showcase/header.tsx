@@ -15,7 +15,7 @@ export function ShowcaseHeader() {
           <div className="flex size-9 items-center justify-center rounded-full bg-white text-slate-900 shadow-md">
             <Package aria-hidden="true" className="size-5" />
           </div>
-          <h1 className="font-['Sansita',sans-serif] text-[22px] leading-7 text-white">
+          <h1 className="font-['Big Shoulders',sans-serif] text-[22px] leading-7 text-white">
             Ecommerce
           </h1>
         </div>
