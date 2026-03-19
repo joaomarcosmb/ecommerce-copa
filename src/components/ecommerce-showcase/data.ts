@@ -22,6 +22,7 @@ import {
 export type Product = {
   id: number;
   image: string;
+  images?: string[];
   title: string;
   price: number;
   originalPrice?: number;
@@ -34,6 +35,11 @@ export const products: Product[] = [
     id: 1,
     image:
       "https://images.unsplash.com/photo-1629977008298-926046be0a8b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    images: [
+      "https://images.unsplash.com/photo-1728520508268-1766303e1ebb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+      "https://images.unsplash.com/photo-1629977008298-926046be0a8b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+      "https://images.unsplash.com/photo-1761449021169-43e776e86179?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    ],
     title: "Kit Oficial Copa do Mundo 2026",
     price: 189.99,
     originalPrice: 249.99,
@@ -76,12 +82,20 @@ export type IconTile = {
 };
 
 export const iconTiles: IconTile[] = [
-  { icon: ShoppingCart, label: "Carrinho", hoverColorClass: "hover:bg-blue-700" },
+  {
+    icon: ShoppingCart,
+    label: "Carrinho",
+    hoverColorClass: "hover:bg-blue-700",
+  },
   { icon: Eye, label: "Ver", hoverColorClass: "hover:bg-green-700" },
   { icon: EyeOff, label: "Ocultar", hoverColorClass: "hover:bg-red-700" },
   { icon: LogIn, label: "Entrar", hoverColorClass: "hover:bg-blue-700" },
   { icon: LogOut, label: "Sair", hoverColorClass: "hover:bg-red-700" },
-  { icon: Share2, label: "Compartilhar", hoverColorClass: "hover:bg-green-700" },
+  {
+    icon: Share2,
+    label: "Compartilhar",
+    hoverColorClass: "hover:bg-green-700",
+  },
   { icon: Menu, label: "Menu", hoverColorClass: "hover:bg-blue-700" },
   { icon: ArrowLeft, label: "Voltar", hoverColorClass: "hover:bg-slate-900" },
   { icon: ArrowRight, label: "Avançar", hoverColorClass: "hover:bg-slate-900" },
@@ -100,4 +114,5 @@ const brlCurrencyFormatter = new Intl.NumberFormat("pt-BR", {
   currency: "BRL",
 });
 
-export const formatCurrency = (value: number) => brlCurrencyFormatter.format(value);
+export const formatCurrency = (value: number) =>
+  brlCurrencyFormatter.format(value);
