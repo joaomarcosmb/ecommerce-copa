@@ -81,6 +81,34 @@ export type IconTile = {
   hoverColorClass: string;
 };
 
+export type InfoSlide = {
+  id: number;
+  badge: string;
+  badgeVariant: "default" | "info" | "error" | "success" | "warning";
+  text: string;
+};
+
+export const infoSlides: InfoSlide[] = [
+  {
+    id: 1,
+    badge: "Frete Grátis",
+    badgeVariant: "success",
+    text: "Entrega grátis para compras acima de R$ 199 em todo o Brasil.",
+  },
+  {
+    id: 2,
+    badge: "Oferta Relâmpago",
+    badgeVariant: "error",
+    text: "Até 30% OFF nos kits oficiais da Copa 2026 por tempo limitado.",
+  },
+  {
+    id: 3,
+    badge: "Novidade",
+    badgeVariant: "info",
+    text: "Novos uniformes e acessórios acabaram de chegar na coleção.",
+  },
+];
+
 export const iconTiles: IconTile[] = [
   {
     icon: ShoppingCart,

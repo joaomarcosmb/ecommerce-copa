@@ -4,7 +4,7 @@ import { P } from "@/components/typography";
 
 export function ShowcaseHero() {
   return (
-    <section className="relative overflow-hidden bg-linear-to-br from-slate-900 via-blue-700 to-blue-900 px-4 py-20">
+    <section className="relative overflow-hidden bg-linear-to-br from-blue-900 via-green-700 to-slate-900 px-4 py-20">
       <div className="absolute -top-20 -right-20 size-80 rounded-full bg-red-700/20 blur-3xl" />
       <div className="absolute -bottom-15 -left-15 size-60 rounded-full bg-green-700/20 blur-3xl" />
       <div className="absolute top-1/2 left-1/2 size-125 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/3 blur-3xl" />
@@ -15,7 +15,7 @@ export function ShowcaseHero() {
           <Badge variant="info">v1.0</Badge>
         </div>
         <h2 className="mb-4 max-w-2xl text-balance font-['Big Shoulders',sans-serif] text-[32px] leading-10 text-white">
-          Sistema de Design Profissional para Ecommerce de Futebol
+          Design System para E-Commerce de Esportes
         </h2>
         <P className="mb-8 max-w-2xl text-blue-200">
           Uma biblioteca de componentes completa, pronta para produção,

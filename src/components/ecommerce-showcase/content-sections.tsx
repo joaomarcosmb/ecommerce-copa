@@ -318,7 +318,7 @@ export function ContentSections() {
           </Card>
           <Card
             hover
-            className="border-blue-700 bg-linear-to-br from-blue-700 to-slate-900 text-white"
+            className="border-blue-700 bg-linear-to-br from-red-800 to-blue-900 text-white"
           >
             <CardHeader>
               <div className="flex items-center gap-2">
