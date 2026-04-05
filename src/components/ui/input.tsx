@@ -50,7 +50,7 @@ function Input({
           spellCheck={spellCheck}
           className={`
             w-full px-4 py-2 rounded-xl 
-            border-2 border-slate-200 bg-slate-50
+            border border-slate-200 bg-white shadow-sm
             text-[14px] leading-5 font-['Poppins',sans-serif] text-slate-900
             placeholder:text-slate-400
             focus-visible:border-blue-600 focus-visible:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-1

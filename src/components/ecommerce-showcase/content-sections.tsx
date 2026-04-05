@@ -1,4 +1,5 @@
-import { AtSign, CircleCheck, Info, ShoppingCart, Star } from "lucide-react";
+import { CircleCheck, Info, ShoppingCart, Star } from "lucide-react";
+import { useForm } from "react-hook-form";
 
 import { H1, H2, H3, P, LabelMedium, BodySmall } from "@/components/typography";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -11,6 +12,21 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Form,
+  FormActions,
+  FormBody,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormHeader,
+  FormItem,
+  FormLabel,
+  FormLead,
+  FormMessage,
+  FormSurface,
+  FormTitle,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -151,6 +167,14 @@ const showcaseTabs = [
 ];
 
 export function ContentSections() {
+  const checkoutForm = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+      coupon: "",
+    },
+  });
+
   return (
     <div className="mx-auto max-w-7xl space-y-16 px-4 py-12 sm:px-6 lg:px-8">
       <section className="space-y-4">
@@ -217,61 +241,115 @@ export function ContentSections() {
           <H2 className="text-slate-900">Formulários</H2>
           <Badge variant="default">Input · Select · Checkbox</Badge>
         </div>
-        <Card>
-          <CardHeader>
-            <H3>Checkout</H3>
-          </CardHeader>
-          <CardContent className="space-y-5 pt-2">
-            <Input
-              label="E-mail"
-              name="email"
-              autoComplete="email"
-              type="email"
-              placeholder="nome@dominio.com…"
-              icon={<AtSign aria-hidden="true" />}
-            />
-            <Input
-              label="Senha"
-              name="password"
-              autoComplete="current-password"
-              type="password"
-              placeholder="Mínimo 8 caracteres…"
-              helperText="Use letras, números e símbolos para maior segurança"
-            />
-            <Input
-              label="Cupom de desconto"
-              name="coupon"
-              autoComplete="off"
-              type="text"
-              placeholder="Ex: COPA2026…"
-              error="Cupom inválido ou expirado"
-            />
-            <Select>
-              <SelectTrigger label="Tamanho do produto" className="w-full">
-                <SelectValue placeholder="Selecione o tamanho…" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pp">PP - Extra Pequeno</SelectItem>
-                <SelectItem value="p">P - Pequeno</SelectItem>
-                <SelectItem value="m">M - Médio</SelectItem>
-                <SelectItem value="g">G - Grande</SelectItem>
-                <SelectItem value="gg">GG - Extra Grande</SelectItem>
-              </SelectContent>
-            </Select>
-            <div className="flex flex-col gap-3">
-              <LabelMedium>Preferências</LabelMedium>
-              <Checkbox label="Receber newsletter com promoções" />
-              <Checkbox label="Ativar notificações de estoque" />
-              <Checkbox label="Salvar dados para próxima compra" />
-            </div>
-          </CardContent>
-          <CardFooter>
-            <div className="flex justify-end gap-3">
-              <Button variant="ghost">Cancelar</Button>
-              <Button variant="primary">Finalizar Compra</Button>
-            </div>
-          </CardFooter>
-        </Card>
+        <div className="w-full">
+          <Form {...checkoutForm}>
+            <FormSurface
+              onSubmit={checkoutForm.handleSubmit(() => undefined)}
+              className="w-full"
+            >
+              <FormHeader>
+                <FormTitle>Checkout</FormTitle>
+                <FormLead>
+                  Finalize sua compra com entrega segura e confirmação imediata.
+                </FormLead>
+              </FormHeader>
+              <FormBody>
+                <FormField
+                  control={checkoutForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>E-mail</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          autoComplete="email"
+                          type="email"
+                          placeholder="nome@dominio.com…"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={checkoutForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Senha</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          autoComplete="current-password"
+                          type="password"
+                          placeholder="Mínimo 8 caracteres…"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Use letras, números e símbolos para maior segurança
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={checkoutForm.control}
+                  name="coupon"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Cupom de desconto</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          autoComplete="off"
+                          type="text"
+                          placeholder="Ex: COPA2026…"
+                        />
+                      </FormControl>
+                      <FormMessage>Cupom inválido ou expirado</FormMessage>
+                    </FormItem>
+                  )}
+                />
+                <FormItem>
+                  <FormLabel>Tamanho do produto</FormLabel>
+                  <FormControl>
+                    <Select>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecione o tamanho…" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pp">PP - Extra Pequeno</SelectItem>
+                        <SelectItem value="p">P - Pequeno</SelectItem>
+                        <SelectItem value="m">M - Médio</SelectItem>
+                        <SelectItem value="g">G - Grande</SelectItem>
+                        <SelectItem value="gg">GG - Extra Grande</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                </FormItem>
+                <div className="flex flex-col gap-3">
+                  <LabelMedium>Preferências</LabelMedium>
+                  <Checkbox label="Receber newsletter com promoções" />
+                  <Checkbox label="Ativar notificações de estoque" />
+                  <Checkbox label="Salvar dados para próxima compra" />
+                </div>
+                <FormActions className="justify-end">
+                  <Button
+                    type="reset"
+                    variant="ghost"
+                    onClick={() => checkoutForm.reset()}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button type="submit" variant="primary">
+                    Finalizar Compra
+                  </Button>
+                </FormActions>
+              </FormBody>
+            </FormSurface>
+          </Form>
+        </div>
       </section>
 
       <section className="space-y-4">
