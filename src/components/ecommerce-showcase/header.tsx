@@ -1,8 +1,10 @@
-import { Headset, Package, Search, User } from "lucide-react";
+import { ShoppingCart, Search, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
-export function ShowcaseHeader() {
+import { categories } from "./data";
+
+export function Header() {
   return (
     <header className="sticky top-0 z-40 bg-slate-900 shadow-xl">
       <div className="flex h-1">
@@ -11,15 +13,28 @@ export function ShowcaseHeader() {
         <div className="flex-1 bg-red-700" />
       </div>
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-3">
-          <div className="flex size-9 items-center justify-center rounded-full bg-white text-slate-900 shadow-md">
-            <Package aria-hidden="true" className="size-5" />
-          </div>
-          <h1 className="font-['Big Shoulders',sans-serif] text-[22px] leading-7 text-white">
-            Ecommerce
-          </h1>
-        </div>
-        <div className="flex items-center gap-2">
+        <a
+          href="/"
+          className="font-big-shoulders text-4xl font-black tracking-tight text-primary-foreground"
+          aria-label="CupStickers — página inicial"
+        >
+          CupStickers
+        </a>
+        <nav aria-label="Categorias">
+          <ul className="hidden items-center gap-8 lg:flex">
+            {categories.map((cat) => (
+              <li key={cat.slug}>
+                <a
+                  href={`/category/${cat.slug}`}
+                  className="whitespace-nowrap font-sans text-[14px] font-medium text-white/80 transition-colors hover:text-primary-foreground"
+                >
+                  {cat.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <div className="flex items-center gap-4">
           <Button
             variant="ghost"
             size="icon"
@@ -31,15 +46,15 @@ export function ShowcaseHeader() {
           <Button
             variant="ghost"
             size="icon"
-            aria-label="Abrir suporte"
+            aria-label="Carrinho de compras"
             className="text-white hover:bg-white/10"
           >
-            <Headset aria-hidden="true" className="size-5" />
+            <ShoppingCart aria-hidden="true" className="size-5" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            aria-label="Abrir perfil"
+            aria-label="Minha conta"
             className="text-white hover:bg-white/10"
           >
             <User aria-hidden="true" className="size-5" />

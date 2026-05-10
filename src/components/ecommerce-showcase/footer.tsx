@@ -1,56 +1,92 @@
-import { Package } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 
-import { H3, P } from "@/components/typography";
+import { categories } from "./data";
 
-export function ShowcaseFooter() {
+const contactItems = [
+  { icon: Mail, label: "contato@cupstickers.com.br" },
+  { icon: Phone, label: "(85) 3333-4444" },
+  { icon: MapPin, label: "Fortaleza, CE – Brasil" },
+];
+
+const socialIcons = [
+  { src: "/instagram.svg", label: "Instagram" },
+  { src: "/x.svg", label: "Twitter" },
+  { src: "/facebook.svg", label: "Facebook" },
+];
+
+export function Footer() {
   return (
-    <footer className="mt-8 bg-slate-900 py-16 text-white">
-      <div className="mb-12 flex h-1">
-        <div className="flex-1 bg-blue-700" />
-        <div className="flex-1 bg-green-500" />
-        <div className="flex-1 bg-red-700" />
-      </div>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-12 grid gap-12 md:grid-cols-2">
-          <div>
-            <div className="mb-4 flex items-center gap-3">
-              <div className="flex size-8 items-center justify-center rounded-full bg-white text-slate-900">
-                <Package aria-hidden="true" className="size-4" />
-              </div>
-              <H3 className="text-white">Ecommerce</H3>
-            </div>
-            <P className="text-slate-400">
-              Design System para e-commerce de figurinhas de futebol da Copa do Mundo de 2026.
-            </P>
-          </div>
-          <div>
-            <H3 className="mb-4 text-white">Componentes</H3>
-            <div className="grid grid-cols-2 gap-2">
-              {[
-                "Button",
-                "Input",
-                "Badge",
-                "Card",
-                "Alert",
-                "Modal",
-                "Tabs",
-                "Select",
-              ].map((item) => (
-                <p
-                  key={item}
-                  className="font-['Poppins',sans-serif] text-[12px] text-slate-500 transition-colors hover:text-blue-200"
+    <footer className="bg-slate-950 text-white mt-30">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Brand */}
+          <div className="flex flex-col gap-5">
+            <span className="font-big-shoulders text-4xl font-black tracking-tight">
+              CupStickers
+            </span>
+            <p className="text-sm leading-relaxed text-slate-400">
+              A loja oficial de figurinhas, álbuns e colecionáveis da Copa do
+              Mundo 2026™. Conectando colecionadores em todo o Brasil.
+            </p>
+            <div className="flex gap-3">
+              {socialIcons.map(({ src, label }) => (
+                <button
+                  key={label}
+                  aria-label={label}
+                  className="flex size-10 cursor-pointer items-center justify-center rounded-full bg-slate-800 transition-colors hover:bg-slate-700"
                 >
-                  {item}
-                </p>
+                  <img
+                    src={src}
+                    alt=""
+                    aria-hidden="true"
+                    className="size-5 invert"
+                  />
+                </button>
               ))}
             </div>
           </div>
+
+          {/* Categorias */}
+          <div>
+            <h3 className="mb-5 text-sm font-semibold text-white">
+              Categorias
+            </h3>
+            <ul className="flex flex-col gap-3">
+              {categories.map(({ label }) => (
+                <li key={label}>
+                  <a
+                    href="#"
+                    className="text-sm text-slate-400 transition-colors hover:text-white"
+                  >
+                    {label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contato */}
+          <div>
+            <h3 className="mb-5 text-sm font-semibold text-white">Contato</h3>
+            <ul className="flex flex-col gap-3">
+              {contactItems.map(({ icon: Icon, label }) => (
+                <li key={label} className="flex items-center gap-3">
+                  <Icon
+                    className="size-4 shrink-0 text-slate-500"
+                    aria-hidden="true"
+                  />
+                  <span className="text-sm text-slate-400">{label}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-        <div className="border-t border-slate-800 pt-8 text-center">
-          <p className="font-['Poppins',sans-serif] text-[12px] text-slate-600">
-            Construído com Astro, React e Tailwind CSS.
-          </p>
-        </div>
+
+        {/* Bottom bar */}
+        <p className="mt-16 text-xs text-slate-500 border-t border-slate-800 pt-8">
+          © 2026 CupStickers. Todos os direitos reservados. Produtos licenciados
+          FIFA™.
+        </p>
       </div>
     </footer>
   );

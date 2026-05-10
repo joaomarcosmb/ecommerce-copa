@@ -144,6 +144,7 @@
 @theme inline {
 
     --font-sans: 'Inter Variable', sans-serif;
+    --font-big-shoulders: 'Big Shoulders Display', sans-serif;
 
     --color-sidebar-ring: var(--sidebar-ring);
 

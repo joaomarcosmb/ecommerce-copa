@@ -1,85 +1,98 @@
-import React from "react";
+import { cn } from "@/lib/utils";
 
-interface TypographyProps {
-  children: React.ReactNode;
-  className?: string;
-}
-
-function H1({ children, className = "" }: TypographyProps) {
+function H1({ className, ...props }: React.ComponentProps<"h1">) {
   return (
     <h1
-      className={`font-['Big Shoulders',sans-serif] text-[57px] leading-16 tracking-[-0.25px] ${className}`}
-    >
-      {children}
-    </h1>
+      className={cn(
+        "font-['Big_Shoulders',sans-serif] text-[57px] leading-16 tracking-[-0.25px]",
+        className,
+      )}
+      {...props}
+    />
   );
 }
 
-function H2({ children, className = "" }: TypographyProps) {
+function H2({ className, ...props }: React.ComponentProps<"h2">) {
   return (
     <h2
-      className={`font-['Big Shoulders',sans-serif] text-[28px] leading-9 ${className}`}
-    >
-      {children}
-    </h2>
+      className={cn(
+        "font-['Big_Shoulders',sans-serif] text-[28px] leading-9",
+        className,
+      )}
+      {...props}
+    />
   );
 }
 
-function H3({ children, className = "" }: TypographyProps) {
+function H3({ className, ...props }: React.ComponentProps<"h3">) {
   return (
     <h3
-      className={`font-['Poppins',sans-serif] text-[16px] leading-6 font-medium ${className}`}
-    >
-      {children}
-    </h3>
+      className={cn(
+        "font-['Poppins',sans-serif] text-[16px] leading-6 font-medium",
+        className,
+      )}
+      {...props}
+    />
   );
 }
 
-function P({ children, className = "" }: TypographyProps) {
+function P({ className, ...props }: React.ComponentProps<"p">) {
   return (
     <p
-      className={`font-['Poppins',sans-serif] text-[14px] leading-5 tracking-[0.25px] ${className}`}
-    >
-      {children}
-    </p>
+      className={cn(
+        "font-['Poppins',sans-serif] text-[14px] leading-5 tracking-[0.25px]",
+        className,
+      )}
+      {...props}
+    />
   );
 }
 
-function BodySmall({ children, className = '' }: TypographyProps) {
+function BodySmall({ className, ...props }: React.ComponentProps<"p">) {
   return (
-    <p className={`text-[12px] leading-4 font-['Poppins',sans-serif] font-normal tracking-[0.4px] ${className}`}>
-      {children}
-    </p>
+    <p
+      className={cn(
+        "font-['Poppins',sans-serif] text-[12px] leading-4 font-normal tracking-[0.4px]",
+        className,
+      )}
+      {...props}
+    />
   );
 }
 
-function LabelLarge({ children, className = "" }: TypographyProps) {
-  return (
-    <span
-      className={`text-[14px] leading-5 font-['Poppins',sans-serif] font-medium tracking-[0.1px] ${className}`}
-    >
-      {children}
-    </span>
-  );
-}
-
-function LabelMedium({ children, className = "" }: TypographyProps) {
+function LabelLarge({ className, ...props }: React.ComponentProps<"span">) {
   return (
     <span
-      className={`text-[12px] leading-4 font-['Poppins',sans-serif] font-medium tracking-[0.5px] ${className}`}
-    >
-      {children}
-    </span>
+      className={cn(
+        "font-['Poppins',sans-serif] text-[14px] leading-5 font-medium tracking-[0.1px]",
+        className,
+      )}
+      {...props}
+    />
   );
 }
 
-function LabelSmall({ children, className = "" }: TypographyProps) {
+function LabelMedium({ className, ...props }: React.ComponentProps<"span">) {
   return (
     <span
-      className={`text-[11px] leading-4 font-['Poppins',sans-serif] font-medium tracking-[0.5px] ${className}`}
-    >
-      {children}
-    </span>
+      className={cn(
+        "font-['Poppins',sans-serif] text-[12px] leading-4 font-medium tracking-[0.5px]",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+function LabelSmall({ className, ...props }: React.ComponentProps<"span">) {
+  return (
+    <span
+      className={cn(
+        "font-['Poppins',sans-serif] text-[11px] leading-4 font-medium tracking-[0.5px]",
+        className,
+      )}
+      {...props}
+    />
   );
 }
 
