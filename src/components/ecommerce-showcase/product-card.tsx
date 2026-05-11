@@ -1,13 +1,12 @@
-import { ShoppingCart, Star } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { CardContent } from "@/components/ui/card";
-import { formatCurrency } from "@/lib/format";
+import { StarRating } from "@/components/ui/star-rating";
 import { cn } from "@/lib/utils";
 
-import { getInstallments, type Product } from "./data";
-
-const RATING_STARS = [0, 1, 2, 3, 4];
+import { type Product } from "./data";
+import { ProductPricing } from "./product-pricing";
 
 interface ProductCardProps {
   product: Product;
@@ -27,8 +26,6 @@ export function ProductCard({
         ((product.originalPrice - product.price) / product.originalPrice) * 100,
       )
     : 0;
-
-  const installments = getInstallments(product.price);
 
   return (
     <article
@@ -79,46 +76,16 @@ export function ProductCard({
           {product.title}
         </h3>
 
-        <div
-          className="flex items-center gap-2"
-          aria-label={`Avaliação: ${product.rating} de 5`}
-        >
-          <div className="flex items-center gap-0.5" aria-hidden="true">
-            {RATING_STARS.map((i) => (
-              <Star
-                key={i}
-                className={cn(
-                  "size-4",
-                  i < Math.floor(product.rating)
-                    ? "fill-amber-500 text-amber-500"
-                    : "text-slate-200",
-                )}
-              />
-            ))}
-          </div>
-          <span className="text-[12px] text-slate-500">
-            {product.rating} ({product.reviewCount.toLocaleString("pt-BR")})
-          </span>
-        </div>
+        <StarRating
+          rating={product.rating}
+          reviewCount={product.reviewCount}
+        />
 
-        <div className="flex flex-col">
-          <div className="flex items-center gap-2">
-            <span className="text-[18px] font-bold text-slate-900">
-              {formatCurrency(product.price)}
-            </span>
-            {product.originalPrice ? (
-              <span className="text-[13px] text-slate-400 line-through">
-                {formatCurrency(product.originalPrice)}
-              </span>
-            ) : null}
-          </div>
-          {installments ? (
-            <span className="text-[12px] text-slate-500">
-              ou {installments.count}x de {formatCurrency(installments.value)}{" "}
-              sem juros
-            </span>
-          ) : null}
-        </div>
+        <ProductPricing
+          price={product.price}
+          originalPrice={product.originalPrice}
+          compact
+        />
       </CardContent>
     </article>
   );

@@ -21,6 +21,11 @@ import {
 
 export type ProductCategory = "albuns" | "figurinhas";
 
+export type ProductVariant = {
+  label: string;
+  productId: number;
+};
+
 export type Product = {
   id: number;
   image: string;
@@ -32,9 +37,13 @@ export type Product = {
   reviewCount: number;
   badge?: string;
   category: ProductCategory;
+  variants?: ProductVariant[];
 };
 
-export const PRODUCT_CATEGORY_ORDER: ProductCategory[] = ["albuns", "figurinhas"];
+export const PRODUCT_CATEGORY_ORDER: ProductCategory[] = [
+  "albuns",
+  "figurinhas",
+];
 
 export const PRODUCT_CATEGORY_LABELS: Record<ProductCategory, string> = {
   albuns: "Álbuns",
@@ -55,12 +64,23 @@ export const products: Product[] = [
     id: 101,
     image:
       "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    images: [
+      "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+      "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+      "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+      "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    ],
     title: "Álbum Oficial FIFA Copa do Mundo 2026™",
     price: 49.9,
     rating: 4.8,
     reviewCount: 3241,
     badge: "Novo",
     category: "albuns",
+    variants: [
+      { label: "Normal", productId: 101 },
+      { label: "Holográfica", productId: 102 },
+      { label: "Limitada", productId: 103 },
+    ],
   },
   {
     id: 102,
@@ -72,6 +92,11 @@ export const products: Product[] = [
     rating: 4.9,
     reviewCount: 1872,
     category: "albuns",
+    variants: [
+      { label: "Normal", productId: 101 },
+      { label: "Holográfica", productId: 102 },
+      { label: "Limitada", productId: 103 },
+    ],
   },
   {
     id: 103,
@@ -84,6 +109,11 @@ export const products: Product[] = [
     reviewCount: 654,
     badge: "Hot",
     category: "albuns",
+    variants: [
+      { label: "Normal", productId: 101 },
+      { label: "Holográfica", productId: 102 },
+      { label: "Limitada", productId: 103 },
+    ],
   },
   {
     id: 104,
@@ -173,12 +203,20 @@ export const infoSlides: InfoSlide[] = [
 ];
 
 export const iconTiles: IconTile[] = [
-  { icon: ShoppingCart, label: "Carrinho", hoverColorClass: "hover:bg-blue-700" },
+  {
+    icon: ShoppingCart,
+    label: "Carrinho",
+    hoverColorClass: "hover:bg-blue-700",
+  },
   { icon: Eye, label: "Ver", hoverColorClass: "hover:bg-green-700" },
   { icon: EyeOff, label: "Ocultar", hoverColorClass: "hover:bg-red-700" },
   { icon: LogIn, label: "Entrar", hoverColorClass: "hover:bg-blue-700" },
   { icon: LogOut, label: "Sair", hoverColorClass: "hover:bg-red-700" },
-  { icon: Share2, label: "Compartilhar", hoverColorClass: "hover:bg-green-700" },
+  {
+    icon: Share2,
+    label: "Compartilhar",
+    hoverColorClass: "hover:bg-green-700",
+  },
   { icon: Menu, label: "Menu", hoverColorClass: "hover:bg-blue-700" },
   { icon: ArrowLeft, label: "Voltar", hoverColorClass: "hover:bg-slate-900" },
   { icon: ArrowRight, label: "Avançar", hoverColorClass: "hover:bg-slate-900" },
