@@ -18,13 +18,13 @@ export function SpotlightCategories() {
               className="group flex flex-col items-center gap-2"
             >
               <div className="relative h-100 w-75">
-                <div className="absolute inset-0 rounded-2xl bg-slate-900 transition-transform duration-300 group-hover:-rotate-5 group-hover:shadow-md" />
+                <div className="absolute inset-0 rounded-2xl bg-slate-900 transition-transform duration-300 group-hover:-rotate-6 group-hover:shadow-md" />
 
-                <div className="relative h-full w-full overflow-hidden rounded-2xl transition-transform duration-300 group-hover:rotate-2 group-hover:shadow-lg">
+                <div className="relative h-full w-full overflow-hidden rounded-2xl transition-transform duration-300 group-hover:rotate-4 group-hover:shadow-lg">
                   <img
                     src={cat.image}
                     alt={`Categoria ${cat.label}`}
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    className="h-full w-full object-cover transition-transform duration-300"
                   />
                 </div>
               </div>
