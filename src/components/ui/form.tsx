@@ -96,9 +96,14 @@ function FormHeader({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function FormTitle({ className, ...props }: React.ComponentProps<"h3">) {
+function FormTitle({
+  className,
+  asChild = false,
+  ...props
+}: React.ComponentProps<"h3"> & { asChild?: boolean }) {
+  const Comp = asChild ? Slot.Root : "h3";
   return (
-    <h3
+    <Comp
       data-slot="form-title"
       className={cn(
         "font-['Poppins',sans-serif] text-[18px] leading-7 font-semibold text-slate-950",
@@ -114,7 +119,7 @@ function FormLead({ className, ...props }: React.ComponentProps<"p">) {
     <p
       data-slot="form-lead"
       className={cn(
-        "max-w-[48ch] font-['Poppins',sans-serif] text-[14px] leading-6 text-slate-500",
+        "max-w-[48ch] font-['Poppins',sans-serif] text-[14px] leading-6 text-slate-500 -mt-2",
         className,
       )}
       {...props}
