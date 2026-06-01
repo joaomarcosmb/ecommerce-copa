@@ -86,12 +86,10 @@ export function ProductPage({ product: productProp }: ProductPageProps) {
       )
     : 0;
 
-  const variantOptions = (product.variants ?? []).map(
-    (v: ProductVariant) => ({
-      ...v,
-      product: products.find((p) => p.id === v.productId),
-    }),
-  );
+  const variantOptions = (product.variants ?? []).map((v: ProductVariant) => ({
+    ...v,
+    product: products.find((p) => p.id === v.productId),
+  }));
 
   const relatedProducts = products.filter(
     (p) =>
@@ -170,9 +168,8 @@ export function ProductPage({ product: productProp }: ProductPageProps) {
 
   return (
     <AppShell>
+      <BreadcrumbNav items={breadcrumbItems} className="mx-6 mt-6" />
       <main>
-        <BreadcrumbNav items={breadcrumbItems} className="px-6 pt-6" />
-
         <div className="grid grid-cols-4 gap-6 py-6 pr-6">
           <div className="col-span-3">
             <ProductImageGallery
