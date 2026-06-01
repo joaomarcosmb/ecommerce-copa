@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 import {
   FormHeader,
   FormLead,
-  FormSurface,
   FormTitle,
 } from "@/components/ui/form";
 
@@ -34,7 +33,7 @@ export function AuthLayout({
             <div className="flex-1 bg-green-500" />
             <div className="flex-1 bg-red-700" />
           </div>
-          <FormSurface className="rounded-none border-0 shadow-none">
+          <div className="w-full bg-white px-8 py-8 sm:px-9">
             <FormHeader className="flex flex-col items-center">
               <FormTitle asChild>
                 <h2>{title}</h2>
@@ -42,7 +41,7 @@ export function AuthLayout({
               <FormLead className="text-center">{lead}</FormLead>
             </FormHeader>
             {children}
-          </FormSurface>
+          </div>
         </div>
         <p className="mt-6 text-center font-['Poppins',sans-serif] text-[14px] leading-5 text-slate-600">
           {footer}

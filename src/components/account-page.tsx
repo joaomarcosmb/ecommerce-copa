@@ -1,23 +1,29 @@
-import { Pencil, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { LogOut, Pencil, Trash2 } from "lucide-react";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { LabelLarge, P } from "@/components/typography";
+import { useClientProfile } from "@/hooks/use-client-profile";
+import { useCurrentUser } from "@/hooks/use-current-user";
+import { useAuth } from "@/hooks/use-auth";
+import { apiDelete } from "@/lib/api";
+import { formatCpf, formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 import { AppShell } from "./ecommerce-showcase/app-shell";
 import { BreadcrumbNav } from "./ecommerce-showcase/breadcrumb-nav";
 
-// TODO: replace with real account data from API (e.g. useAccount hook)
-const PERSONAL_DATA = [
-  { label: "E-mail", value: "pele@selecaobr.com" },
-  { label: "Nome", value: "Edson" },
-  { label: "Sobrenome", value: "Arantes do Nascimento" },
-  { label: "Data de nascimento", value: "23/10/1940" },
-  { label: "CPF", value: "10********70" },
-];
-
-// TODO: replace with real saved addresses from API
+// Addresses are not yet covered by the API — kept as mock data.
 const ADDRESSES = [
   {
     id: "1",
@@ -80,6 +86,15 @@ function DataRow({ label, value }: { label: string; value: string }) {
   );
 }
 
+function DataRowSkeleton() {
+  return (
+    <div className="grid grid-cols-[160px_1fr] items-baseline gap-2">
+      <div className="h-4 w-24 animate-pulse rounded bg-slate-200" />
+      <div className="h-4 w-40 animate-pulse rounded bg-slate-200" />
+    </div>
+  );
+}
+
 type Address = {
   id: string;
   name: string;
@@ -94,6 +109,7 @@ type Address = {
     complemento?: { label: string; value: string };
   };
 };
+
 function AddressField({ name, isDefault, fields }: Address) {
   return (
     <div className="w-full grid grid-cols-[80px_minmax(0,1fr)_130px] grid-flow-col items-center gap-4">
@@ -109,6 +125,7 @@ function AddressField({ name, isDefault, fields }: Address) {
           size="icon-sm"
           className="cursor-pointer"
           aria-label={`Editar endereço ${name}`}
+          disabled
         >
           <Pencil aria-hidden="true" className="size-4.5" />
         </Button>
@@ -117,6 +134,7 @@ function AddressField({ name, isDefault, fields }: Address) {
           size="icon-sm"
           className="cursor-pointer"
           aria-label={`Remover endereço ${name}`}
+          disabled
         >
           <Trash2 aria-hidden="true" className="size-4.5" />
         </Button>
@@ -126,6 +144,41 @@ function AddressField({ name, isDefault, fields }: Address) {
 }
 
 export function AccountPage() {
+  const { user, isLoading: authLoading } = useCurrentUser();
+  const { profile, isLoading: profileLoading } = useClientProfile();
+  const { logout } = useAuth();
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  // Auth guard — redirect while still loading or once confirmed unauthenticated.
+  if (!authLoading && user === null) {
+    window.location.href = "/signin";
+    return null;
+  }
+
+  async function handleDeleteAccount() {
+    setIsDeleting(true);
+    setDeleteError(null);
+    try {
+      await apiDelete("/clients/me");
+      window.location.href = "/";
+    } catch {
+      setDeleteError("Não foi possível excluir a conta. Tente novamente.");
+      setIsDeleting(false);
+      setIsDeleteDialogOpen(false);
+    }
+  }
+
+  const personalDataRows = profile
+    ? [
+        { label: "E-mail", value: profile.email },
+        { label: "Nome", value: profile.name },
+        { label: "Data de nascimento", value: formatDate(profile.dateOfBirth) },
+        { label: "CPF", value: formatCpf(profile.cpf) },
+      ]
+    : null;
+
   return (
     <AppShell>
       <BreadcrumbNav items={breadcrumbItems} className="mx-6 mt-6" />
@@ -141,12 +194,22 @@ export function AccountPage() {
           >
             <SectionTitle>Dados pessoais</SectionTitle>
             <div className="mt-6 space-y-3">
-              {PERSONAL_DATA.map((row) => (
-                <DataRow key={row.label} label={row.label} value={row.value} />
-              ))}
+              {profileLoading || !personalDataRows
+                ? Array.from({ length: 4 }).map((_, i) => (
+                    <DataRowSkeleton key={i} />
+                  ))
+                : personalDataRows.map((row) => (
+                    <DataRow
+                      key={row.label}
+                      label={row.label}
+                      value={row.value}
+                    />
+                  ))}
             </div>
             <div className="mt-6 flex justify-center">
-              <Button variant="outline">Editar</Button>
+              <Button variant="outline" disabled title="Em breve">
+                Editar
+              </Button>
             </div>
           </Card>
 
@@ -170,24 +233,100 @@ export function AccountPage() {
               ))}
             </div>
             <div className="mt-6 flex justify-center">
-              <Button variant="outline">Adicionar endereço</Button>
+              <Button variant="outline" disabled>Adicionar endereço</Button>
             </div>
           </Card>
         </div>
 
+        {/* Sair */}
+        <div className="mt-8 flex flex-col gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <SectionTitle>Sair da conta</SectionTitle>
+            <P className="mt-1 text-slate-600">
+              Encerra a sessão neste dispositivo.
+            </P>
+          </div>
+          <Button
+            variant="outline"
+            className="shrink-0"
+            onClick={() => logout()}
+          >
+            <LogOut aria-hidden="true" className="size-4" />
+            Sair
+          </Button>
+        </div>
+
+        {/* Excluir conta */}
         <div className="mt-8 flex flex-col gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <SectionTitle>Excluir conta</SectionTitle>
             <P className="mt-1 text-slate-600">
               Esta ação é permanente e remove todos os seus dados e coleções.
             </P>
+            {deleteError && (
+              <Alert variant="error" className="mt-3">
+                <AlertDescription>{deleteError}</AlertDescription>
+              </Alert>
+            )}
           </div>
-          <Button variant="destructive" className="shrink-0">
+          <Button
+            variant="destructive"
+            className="shrink-0 py-2"
+            onClick={() => setIsDeleteDialogOpen(true)}
+          >
             <Trash2 aria-hidden="true" className="size-4" />
             Excluir conta
           </Button>
         </div>
       </main>
+
+      <Dialog
+        open={isDeleteDialogOpen}
+        onOpenChange={(open) => {
+          if (!isDeleting) {
+            setIsDeleteDialogOpen(open);
+          }
+        }}
+      >
+        <DialogContent
+          showCloseButton={false}
+          className="gap-0 overflow-hidden rounded-[28px] border-none p-0 shadow-2xl sm:max-w-md"
+        >
+          <DialogHeader className="space-y-0 px-7 pb-5 pt-7">
+            <div className="grid grid-cols-[auto_1fr] items-center gap-4">
+              <span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full text-white bg-red-700 shadow-md">
+                <Trash2 aria-hidden="true" className="size-5" />
+              </span>
+              <DialogTitle className="font-big-shoulders text-xl font-bold text-slate-900">
+                Deseja mesmo excluir sua conta?
+              </DialogTitle>
+            </div>
+          </DialogHeader>
+          <div className="w-full h-px bg-slate-200"></div>
+          <DialogDescription className="mt-1 mx-6 my-4 text-slate-600">
+            Esta ação é permanente e remove todos os seus dados e coleções. Tem
+            certeza de que deseja continuar?
+          </DialogDescription>
+          <div className="w-full h-px bg-slate-200"></div>
+          <DialogFooter className="flex flex-row justify-between! gap-3 border-t-0 bg-transparent px-5 pb-7 mx-0">
+            <Button
+              variant="ghost"
+              onClick={() => setIsDeleteDialogOpen(false)}
+              disabled={isDeleting}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteAccount}
+              disabled={isDeleting}
+            >
+              <Trash2 aria-hidden="true" className="size-4" />
+              {isDeleting ? "Excluindo..." : "Excluir conta"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }

@@ -1,13 +1,12 @@
 import { useState } from "react";
 
 import type { SignInValues, SignUpValues } from "@/components/auth/schemas";
+import { apiPost } from "@/lib/api";
 
 type AuthState = {
   isLoading: boolean;
   error: Error | null;
 };
-
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export function useAuth() {
   const [state, setState] = useState<AuthState>({
@@ -29,20 +28,34 @@ export function useAuth() {
   }
 
   async function login(values: SignInValues) {
-    // TODO: replace with fetch("/api/auth/login", { method: "POST", body: JSON.stringify(values) })
     await run(async () => {
-      await delay(600);
-      void values;
+      await apiPost("/auth/login", {
+        email: values.email,
+        password: values.password,
+      });
+      window.location.href = "/";
     });
   }
 
   async function signup(values: SignUpValues) {
-    // TODO: replace with fetch("/api/auth/signup", { method: "POST", body: JSON.stringify(values) })
     await run(async () => {
-      await delay(600);
-      void values;
+      await apiPost("/auth/register/client", {
+        name: `${values.name} ${values.lastName}`,
+        email: values.email,
+        password: values.password,
+        cpf: values.cpf.replace(/\D/g, ""),
+        dateOfBirth: values.birthDate,
+      });
+      window.location.href = "/signin";
     });
   }
 
-  return { login, signup, isLoading: state.isLoading, error: state.error };
+  async function logout() {
+    await run(async () => {
+      await apiPost("/auth/logout");
+      window.location.href = "/";
+    });
+  }
+
+  return { login, signup, logout, isLoading: state.isLoading, error: state.error };
 }
