@@ -24,8 +24,8 @@ export function ProductPricing({
         <span
           className={
             compact
-              ? "text-[18px] font-bold text-slate-900"
-              : "text-3xl font-bold text-slate-900"
+              ? `text-[18px] font-bold ${originalPrice ? "text-green-600" : "text-slate-900"}`
+              : `text-3xl font-bold ${originalPrice ? "text-green-600" : "text-slate-900"}`
           }
         >
           {formatCurrency(price)}
@@ -34,8 +34,8 @@ export function ProductPricing({
           <span
             className={
               compact
-                ? "text-[13px] text-slate-400 line-through"
-                : "text-sm text-slate-400 line-through"
+                ? "text-[13px] text-red-500 line-through"
+                : "text-sm text-red-500 line-through"
             }
           >
             {formatCurrency(originalPrice)}
