@@ -90,7 +90,7 @@ function AccountMenu() {
 
 export function Header() {
 	return (
-		<header className="sticky top-0 z-40 bg-slate-900 shadow-xl">
+		<header className="sticky top-0 z-40 bg-slate-900 shadow-md">
 			<div className="flex h-1">
 				<div className="flex-1 bg-blue-700" />
 				<div className="flex-1 bg-green-500" />
