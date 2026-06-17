@@ -4,11 +4,11 @@ import { ProductsSection } from "./ecommerce-showcase/products";
 import { SpotlightCategories } from "./ecommerce-showcase/spotlight-categories";
 
 export function Home() {
-  return (
-    <AppShell>
-      <HeroSection />
-      <SpotlightCategories />
-      <ProductsSection />
-    </AppShell>
-  );
+	return (
+		<AppShell>
+			<HeroSection />
+			<SpotlightCategories />
+			<ProductsSection />
+		</AppShell>
+	);
 }

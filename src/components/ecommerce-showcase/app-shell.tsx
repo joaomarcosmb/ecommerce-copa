@@ -5,16 +5,16 @@ import { Header } from "./header";
 import { InfoCarousel } from "./info-carousel";
 
 interface AppShellProps {
-  children: ReactNode;
+	children: ReactNode;
 }
 
 export function AppShell({ children }: AppShellProps) {
-  return (
-    <div className="min-h-screen">
-      <InfoCarousel />
-      <Header />
-      {children}
-      <Footer />
-    </div>
-  );
+	return (
+		<div className="min-h-screen">
+			<InfoCarousel />
+			<Header />
+			{children}
+			<Footer />
+		</div>
+	);
 }
