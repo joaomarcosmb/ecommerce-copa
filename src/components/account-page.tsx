@@ -181,7 +181,6 @@ export function AccountPage() {
 
 	return (
 		<AppShell>
-			<BreadcrumbNav items={breadcrumbItems} className="mx-6 mt-6" />
 			<main className="mx-auto max-w-370 px-4 py-8 sm:px-6 lg:px-8 pb-0">
 				<h1 className="font-big-shoulders text-4xl font-bold text-slate-900">
 					Minha conta

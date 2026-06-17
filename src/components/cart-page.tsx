@@ -119,8 +119,8 @@ export function CartPage() {
 
 	return (
 		<AppShell>
-			<main className="px-6 py-6">
-				<h1 className="font-big-shoulders text-3xl font-bold leading-tight text-slate-900">
+			<main className="mx-auto max-w-370 px-4 py-8 sm:px-6 lg:px-8 pb-0">
+				<h1 className="font-big-shoulders text-4xl font-bold text-slate-900">
 					Meu carrinho
 				</h1>
 
