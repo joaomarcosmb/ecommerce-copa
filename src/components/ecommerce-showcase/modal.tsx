@@ -53,7 +53,7 @@ export function ProductDetailsModal({
 		>
 			<DialogContent
 				showCloseButton={false}
-				className="w-[min(94vw,760px)] max-h-[90vh] gap-0 overflow-hidden rounded-[32px] border-none bg-white p-0 shadow-2xl sm:max-w-190"
+				className="w-[min(94vw,760px)] max-h-[90vh] gap-0 overflow-hidden rounded-[32px] border-none bg-white p-0 shadow-2xl lg:max-w-190"
 			>
 				<DialogHeader className="space-y-0 px-7 pb-5 pt-7 sm:px-9">
 					<div className="grid grid-cols-[auto_1fr_auto] items-start gap-4">
@@ -116,7 +116,6 @@ export function ProductDetailsModal({
 						Cancelar
 					</Button>
 					<Button onClick={handleClose} disabled={!selectedOption}>
-						<ShoppingCart aria-hidden="true" className="mr-2.5 size-6" />
 						Adicionar ao Carrinho
 					</Button>
 				</DialogFooter>

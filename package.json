@@ -11,7 +11,8 @@
 		"preview": "astro preview",
 		"astro": "astro",
 		"format": "biome format --write",
-		"lint": "biome lint"
+		"lint": "biome lint",
+		"orval": "orval --config ./orval.config.ts"
 	},
 	"dependencies": {
 		"@astrojs/react": "^5.0.0",
@@ -37,6 +38,7 @@
 		"zod": "^4.3.6"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.5.0"
+		"@biomejs/biome": "2.5.0",
+		"orval": "^8.18.0"
 	}
 }

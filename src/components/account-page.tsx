@@ -125,7 +125,6 @@ function AddressField({ name, isDefault, fields }: Address) {
 					size="icon-sm"
 					className="cursor-pointer"
 					aria-label={`Editar endereço ${name}`}
-					disabled
 				>
 					<Pencil aria-hidden="true" className="size-4.5" />
 				</Button>
@@ -134,9 +133,11 @@ function AddressField({ name, isDefault, fields }: Address) {
 					size="icon-sm"
 					className="cursor-pointer"
 					aria-label={`Remover endereço ${name}`}
-					disabled
 				>
-					<Trash2 aria-hidden="true" className="size-4.5" />
+					<Trash2
+						aria-hidden="true"
+						className="size-4.5 text-red-700 hover:bg-red-50"
+					/>
 				</Button>
 			</div>
 		</div>
@@ -322,7 +323,6 @@ export function AccountPage() {
 							onClick={handleDeleteAccount}
 							disabled={isDeleting}
 						>
-							<Trash2 aria-hidden="true" className="size-4" />
 							{isDeleting ? "Excluindo..." : "Excluir conta"}
 						</Button>
 					</DialogFooter>

@@ -1,4 +1,4 @@
-import { Search, ShoppingCart, User } from "lucide-react";
+import { Grid2X2Plus, Search, ShoppingCart, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -140,6 +140,17 @@ export function Header() {
 						className="text-white hover:bg-white/10"
 					>
 						<ShoppingCart aria-hidden="true" className="size-5" />
+					</Button>
+					{/* TODO: For admin only */}
+					<Button
+						asChild
+						variant="ghost"
+						size="icon"
+						className="text-white hover:bg-white/10"
+					>
+						<a href="/admin" aria-label="Cadastrar produtos ou categorias">
+							<Grid2X2Plus aria-hidden="true" className="size-5" />
+						</a>
 					</Button>
 					<AccountMenu />
 				</div>
