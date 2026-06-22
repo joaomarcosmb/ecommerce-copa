@@ -33,7 +33,7 @@ import type {
 	ApiResponseUserPhotoResponse,
 	CartItemRequest,
 	CreateAddressRequest,
-	CreateCategoryRequest,
+	CreateCategoryFormRequest,
 	CreateOrderRequest,
 	CreateProductRequest,
 	CreateReviewRequest,
@@ -50,7 +50,7 @@ import type {
 	UpdateAddressRequest,
 	UpdateAdminMeRequest,
 	UpdateCartItemRequest,
-	UpdateCategoryRequest,
+	UpdateCategoryFormRequest,
 	UpdateClientMeRequest,
 	UpdateMyPhotoBody,
 	UpdateOrderStatusRequest,
@@ -654,18 +654,28 @@ export const getCreate5Url = () => {
 };
 
 /**
- * Cria categoria com slug gerado automaticamente a partir do título.
+ * Cria categoria via multipart/form-data com slug gerado automaticamente a partir do título.
  * @summary Criar categoria
  */
 export const create5 = async (
-	createCategoryRequest: CreateCategoryRequest,
+	createCategoryFormRequest?: CreateCategoryFormRequest,
 	options?: RequestInit,
 ): Promise<create5Response> => {
+	const formData = new FormData();
+	if (createCategoryFormRequest?.title !== undefined) {
+		formData.append(`title`, createCategoryFormRequest.title);
+	}
+	if (createCategoryFormRequest?.image !== undefined) {
+		formData.append(`image`, createCategoryFormRequest.image);
+	}
+	if (createCategoryFormRequest?.featured !== undefined) {
+		formData.append(`featured`, createCategoryFormRequest.featured.toString());
+	}
+
 	const res = await fetch(getCreate5Url(), {
 		...options,
 		method: "POST",
-		headers: { "Content-Type": "application/json", ...options?.headers },
-		body: JSON.stringify(createCategoryRequest),
+		body: formData,
 	});
 
 	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
@@ -1617,19 +1627,35 @@ export const getUpdate4Url = (id: string) => {
 };
 
 /**
- * Atualiza o título e recalcula um slug único.
+ * Atualiza categoria via multipart/form-data. Use removeImage=true para remover a imagem atual.
  * @summary Atualizar categoria
  */
 export const update4 = async (
 	id: string,
-	updateCategoryRequest: UpdateCategoryRequest,
+	updateCategoryFormRequest?: UpdateCategoryFormRequest,
 	options?: RequestInit,
 ): Promise<update4Response> => {
+	const formData = new FormData();
+	if (updateCategoryFormRequest?.title !== undefined) {
+		formData.append(`title`, updateCategoryFormRequest.title);
+	}
+	if (updateCategoryFormRequest?.image !== undefined) {
+		formData.append(`image`, updateCategoryFormRequest.image);
+	}
+	if (updateCategoryFormRequest?.removeImage !== undefined) {
+		formData.append(
+			`removeImage`,
+			updateCategoryFormRequest.removeImage.toString(),
+		);
+	}
+	if (updateCategoryFormRequest?.featured !== undefined) {
+		formData.append(`featured`, updateCategoryFormRequest.featured.toString());
+	}
+
 	const res = await fetch(getUpdate4Url(id), {
 		...options,
 		method: "PATCH",
-		headers: { "Content-Type": "application/json", ...options?.headers },
-		body: JSON.stringify(updateCategoryRequest),
+		body: formData,
 	});
 
 	const body = [204, 205, 304].includes(res.status) ? null : await res.text();

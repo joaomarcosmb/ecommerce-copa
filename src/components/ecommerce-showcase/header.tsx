@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/use-auth";
 import { useCurrentUser, type AuthUser } from "@/hooks/use-current-user";
+import { useCart } from "@/contexts/cart-context";
 
 import { categories } from "./data";
 
@@ -75,6 +76,7 @@ function AccountMenu({ user }: AccountMenuProps) {
 export function Header() {
 	const { user, isLoading } = useCurrentUser();
 	const isAdmin = user?.role === "ADMIN";
+	const { itemCount } = useCart();
 
 	return (
 		<header className="sticky top-0 z-40 bg-slate-900 shadow-md">
@@ -121,12 +123,20 @@ export function Header() {
 								<Search aria-hidden="true" className="size-5" />
 							</Button>
 							<Button
+								asChild
 								variant="ghost"
 								size="icon"
-								aria-label="Carrinho de compras"
-								className="text-white hover:bg-white/10"
+								aria-label={`Carrinho de compras${itemCount > 0 ? ` (${itemCount} itens)` : ""}`}
+								className="relative text-white hover:bg-white/10"
 							>
-								<ShoppingCart aria-hidden="true" className="size-5" />
+								<a href="/cart">
+									<ShoppingCart aria-hidden="true" className="size-5" />
+									{itemCount > 0 && (
+										<span className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
+											{itemCount > 99 ? "99+" : itemCount}
+										</span>
+									)}
+								</a>
 							</Button>
 						</>
 					)}

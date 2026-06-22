@@ -17,7 +17,8 @@ import type {
 	CategoryResponse,
 	CategoryListResponse,
 } from "@/api/generated/model";
-import { ApiError, apiDelete, apiGet, apiPatch, apiPost } from "@/lib/api";
+import { ApiError, apiDelete, apiGet, apiPost } from "@/lib/api";
+import { resolveMediaUrl } from "@/lib/format";
 
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -56,7 +57,11 @@ async function createCategory(
 		const json = await res.json();
 		if (!res.ok) {
 			const e = json?.error ?? {};
-			throw new ApiError(e.code ?? "ERROR", e.message ?? "Erro ao criar categoria.", e.details);
+			throw new ApiError(
+				e.code ?? "ERROR",
+				e.message ?? "Erro ao criar categoria.",
+				e.details,
+			);
 		}
 		return json.data as CategoryResponse;
 	}
@@ -71,27 +76,25 @@ async function updateCategory(
 	values: CategoryFormValues,
 	image?: File,
 ): Promise<CategoryResponse> {
-	if (image) {
-		const fd = new FormData();
-		fd.append("title", values.title);
-		fd.append("featured", String(values.featured ?? false));
-		fd.append("image", image);
-		const res = await fetch(`/api/admin/categories/${id}`, {
-			method: "PATCH",
-			credentials: "include",
-			body: fd,
-		});
-		const json = await res.json();
-		if (!res.ok) {
-			const e = json?.error ?? {};
-			throw new ApiError(e.code ?? "ERROR", e.message ?? "Erro ao atualizar categoria.", e.details);
-		}
-		return json.data as CategoryResponse;
-	}
-	return apiPatch<CategoryResponse>(`/admin/categories/${id}`, {
-		title: values.title,
-		featured: values.featured || undefined,
+	const fd = new FormData();
+	fd.append("title", values.title);
+	fd.append("featured", String(values.featured ?? false));
+	if (image) fd.append("image", image);
+	const res = await fetch(`/api/admin/categories/${id}`, {
+		method: "PATCH",
+		credentials: "include",
+		body: fd,
 	});
+	const json = await res.json();
+	if (!res.ok) {
+		const e = json?.error ?? {};
+		throw new ApiError(
+			e.code ?? "ERROR",
+			e.message ?? "Erro ao atualizar categoria.",
+			e.details,
+		);
+	}
+	return json.data as CategoryResponse;
 }
 
 export function AdminCategoriesPage() {
@@ -231,7 +234,9 @@ export function AdminCategoriesPage() {
 							filtered.map((category) => (
 								<AdminListRow
 									key={category.id}
-									thumbnail={category.image ?? undefined}
+									thumbnail={
+										category.image ? resolveMediaUrl(category.image) : undefined
+									}
 									title={category.title ?? "—"}
 									subtitle={
 										<span className="flex items-center gap-2">

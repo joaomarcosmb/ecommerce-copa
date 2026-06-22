@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 
-import { products, type Product } from "@/components/ecommerce-showcase/data";
+import { apiGet } from "@/lib/api";
+import type {
+	CatalogSkuListResponse,
+	CatalogSkuResponse,
+} from "@/api/generated/model";
 
 type ProductsState = {
-	data: Product[];
+	data: CatalogSkuResponse[];
 	isLoading: boolean;
 	error: Error | null;
 };
@@ -16,9 +20,10 @@ export function useProducts(): ProductsState {
 	});
 
 	useEffect(() => {
-		// TODO: replace with fetch("/api/products").then(r => r.json())
-		Promise.resolve(products)
-			.then((data) => setState({ data, isLoading: false, error: null }))
+		apiGet<CatalogSkuListResponse>("/catalog/skus")
+			.then((res) =>
+				setState({ data: res.items ?? [], isLoading: false, error: null }),
+			)
 			.catch((error) => setState({ data: [], isLoading: false, error }));
 	}, []);
 

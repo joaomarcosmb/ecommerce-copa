@@ -3,38 +3,15 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/format";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { useCart } from "@/contexts/cart-context";
 import { cn } from "@/lib/utils";
 
 import { AppShell } from "./ecommerce-showcase/app-shell";
-import { BreadcrumbNav } from "./ecommerce-showcase/breadcrumb-nav";
 import { CartAddressForm } from "./ecommerce-showcase/cart-address-form";
 import { CartIdentificationForm } from "./ecommerce-showcase/cart-identification-form";
-import { CartItem, type CartItemData } from "./ecommerce-showcase/cart-item";
+import { CartItem } from "./ecommerce-showcase/cart-item";
 
 const SHIPPING = 20;
-
-const INITIAL_ITEMS: CartItemData[] = [
-	{
-		id: 1,
-		title: "Álbum Oficial FIFA Copa do Mundo 2026™",
-		variant: "Normal",
-		price: 49.9,
-		quantity: 1,
-		image:
-			"https://images.unsplash.com/photo-1579952363873-27f3bade9f55?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
-	},
-	{
-		id: 2,
-		title: "Álbum Capa Dura Holográfica Copa 2026",
-		variant: "Holográfica",
-		price: 89.9,
-		quantity: 1,
-		image:
-			"https://images.unsplash.com/photo-1529900748604-07564a03e7a6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
-	},
-];
-
-const breadcrumbItems = [{ label: "Início", href: "/" }, { label: "Carrinho" }];
 
 interface StepIndicatorProps {
 	steps: string[];
@@ -75,35 +52,30 @@ function StepIndicator({
 const VISITOR_STEPS = ["Revisão dos itens", "Identificação", "Endereço"];
 const AUTH_STEPS = ["Revisão dos itens", "Endereço"];
 
-export function CartPage() {
+function getInitialStep(): number {
+	if (typeof window === "undefined") return 0;
+	const s = new URLSearchParams(window.location.search).get("step");
+	const n = Number(s);
+	return Number.isFinite(n) && n > 0 ? n : 0;
+}
+
+function CartPageContent() {
 	const { user, isLoading: authLoading } = useCurrentUser();
-	const [items, setItems] = useState<CartItemData[]>(INITIAL_ITEMS);
-	const [activeStep, setActiveStep] = useState(0);
+	const { cart, isLoading: cartLoading, updateItem, removeItem } = useCart();
+	const [activeStep, setActiveStep] = useState(getInitialStep);
 
 	const isAuthenticated = !authLoading && user !== null;
 	const steps = isAuthenticated ? AUTH_STEPS : VISITOR_STEPS;
 	const lastStep = steps.length - 1;
 
-	// Map step index to content type
-	// visitor:       0=revisão  1=identificação  2=endereço
-	// authenticated: 0=revisão  1=endereço
 	const isReviewStep = activeStep === 0;
 	const isIdentificationStep = !isAuthenticated && activeStep === 1;
 	const isAddressStep =
 		activeStep === lastStep && !isReviewStep && !isIdentificationStep;
 
-	const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+	const items = cart?.items ?? [];
+	const subtotal = cart?.totalValue ?? 0;
 	const total = subtotal + SHIPPING;
-
-	function updateQuantity(id: number, quantity: number) {
-		setItems((prev) =>
-			prev.map((item) => (item.id === id ? { ...item, quantity } : item)),
-		);
-	}
-
-	function removeItem(id: number) {
-		setItems((prev) => prev.filter((item) => item.id !== id));
-	}
 
 	const summaryButton = isReviewStep ? (
 		<Button
@@ -118,105 +90,120 @@ export function CartPage() {
 	) : null;
 
 	return (
-		<AppShell>
-			<main className="mx-auto max-w-370 px-4 py-8 sm:px-6 lg:px-8 pb-0">
-				<h1 className="font-big-shoulders text-4xl font-bold text-slate-900">
-					Meu carrinho
-				</h1>
+		<main className="mx-auto max-w-370 px-4 py-8 sm:px-6 lg:px-8 pb-0">
+			<h1 className="font-big-shoulders text-4xl font-bold text-slate-900">
+				Meu carrinho
+			</h1>
 
-				<div className="mt-6 flex justify-center">
-					<StepIndicator
-						steps={steps}
-						activeStep={activeStep}
-						onStepChange={setActiveStep}
-					/>
+			<div className="mt-6 flex justify-center">
+				<StepIndicator
+					steps={steps}
+					activeStep={activeStep}
+					onStepChange={setActiveStep}
+				/>
+			</div>
+
+			<div className="mt-6 grid grid-cols-[1fr_400px] gap-6">
+				{/* Main column */}
+				<div className="rounded-2xl border border-slate-200 bg-white px-8 py-2">
+					{isReviewStep ? (
+						cartLoading ? (
+							<div className="flex flex-col gap-4 py-8">
+								{Array.from({ length: 2 }).map((_, i) => (
+									<div
+										key={i}
+										className="h-28 animate-pulse rounded-xl bg-slate-100"
+									/>
+								))}
+							</div>
+						) : items.length === 0 ? (
+							<div className="flex flex-col items-center justify-center py-16 text-center">
+								<p className="text-slate-500">Seu carrinho está vazio.</p>
+								<a
+									href="/"
+									className="mt-4 text-sm font-medium text-blue-700 hover:underline"
+								>
+									Continuar comprando
+								</a>
+							</div>
+						) : (
+							<ul>
+								{items.map((item, index) => (
+									<li
+										key={item.skuId}
+										className={cn(
+											index < items.length - 1 && "border-b border-slate-100",
+										)}
+									>
+										<CartItem
+											item={item}
+											onUpdateQuantity={updateItem}
+											onRemove={removeItem}
+										/>
+									</li>
+								))}
+							</ul>
+						)
+					) : isIdentificationStep ? (
+						<div className="py-6">
+							<CartIdentificationForm onSuccess={() => setActiveStep(2)} />
+						</div>
+					) : isAddressStep ? (
+						<div className="py-6">
+							<CartAddressForm
+								onSuccess={() => {
+									window.location.href = "/checkout";
+								}}
+							/>
+						</div>
+					) : null}
 				</div>
 
-				<div className="mt-6 grid grid-cols-[1fr_400px] gap-6">
-					{/* Main column */}
-					<div className="rounded-2xl border border-slate-200 bg-white px-8 py-2">
-						{isReviewStep ? (
-							items.length === 0 ? (
-								<div className="flex flex-col items-center justify-center py-16 text-center">
-									<p className="text-slate-500">Seu carrinho está vazio.</p>
-									<a
-										href="/"
-										className="mt-4 text-sm font-medium text-blue-700 hover:underline"
-									>
-										Continuar comprando
-									</a>
-								</div>
-							) : (
-								<ul>
-									{items.map((item, index) => (
-										<li
-											key={item.id}
-											className={cn(
-												index < items.length - 1 && "border-b border-slate-100",
-											)}
-										>
-											<CartItem
-												item={item}
-												onUpdateQuantity={updateQuantity}
-												onRemove={removeItem}
-											/>
-										</li>
-									))}
-								</ul>
-							)
-						) : isIdentificationStep ? (
-							<div className="py-6">
-								<CartIdentificationForm onSuccess={() => setActiveStep(2)} />
-							</div>
-						) : isAddressStep ? (
-							<div className="py-6">
-								<CartAddressForm
-									onSuccess={() => {
-										window.location.href = "/checkout";
-									}}
-								/>
-							</div>
-						) : null}
+				{/* Order summary */}
+				<aside className="flex flex-col gap-5 self-start rounded-2xl border border-slate-200 bg-white px-8 py-6">
+					<h2 className="font-big-shoulders text-xl font-bold text-slate-900">
+						Resumo do pedido
+					</h2>
+
+					<div className="flex flex-col gap-3">
+						<div className="flex items-center justify-between text-sm text-slate-600">
+							<span>Subtotal</span>
+							<span>{formatCurrency(subtotal)}</span>
+						</div>
+						<div className="flex items-center justify-between text-sm text-slate-600">
+							<span>Frete</span>
+							<span>{formatCurrency(SHIPPING)}</span>
+						</div>
 					</div>
 
-					{/* Order summary */}
-					<aside className="flex flex-col gap-5 self-start rounded-2xl border border-slate-200 bg-white px-8 py-6">
-						<h2 className="font-big-shoulders text-xl font-bold text-slate-900">
-							Resumo do pedido
-						</h2>
-
-						<div className="flex flex-col gap-3">
-							<div className="flex items-center justify-between text-sm text-slate-600">
-								<span>Subtotal</span>
-								<span>{formatCurrency(subtotal)}</span>
-							</div>
-							<div className="flex items-center justify-between text-sm text-slate-600">
-								<span>Frete</span>
-								<span>{formatCurrency(SHIPPING)}</span>
-							</div>
+					<div className="border-t border-slate-200 pt-4">
+						<div className="flex items-center justify-between">
+							<span className="font-semibold text-slate-900">Total</span>
+							<span className="text-lg font-bold text-slate-900">
+								{formatCurrency(total)}
+							</span>
 						</div>
+					</div>
 
-						<div className="border-t border-slate-200 pt-4">
-							<div className="flex items-center justify-between">
-								<span className="font-semibold text-slate-900">Total</span>
-								<span className="text-lg font-bold text-slate-900">
-									{formatCurrency(total)}
-								</span>
-							</div>
-						</div>
+					<div className="flex flex-col items-center gap-3">
+						{summaryButton}
+						<a
+							href="/"
+							className="text-sm text-slate-500 transition-colors duration-200 hover:text-slate-800"
+						>
+							Continuar comprando
+						</a>
+					</div>
+				</aside>
+			</div>
+		</main>
+	);
+}
 
-						<div className="flex flex-col items-center gap-3">
-							{summaryButton}
-							<a
-								href="/"
-								className="text-sm text-slate-500 transition-colors duration-200 hover:text-slate-800"
-							>
-								Continuar comprando
-							</a>
-						</div>
-					</aside>
-				</div>
-			</main>
+export function CartPage() {
+	return (
+		<AppShell>
+			<CartPageContent />
 		</AppShell>
 	);
 }

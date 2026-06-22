@@ -12,43 +12,49 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import { apiGet } from "@/lib/api";
+import type {
+	CatalogProductDetailResponse,
+	CatalogSkuOptionResponse,
+} from "@/api/generated/model";
 import { H2, P } from "../typography";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 
 interface ProductDetailsModalProps {
-	selectedProduct: string | null;
+	productId: string | null;
 	onClose: () => void;
-	options?: string[];
 }
 
-const OPTIONS = ["Kit 1", "Kit 2", "Kit 3"];
-
 export function ProductDetailsModal({
-	selectedProduct,
+	productId,
 	onClose,
-	options = OPTIONS,
 }: ProductDetailsModalProps) {
-	const [selectedOption, setSelectedOption] = useState<string>("");
+	const [product, setProduct] = useState<CatalogProductDetailResponse | null>(
+		null,
+	);
+	const [isLoading, setIsLoading] = useState(false);
+	const [selectedSku, setSelectedSku] =
+		useState<CatalogSkuOptionResponse | null>(null);
 
 	useEffect(() => {
-		if (!selectedProduct) {
+		if (!productId) {
+			setProduct(null);
+			setSelectedSku(null);
 			return;
 		}
 
-		setSelectedOption("");
-	}, [selectedProduct]);
-
-	function handleClose() {
-		onClose();
-	}
+		setIsLoading(true);
+		setSelectedSku(null);
+		apiGet<CatalogProductDetailResponse>(`/catalog/products/${productId}`)
+			.then((res) => setProduct(res))
+			.catch(() => setProduct(null))
+			.finally(() => setIsLoading(false));
+	}, [productId]);
 
 	return (
 		<Dialog
-			open={Boolean(selectedProduct)}
+			open={Boolean(productId)}
 			onOpenChange={(open) => {
-				if (!open) {
-					handleClose();
-				}
+				if (!open) onClose();
 			}}
 		>
 			<DialogContent
@@ -62,7 +68,7 @@ export function ProductDetailsModal({
 						</span>
 						<div className="min-w-0 text-left">
 							<DialogTitle>
-								<H2>{selectedProduct ?? "Bola Oficial Copa do Mundo FIFA"}</H2>
+								<H2>{product?.category?.title ?? "Produto"}</H2>
 							</DialogTitle>
 							<P className="text-slate-500">Adicionar à sacola</P>
 						</div>
@@ -70,52 +76,63 @@ export function ProductDetailsModal({
 							variant="ghost"
 							size="icon-sm"
 							aria-label="Fechar modal"
-							onClick={handleClose}
+							onClick={onClose}
 							className="text-slate-900 hover:bg-transparent cursor-pointer"
 						>
 							<X aria-hidden="true" className="size-8" />
 						</Button>
 					</div>
 					<DialogDescription className="sr-only">
-						Modal de exemplo com estrutura genérica.
+						Selecione uma variante para adicionar ao carrinho.
 					</DialogDescription>
 				</DialogHeader>
 
 				<div className="mx-7 h-px bg-slate-200 sm:mx-9" />
 
 				<div className="space-y-7 overflow-y-auto px-7 py-6 sm:px-9 sm:py-7">
-					<P>
-						Personalize seu pedido escolhendo o tamanho ideal. Após adicionar ao
-						carrinho, você ainda poderá ajustar a quantidade.
-					</P>
-					<Alert variant="info">
-						<AlertTitle>Produto disponível em estoque.</AlertTitle>
-						<AlertDescription>
-							Entrega em até <span className="font-bold">3 dias úteis</span>.
-						</AlertDescription>
-					</Alert>
-
-					<div className="space-y-4">
-						<P className="text-slate-500">Selecione uma opção</P>
-						<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
-							{options.map((option) => (
-								<Button
-									key={option}
-									onClick={() => setSelectedOption(option)}
-									variant={selectedOption == option ? "primary" : "outline"}
-								>
-									{option}
-								</Button>
-							))}
+					{isLoading ? (
+						<div className="space-y-3">
+							<div className="h-4 w-48 animate-pulse rounded bg-slate-200" />
+							<div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+								{Array.from({ length: 3 }).map((_, i) => (
+									<div
+										key={i}
+										className="h-10 animate-pulse rounded-lg bg-slate-200"
+									/>
+								))}
+							</div>
 						</div>
-					</div>
+					) : (product?.skus ?? []).length > 0 ? (
+						<div className="space-y-4">
+							<P className="text-slate-500">Selecione uma variante</P>
+							<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+								{product!.skus!.map((sku) => (
+									<Button
+										key={sku.id}
+										onClick={() => setSelectedSku(sku)}
+										variant={selectedSku?.id === sku.id ? "primary" : "outline"}
+										disabled={sku.stock === 0}
+									>
+										{sku.title}
+										{sku.stock === 0 && (
+											<span className="ml-1 text-xs opacity-60">
+												(esgotado)
+											</span>
+										)}
+									</Button>
+								))}
+							</div>
+						</div>
+					) : (
+						<P className="text-slate-500">Nenhuma variante disponível.</P>
+					)}
 				</div>
 
 				<DialogFooter className="flex justify-between! pb-9! px-10!">
-					<Button variant="ghost" onClick={handleClose}>
+					<Button variant="ghost" onClick={onClose}>
 						Cancelar
 					</Button>
-					<Button onClick={handleClose} disabled={!selectedOption}>
+					<Button disabled={!selectedSku || selectedSku.stock === 0}>
 						Adicionar ao Carrinho
 					</Button>
 				</DialogFooter>

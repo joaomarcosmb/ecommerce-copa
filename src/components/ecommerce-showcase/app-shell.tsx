@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { CartProvider } from "@/contexts/cart-context";
+
 import { Footer } from "./footer";
 import { Header } from "./header";
 import { InfoCarousel } from "./info-carousel";
@@ -10,11 +12,13 @@ interface AppShellProps {
 
 export function AppShell({ children }: AppShellProps) {
 	return (
-		<div className="min-h-screen">
-			<InfoCarousel />
-			<Header />
-			{children}
-			<Footer />
-		</div>
+		<CartProvider>
+			<div className="min-h-screen">
+				<InfoCarousel />
+				<Header />
+				{children}
+				<Footer />
+			</div>
+		</CartProvider>
 	);
 }

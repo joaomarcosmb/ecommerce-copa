@@ -15,8 +15,16 @@ export function ProductImageGallery({
 	badge,
 	discount,
 }: ProductImageGalleryProps) {
+	const count = Math.min(images.length, 4);
+	const gridClass =
+		count === 1
+			? "grid-cols-1"
+			: count === 2
+				? "grid-cols-2"
+				: "grid-cols-2 grid-rows-2";
+
 	return (
-		<div className="grid grid-cols-2 grid-rows-2 gap-1">
+		<div className={`grid gap-1 ${gridClass}`}>
 			{images.slice(0, 4).map((img, i) => (
 				<button
 					key={i}

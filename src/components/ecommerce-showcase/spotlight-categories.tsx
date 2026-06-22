@@ -1,7 +1,23 @@
+import { useEffect, useState } from "react";
+
+import { apiGet } from "@/lib/api";
+import type {
+	CategoryListResponse,
+	CategoryResponse,
+} from "@/api/generated/model";
 import { H2 } from "../typography";
-import { featuredCategories } from "./data";
 
 export function SpotlightCategories() {
+	const [categories, setCategories] = useState<CategoryResponse[]>([]);
+
+	useEffect(() => {
+		apiGet<CategoryListResponse>("/catalog/categories")
+			.then((res) => setCategories((res.items ?? []).filter((c) => c.featured)))
+			.catch(() => {});
+	}, []);
+
+	if (categories.length === 0) return null;
+
 	return (
 		<section
 			aria-labelledby="spotlight-heading"
@@ -11,7 +27,7 @@ export function SpotlightCategories() {
 				Nossos destaques
 			</H2>
 			<ul className="flex flex-row items-center justify-center gap-20">
-				{featuredCategories.map((cat) => (
+				{categories.map((cat) => (
 					<li key={cat.slug}>
 						<a
 							href={`/category/${cat.slug}`}
@@ -22,14 +38,14 @@ export function SpotlightCategories() {
 
 								<div className="relative h-full w-full overflow-hidden rounded-2xl transition-transform duration-300 group-hover:rotate-4 group-hover:shadow-lg">
 									<img
-										src={cat.image}
-										alt={`Categoria ${cat.label}`}
+										src={cat.image ?? ""}
+										alt={`Categoria ${cat.title}`}
 										className="h-full w-full object-cover transition-transform duration-300"
 									/>
 								</div>
 							</div>
 
-							<span className="text-lg">{cat.label}</span>
+							<span className="text-lg">{cat.title}</span>
 						</a>
 					</li>
 				))}

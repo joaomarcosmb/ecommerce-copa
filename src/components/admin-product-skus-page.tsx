@@ -28,7 +28,7 @@ import { SkuForm } from "./admin/sku-form";
 import { emptySkuForm, type SkuFormValues } from "./admin/schemas";
 import { AppShell } from "./ecommerce-showcase/app-shell";
 import { BreadcrumbNav } from "./ecommerce-showcase/breadcrumb-nav";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, resolveMediaUrl } from "@/lib/format";
 
 async function createSku(
 	productId: string,
@@ -95,12 +95,6 @@ async function updateSku(
 		);
 	}
 	return json.data as SkuResponse;
-}
-
-function resolveMediaUrl(url: string | undefined): string | undefined {
-	if (!url) return undefined;
-	if (/^https?:\/\//i.test(url)) return url;
-	return `http://localhost:8080${url}`;
 }
 
 function skuToFormValues(
