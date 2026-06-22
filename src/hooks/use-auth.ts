@@ -29,11 +29,11 @@ export function useAuth() {
 
 	async function login(values: SignInValues) {
 		await run(async () => {
-			await apiPost("/auth/login", {
+			const user = await apiPost<{ role?: string }>("/auth/login", {
 				email: values.email,
 				password: values.password,
 			});
-			window.location.href = "/";
+			window.location.href = user?.role === "ADMIN" ? "/admin" : "/";
 		});
 	}
 

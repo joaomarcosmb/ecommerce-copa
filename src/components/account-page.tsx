@@ -1,5 +1,8 @@
-import { useState } from "react";
-import { LogOut, Pencil, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Lock, LogOut, Pencil, Trash2 } from "lucide-react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -12,62 +15,48 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { LabelLarge, P } from "@/components/typography";
 import { useClientProfile } from "@/hooks/use-client-profile";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useAuth } from "@/hooks/use-auth";
-import { apiDelete } from "@/lib/api";
+import { apiDelete, apiGet, apiPatch, apiPost } from "@/lib/api";
 import { formatCpf, formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import type { AddressListResponse } from "@/api/generated/model/addressListResponse";
+import type { AddressResponse } from "@/api/generated/model/addressResponse";
+import type { ClientMeResponse } from "@/api/generated/model/clientMeResponse";
 
+import { AddressForm, type AddressFormValues } from "./account/address-form";
 import { AppShell } from "./ecommerce-showcase/app-shell";
-import { BreadcrumbNav } from "./ecommerce-showcase/breadcrumb-nav";
 
-// Addresses are not yet covered by the API — kept as mock data.
-const ADDRESSES = [
-	{
-		id: "1",
-		name: "Casa",
-		isDefault: true,
-		fields: {
-			endereco: { label: "Endereço", value: "Rua Três Corações" },
-			numero: { label: "Número", value: "10" },
-			bairro: { label: "Bairro", value: "Vila Pelé" },
-			cep: { label: "CEP", value: "37520-000" },
-			cidade: { label: "Cidade", value: "Três Corações" },
-			estado: { label: "Estado", value: "Minas Gerais" },
-			complemento: { label: "Complemento", value: "Rei do Futebol" },
-		},
-	},
-	{
-		id: "2",
-		name: "Estádio",
-		fields: {
-			endereco: { label: "Endereço", value: "Praça Charles Miller" },
-			numero: { label: "Número", value: "1" },
-			bairro: { label: "Bairro", value: "Pacaembu" },
-			cep: { label: "CEP", value: "01234-010" },
-			cidade: { label: "Cidade", value: "São Paulo" },
-			estado: { label: "Estado", value: "São Paulo" },
-			complemento: { label: "Complemento", value: "Portão dos Campeões" },
-		},
-	},
-	{
-		id: "3",
-		name: "Trabalho",
-		fields: {
-			endereco: { label: "Endereço", value: "Av. Maracanã" },
-			numero: { label: "Número", value: "2000" },
-			bairro: { label: "Bairro", value: "Maracanã" },
-			cep: { label: "CEP", value: "20271-130" },
-			cidade: { label: "Cidade", value: "Rio de Janeiro" },
-			estado: { label: "Estado", value: "Rio de Janeiro" },
-			complemento: { label: "Complemento", value: "Setor Leste Superior" },
-		},
-	},
-];
+const changePasswordSchema = z
+	.object({
+		currentPassword: z.string().min(1, "Informe a senha atual."),
+		newPassword: z.string().min(6, "Mínimo 6 caracteres."),
+		confirmPassword: z.string().min(1, "Confirme a nova senha."),
+	})
+	.refine((d) => d.newPassword === d.confirmPassword, {
+		path: ["confirmPassword"],
+		message: "As senhas não coincidem.",
+	});
 
-const breadcrumbItems = [{ label: "Início", href: "/" }, { label: "Conta" }];
+type ChangePasswordValues = z.infer<typeof changePasswordSchema>;
+
+const editProfileSchema = z.object({
+	name: z.string().trim().min(2, "Mínimo 2 caracteres."),
+	email: z.email("E-mail inválido."),
+});
+
+type EditProfileValues = z.infer<typeof editProfileSchema>;
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
 	return (
@@ -95,29 +84,39 @@ function DataRowSkeleton() {
 	);
 }
 
-type Address = {
-	id: string;
-	name: string;
-	isDefault?: boolean;
-	fields: {
-		endereco: { label: string; value: string };
-		numero: { label: string; value: string };
-		bairro: { label: string; value: string };
-		cep: { label: string; value: string };
-		cidade: { label: string; value: string };
-		estado: { label: string; value: string };
-		complemento?: { label: string; value: string };
-	};
-};
+interface AddressFieldProps {
+	address: AddressResponse;
+	onEdit: (address: AddressResponse) => void;
+	onDelete: (address: AddressResponse) => void;
+}
 
-function AddressField({ name, isDefault, fields }: Address) {
+function AddressField({ address, onEdit, onDelete }: AddressFieldProps) {
+	const {
+		name,
+		street,
+		number,
+		neighborhood,
+		city,
+		state,
+		postalCode,
+		isDefault,
+	} = address;
+
+	const formatted = [
+		street,
+		number,
+		neighborhood,
+		city,
+		state,
+		postalCode,
+	].filter(Boolean).length
+		? `${street}, ${number} - ${neighborhood}, ${city} - ${state}. ${postalCode}`
+		: "—";
+
 	return (
 		<div className="w-full grid grid-cols-[80px_minmax(0,1fr)_130px] grid-flow-col items-center gap-4">
 			<LabelLarge className="text-slate-900 text-md">{name}</LabelLarge>
-			<P className="text-slate-600 text-wrap">
-				{fields.endereco.value}, {fields.numero.value} - {fields.bairro.value},{" "}
-				{fields.cidade.value} - {fields.estado.value}. {fields.cep.value}
-			</P>
+			<P className="text-slate-600 text-wrap">{formatted}</P>
 			<div className="flex items-center gap-1.5 ml-auto">
 				{isDefault && <P className="text-slate-600 text-sm">Padrão</P>}
 				<Button
@@ -125,6 +124,7 @@ function AddressField({ name, isDefault, fields }: Address) {
 					size="icon-sm"
 					className="cursor-pointer"
 					aria-label={`Editar endereço ${name}`}
+					onClick={() => onEdit(address)}
 				>
 					<Pencil aria-hidden="true" className="size-4.5" />
 				</Button>
@@ -133,6 +133,7 @@ function AddressField({ name, isDefault, fields }: Address) {
 					size="icon-sm"
 					className="cursor-pointer"
 					aria-label={`Remover endereço ${name}`}
+					onClick={() => onDelete(address)}
 				>
 					<Trash2
 						aria-hidden="true"
@@ -144,15 +145,376 @@ function AddressField({ name, isDefault, fields }: Address) {
 	);
 }
 
+interface EditProfileDialogProps {
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	initialName: string;
+	initialEmail: string;
+	onSuccess: (updated: ClientMeResponse) => void;
+}
+
+function EditProfileDialog({
+	open,
+	onOpenChange,
+	initialName,
+	initialEmail,
+	onSuccess,
+}: EditProfileDialogProps) {
+	const [submitError, setSubmitError] = useState<string | null>(null);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+
+	const form = useForm<EditProfileValues>({
+		resolver: zodResolver(editProfileSchema),
+		defaultValues: {
+			name: initialName,
+			email: initialEmail,
+		},
+	});
+
+	// Reset form when dialog opens with fresh defaults
+	useEffect(() => {
+		if (open) {
+			form.reset({ name: initialName, email: initialEmail });
+			setSubmitError(null);
+		}
+	}, [open, initialName, initialEmail]);
+
+	async function handleSubmit(values: EditProfileValues) {
+		setIsSubmitting(true);
+		setSubmitError(null);
+		try {
+			const updated = await apiPatch<ClientMeResponse>("/clients/me", {
+				name: values.name,
+				email: values.email,
+			});
+			onSuccess(updated);
+			onOpenChange(false);
+		} catch (err) {
+			setSubmitError(
+				err instanceof Error ? err.message : "Erro ao salvar. Tente novamente.",
+			);
+		} finally {
+			setIsSubmitting(false);
+		}
+	}
+
+	return (
+		<Dialog
+			open={open}
+			onOpenChange={(o) => {
+				if (!isSubmitting) onOpenChange(o);
+			}}
+		>
+			<DialogContent
+				showCloseButton={false}
+				className="gap-0 overflow-hidden rounded-[28px] border-none p-0 shadow-2xl sm:max-w-md"
+			>
+				<DialogHeader className="space-y-0 px-7 pb-5 pt-7">
+					<div className="grid grid-cols-[auto_1fr] items-center gap-4">
+						<span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full text-white bg-slate-700 shadow-md">
+							<Pencil aria-hidden="true" className="size-5" />
+						</span>
+						<DialogTitle className="font-big-shoulders text-xl font-bold text-slate-900">
+							Editar dados pessoais
+						</DialogTitle>
+					</div>
+				</DialogHeader>
+				<div className="w-full h-px bg-slate-200" />
+
+				<div className="px-7 py-5">
+					{submitError && (
+						<Alert variant="error" className="mb-4">
+							<AlertDescription>{submitError}</AlertDescription>
+						</Alert>
+					)}
+
+					<Form {...form}>
+						<form
+							onSubmit={form.handleSubmit(handleSubmit)}
+							className="space-y-4"
+						>
+							<FormField
+								control={form.control}
+								name="name"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Nome</FormLabel>
+										<FormControl>
+											<Input placeholder="Seu nome" {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+
+							<FormField
+								control={form.control}
+								name="email"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>E-mail</FormLabel>
+										<FormControl>
+											<Input
+												type="email"
+												placeholder="seu@email.com"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+
+							<div className="w-full h-px bg-slate-200 mt-5!" />
+
+							<div className="flex justify-between mt-0! pt-4">
+								<Button
+									type="button"
+									variant="ghost"
+									onClick={() => onOpenChange(false)}
+									disabled={isSubmitting}
+								>
+									Cancelar
+								</Button>
+								<Button type="submit" disabled={isSubmitting}>
+									{isSubmitting ? "Salvando…" : "Salvar"}
+								</Button>
+							</div>
+						</form>
+					</Form>
+				</div>
+			</DialogContent>
+		</Dialog>
+	);
+}
+
+// ── Change password dialog ─────────────────────────────────────────────────────
+
+interface ChangePasswordDialogProps {
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+}
+
+function ChangePasswordDialog({
+	open,
+	onOpenChange,
+}: ChangePasswordDialogProps) {
+	const [submitError, setSubmitError] = useState<string | null>(null);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [success, setSuccess] = useState(false);
+
+	const form = useForm<ChangePasswordValues>({
+		resolver: zodResolver(changePasswordSchema),
+		defaultValues: {
+			currentPassword: "",
+			newPassword: "",
+			confirmPassword: "",
+		},
+	});
+
+	useEffect(() => {
+		if (open) {
+			form.reset();
+			setSubmitError(null);
+			setSuccess(false);
+		}
+	}, [open]);
+
+	async function handleSubmit(values: ChangePasswordValues) {
+		setIsSubmitting(true);
+		setSubmitError(null);
+		try {
+			// The API uses session auth; currentPassword is a UX safeguard only.
+			await apiPatch<ClientMeResponse>("/clients/me", {
+				password: values.newPassword,
+			});
+			setSuccess(true);
+		} catch (err) {
+			setSubmitError(
+				err instanceof Error
+					? err.message
+					: "Erro ao alterar senha. Tente novamente.",
+			);
+		} finally {
+			setIsSubmitting(false);
+		}
+	}
+
+	return (
+		<Dialog
+			open={open}
+			onOpenChange={(o) => {
+				if (!isSubmitting) onOpenChange(o);
+			}}
+		>
+			<DialogContent
+				showCloseButton={false}
+				className="gap-0 overflow-hidden rounded-[28px] border-none p-0 shadow-2xl sm:max-w-md"
+			>
+				<DialogHeader className="space-y-0 px-7 pb-5 pt-7">
+					<div className="grid grid-cols-[auto_1fr] items-center gap-4">
+						<span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full bg-slate-700 text-white shadow-md">
+							<Lock aria-hidden="true" className="size-5" />
+						</span>
+						<DialogTitle className="font-big-shoulders text-xl font-bold text-slate-900">
+							Alterar senha
+						</DialogTitle>
+					</div>
+				</DialogHeader>
+				<div className="h-px w-full bg-slate-200" />
+
+				<div className="px-7 py-5">
+					{success ? (
+						<div className="space-y-5">
+							<Alert variant="success">
+								<AlertDescription>Senha alterada com sucesso.</AlertDescription>
+							</Alert>
+							<div className="flex justify-end">
+								<Button onClick={() => onOpenChange(false)}>Fechar</Button>
+							</div>
+						</div>
+					) : (
+						<Form {...form}>
+							<form
+								onSubmit={form.handleSubmit(handleSubmit)}
+								className="space-y-4"
+							>
+								{submitError && (
+									<Alert variant="error" className="mb-4">
+										<AlertDescription>{submitError}</AlertDescription>
+									</Alert>
+								)}
+
+								<FormField
+									control={form.control}
+									name="currentPassword"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Senha atual</FormLabel>
+											<FormControl>
+												<Input
+													type="password"
+													placeholder="••••••••"
+													{...field}
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+
+								<FormField
+									control={form.control}
+									name="newPassword"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Nova senha</FormLabel>
+											<FormControl>
+												<Input
+													type="password"
+													placeholder="Mínimo 6 caracteres"
+													{...field}
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+
+								<FormField
+									control={form.control}
+									name="confirmPassword"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Confirmar nova senha</FormLabel>
+											<FormControl>
+												<Input
+													type="password"
+													placeholder="Repita a nova senha"
+													{...field}
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+
+								<div className="mt-5! h-px w-full bg-slate-200" />
+
+								<div className="flex justify-between pt-4">
+									<Button
+										type="button"
+										variant="ghost"
+										onClick={() => onOpenChange(false)}
+										disabled={isSubmitting}
+									>
+										Cancelar
+									</Button>
+									<Button type="submit" disabled={isSubmitting}>
+										{isSubmitting ? "Salvando…" : "Alterar senha"}
+									</Button>
+								</div>
+							</form>
+						</Form>
+					)}
+				</div>
+			</DialogContent>
+		</Dialog>
+	);
+}
+
+// ── Main component ─────────────────────────────────────────────────────────────
+
 export function AccountPage() {
 	const { user, isLoading: authLoading } = useCurrentUser();
-	const { profile, isLoading: profileLoading } = useClientProfile();
+	const { profile: fetchedProfile, isLoading: profileLoading } =
+		useClientProfile();
 	const { logout } = useAuth();
+
+	// Local profile state so it can be updated after edits
+	const [profile, setProfile] = useState<ClientMeResponse | null>(null);
+
+	useEffect(() => {
+		if (fetchedProfile) setProfile(fetchedProfile);
+	}, [fetchedProfile]);
+
 	const [deleteError, setDeleteError] = useState<string | null>(null);
 	const [isDeleting, setIsDeleting] = useState(false);
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-	// Auth guard — redirect while still loading or once confirmed unauthenticated.
+	const [isEditProfileDialogOpen, setIsEditProfileDialogOpen] = useState(false);
+	const [isChangePasswordDialogOpen, setIsChangePasswordDialogOpen] =
+		useState(false);
+
+	const [addresses, setAddresses] = useState<AddressResponse[]>([]);
+	const [addressesLoading, setAddressesLoading] = useState(true);
+
+	// Address add/edit dialog
+	const [addressDialogOpen, setAddressDialogOpen] = useState(false);
+	const [editingAddress, setEditingAddress] = useState<AddressResponse | null>(
+		null,
+	);
+	const [addressSubmitError, setAddressSubmitError] = useState<string | null>(
+		null,
+	);
+	const [isAddressSubmitting, setIsAddressSubmitting] = useState(false);
+
+	// Address delete dialog
+	const [deleteAddressDialogOpen, setDeleteAddressDialogOpen] = useState(false);
+	const [deletingAddress, setDeletingAddress] =
+		useState<AddressResponse | null>(null);
+	const [isDeletingAddress, setIsDeletingAddress] = useState(false);
+	const [deleteAddressError, setDeleteAddressError] = useState<string | null>(
+		null,
+	);
+
+	useEffect(() => {
+		apiGet<AddressListResponse>("/addresses")
+			.then((res) => setAddresses(res.items ?? []))
+			.catch(() => setAddresses([]))
+			.finally(() => setAddressesLoading(false));
+	}, []);
+
 	if (!authLoading && user === null) {
 		window.location.href = "/signin";
 		return null;
@@ -171,14 +533,101 @@ export function AccountPage() {
 		}
 	}
 
+	function handleOpenAddAddress() {
+		setEditingAddress(null);
+		setAddressSubmitError(null);
+		setAddressDialogOpen(true);
+	}
+
+	function handleOpenEditAddress(address: AddressResponse) {
+		setEditingAddress(address);
+		setAddressSubmitError(null);
+		setAddressDialogOpen(true);
+	}
+
+	function handleOpenDeleteAddress(address: AddressResponse) {
+		setDeletingAddress(address);
+		setDeleteAddressError(null);
+		setDeleteAddressDialogOpen(true);
+	}
+
+	async function handleAddressSubmit(values: AddressFormValues) {
+		setIsAddressSubmitting(true);
+		setAddressSubmitError(null);
+		try {
+			if (editingAddress?.id) {
+				const updated = await apiPatch<AddressResponse>(
+					`/addresses/${editingAddress.id}`,
+					values,
+				);
+				setAddresses((prev) =>
+					prev.map((a) => (a.id === updated.id ? updated : a)),
+				);
+			} else {
+				const created = await apiPost<AddressResponse>("/addresses", values);
+				setAddresses((prev) => [created, ...prev]);
+			}
+			setAddressDialogOpen(false);
+		} catch (err) {
+			setAddressSubmitError(
+				err instanceof Error ? err.message : "Erro ao salvar endereço.",
+			);
+		} finally {
+			setIsAddressSubmitting(false);
+		}
+	}
+
+	async function handleDeleteAddress() {
+		if (!deletingAddress?.id) return;
+		setIsDeletingAddress(true);
+		setDeleteAddressError(null);
+		try {
+			await apiDelete(`/addresses/${deletingAddress.id}`);
+			setAddresses((prev) => prev.filter((a) => a.id !== deletingAddress.id));
+			setDeleteAddressDialogOpen(false);
+		} catch {
+			setDeleteAddressError(
+				"Não foi possível remover o endereço. Tente novamente.",
+			);
+			setIsDeletingAddress(false);
+		}
+	}
+
 	const personalDataRows = profile
 		? [
-				{ label: "E-mail", value: profile.email },
-				{ label: "Nome", value: profile.name },
-				{ label: "Data de nascimento", value: formatDate(profile.dateOfBirth) },
-				{ label: "CPF", value: formatCpf(profile.cpf) },
+				{ label: "E-mail", value: profile.email ?? "—" },
+				{ label: "Nome", value: profile.name ?? "—" },
+				{
+					label: "Data de nascimento",
+					value: formatDate(profile.dateOfBirth ?? ""),
+				},
+				{ label: "CPF", value: formatCpf(profile.cpf ?? "") },
 			]
 		: null;
+
+	const addressDefaultValues: AddressFormValues = editingAddress
+		? {
+				name: editingAddress.name ?? "",
+				street: editingAddress.street ?? "",
+				number: editingAddress.number ?? "",
+				neighborhood: editingAddress.neighborhood ?? "",
+				city: editingAddress.city ?? "",
+				state: editingAddress.state ?? "",
+				postalCode: editingAddress.postalCode ?? "",
+				complement: editingAddress.complement ?? "",
+				isDefault: editingAddress.isDefault ?? false,
+			}
+		: {
+				name: "",
+				street: "",
+				number: "",
+				neighborhood: "",
+				city: "",
+				state: "",
+				postalCode: "",
+				complement: "",
+				isDefault: false,
+			};
 
 	return (
 		<AppShell>
@@ -207,7 +656,10 @@ export function AccountPage() {
 									))}
 						</div>
 						<div className="mt-6 flex justify-center">
-							<Button variant="outline" disabled title="Em breve">
+							<Button
+								variant="outline"
+								onClick={() => setIsEditProfileDialogOpen(true)}
+							>
 								Editar
 							</Button>
 						</div>
@@ -219,25 +671,45 @@ export function AccountPage() {
 					>
 						<SectionTitle>Endereços salvos</SectionTitle>
 						<div className="mt-6 space-y-6">
-							{ADDRESSES.map((address) => (
-								<div key={address.id}>
-									<div className="flex items-center justify-between">
-										<AddressField
-											id={address.id}
-											name={address.name}
-											isDefault={address.isDefault}
-											fields={address.fields}
-										/>
-									</div>
-								</div>
-							))}
+							{addressesLoading
+								? Array.from({ length: 2 }).map((_, i) => (
+										<DataRowSkeleton key={i} />
+									))
+								: addresses.map((address) => (
+										<div key={address.id}>
+											<AddressField
+												address={address}
+												onEdit={handleOpenEditAddress}
+												onDelete={handleOpenDeleteAddress}
+											/>
+										</div>
+									))}
 						</div>
 						<div className="mt-6 flex justify-center">
-							<Button variant="outline" disabled>
+							<Button variant="outline" onClick={handleOpenAddAddress}>
 								Adicionar endereço
 							</Button>
 						</div>
 					</Card>
+				</div>
+
+				{/* Alterar senha */}
+				<div className="mt-8 flex flex-col gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
+					<div>
+						<SectionTitle>Alterar senha</SectionTitle>
+						<P className="mt-1 text-slate-600">
+							Altere sua senha para manter sua conta segura. Recomendamos usar
+							uma senha forte e única, que você não use em outros sites.
+						</P>
+					</div>
+					<Button
+						variant="outline"
+						className="shrink-0"
+						onClick={() => setIsChangePasswordDialogOpen(true)}
+					>
+						<Lock aria-hidden="true" className="size-4" />
+						Alterar senha
+					</Button>
 				</div>
 
 				{/* Sair */}
@@ -282,6 +754,106 @@ export function AccountPage() {
 				</div>
 			</main>
 
+			{/* ── Edit profile dialog ──────────────────────────────────────────── */}
+			<EditProfileDialog
+				open={isEditProfileDialogOpen}
+				onOpenChange={setIsEditProfileDialogOpen}
+				initialName={profile?.name ?? ""}
+				initialEmail={profile?.email ?? ""}
+				onSuccess={(updated) => setProfile(updated)}
+			/>
+
+			{/* ── Change password dialog ──────────────────────────────────────── */}
+			<ChangePasswordDialog
+				open={isChangePasswordDialogOpen}
+				onOpenChange={setIsChangePasswordDialogOpen}
+			/>
+
+			{/* ── Add / Edit address dialog ────────────────────────────────────── */}
+			<Dialog
+				open={addressDialogOpen}
+				onOpenChange={(o) => {
+					if (!isAddressSubmitting) setAddressDialogOpen(o);
+				}}
+			>
+				<DialogContent
+					showCloseButton={false}
+					className="gap-0 overflow-hidden rounded-[28px] border-none p-0 shadow-2xl sm:max-w-lg"
+				>
+					<DialogHeader className="space-y-0 px-7 pb-5 pt-7">
+						<DialogTitle className="font-big-shoulders text-xl font-bold text-slate-900">
+							{editingAddress ? "Editar endereço" : "Adicionar endereço"}
+						</DialogTitle>
+					</DialogHeader>
+					<div className="w-full h-px bg-slate-200" />
+					<div className="px-7 py-5">
+						<AddressForm
+							key={editingAddress?.id ?? "new"}
+							defaultValues={addressDefaultValues}
+							submitLabel={editingAddress ? "Salvar alterações" : "Adicionar"}
+							isSubmitting={isAddressSubmitting}
+							error={addressSubmitError}
+							onSubmit={handleAddressSubmit}
+							onCancel={() => setAddressDialogOpen(false)}
+						/>
+					</div>
+				</DialogContent>
+			</Dialog>
+
+			{/* ── Delete address dialog ────────────────────────────────────────── */}
+			<Dialog
+				open={deleteAddressDialogOpen}
+				onOpenChange={(o) => {
+					if (!isDeletingAddress) setDeleteAddressDialogOpen(o);
+				}}
+			>
+				<DialogContent
+					showCloseButton={false}
+					className="gap-0 overflow-hidden rounded-[28px] border-none p-0 shadow-2xl sm:max-w-md"
+				>
+					<DialogHeader className="space-y-0 px-7 pb-5 pt-7">
+						<div className="grid grid-cols-[auto_1fr] items-center gap-4">
+							<span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full text-white bg-red-700 shadow-md">
+								<Trash2 aria-hidden="true" className="size-5" />
+							</span>
+							<DialogTitle className="font-big-shoulders text-xl font-bold text-slate-900">
+								Remover endereço?
+							</DialogTitle>
+						</div>
+					</DialogHeader>
+					<div className="w-full h-px bg-slate-200" />
+					<DialogDescription className="mt-1 mx-6 my-4 text-slate-600">
+						O endereço <strong>{deletingAddress?.name}</strong> será removido
+						permanentemente.
+					</DialogDescription>
+					{deleteAddressError && (
+						<div className="mx-6 mb-4">
+							<Alert variant="error">
+								<AlertDescription>{deleteAddressError}</AlertDescription>
+							</Alert>
+						</div>
+					)}
+					<div className="w-full h-px bg-slate-200" />
+					<DialogFooter className="flex flex-row justify-between! gap-3 border-t-0 bg-transparent px-5 pb-7 mx-0">
+						<Button
+							variant="ghost"
+							onClick={() => setDeleteAddressDialogOpen(false)}
+							disabled={isDeletingAddress}
+						>
+							Cancelar
+						</Button>
+						<Button
+							variant="destructive"
+							onClick={handleDeleteAddress}
+							disabled={isDeletingAddress}
+						>
+							{isDeletingAddress ? "Removendo..." : "Remover"}
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+
+			{/* ── Delete account dialog ────────────────────────────────────────── */}
 			<Dialog
 				open={isDeleteDialogOpen}
 				onOpenChange={(open) => {

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Plus, Search, Tag } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -13,10 +13,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { P } from "@/components/typography";
-import {
-	categories as seedCategories,
-	type Category,
-} from "@/components/ecommerce-showcase/data";
+import type {
+	CategoryResponse,
+	CategoryListResponse,
+} from "@/api/generated/model";
+import { ApiError, apiDelete, apiGet } from "@/lib/api";
+
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { AdminFormDialog } from "./admin/admin-form-dialog";
 import { AdminListRow } from "./admin/admin-list-row";
@@ -31,56 +34,138 @@ const breadcrumbItems = [
 	{ label: "Categorias" },
 ];
 
-const emptyCategoryForm: CategoryFormValues = { label: "", slug: "" };
+const emptyCategoryForm: CategoryFormValues = {
+	title: "",
+	featured: false,
+};
+
+async function createCategory(
+	values: CategoryFormValues,
+	image?: File,
+): Promise<CategoryResponse> {
+	const fd = new FormData();
+	fd.append("title", values.title);
+	fd.append("featured", String(values.featured ?? false));
+	if (image) fd.append("image", image);
+
+	const res = await fetch("/api/admin/categories", {
+		method: "POST",
+		credentials: "include",
+		body: fd,
+	});
+	const json = await res.json();
+	if (!res.ok) {
+		const e = json?.error ?? {};
+		throw new ApiError(
+			e.code ?? "ERROR",
+			e.message ?? "Erro ao criar categoria.",
+			e.details,
+		);
+	}
+	return json.data as CategoryResponse;
+}
+
+async function updateCategory(
+	id: string,
+	values: CategoryFormValues,
+	image?: File,
+): Promise<CategoryResponse> {
+	const fd = new FormData();
+	fd.append("title", values.title);
+	fd.append("featured", String(values.featured ?? false));
+	if (image) fd.append("image", image);
+
+	const res = await fetch(`/api/admin/categories/${id}`, {
+		method: "PATCH",
+		credentials: "include",
+		body: fd,
+	});
+	const json = await res.json();
+	if (!res.ok) {
+		const e = json?.error ?? {};
+		throw new ApiError(
+			e.code ?? "ERROR",
+			e.message ?? "Erro ao atualizar categoria.",
+			e.details,
+		);
+	}
+	return json.data as CategoryResponse;
+}
 
 export function AdminCategoriesPage() {
-	const [categories, setCategories] = useState<Category[]>(seedCategories);
+	const [categories, setCategories] = useState<CategoryResponse[]>([]);
+	const [isLoading, setIsLoading] = useState(true);
 	const [query, setQuery] = useState("");
-	const [editing, setEditing] = useState<Category | null>(null);
+	const [editing, setEditing] = useState<CategoryResponse | null>(null);
 	const [isFormOpen, setIsFormOpen] = useState(false);
 	const [formError, setFormError] = useState<string | null>(null);
-	const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [deleteTarget, setDeleteTarget] = useState<CategoryResponse | null>(
+		null,
+	);
+	const [deleteError, setDeleteError] = useState<string | null>(null);
+
+	useEffect(() => {
+		apiGet<CategoryListResponse>("/admin/categories")
+			.then((res) => setCategories(res.items ?? []))
+			.catch(() => {})
+			.finally(() => setIsLoading(false));
+	}, []);
 
 	const filtered = useMemo(() => {
 		const q = query.trim().toLowerCase();
 		if (!q) return categories;
 		return categories.filter(
 			(c) =>
-				c.label.toLowerCase().includes(q) || c.slug.toLowerCase().includes(q),
+				(c.title ?? "").toLowerCase().includes(q) ||
+				(c.slug ?? "").toLowerCase().includes(q),
 		);
 	}, [categories, query]);
 
-	function openForm(category: Category | null) {
+	function openForm(category: CategoryResponse | null) {
 		setEditing(category);
 		setFormError(null);
 		setIsFormOpen(true);
 	}
 
-	function handleSubmit(values: CategoryFormValues) {
-		const slugTaken = categories.some(
-			(c) => c.slug === values.slug && c.slug !== editing?.slug,
-		);
-		if (slugTaken) {
-			setFormError("Já existe uma categoria com esse slug.");
-			return;
-		}
-
-		if (editing) {
-			setCategories((prev) =>
-				prev.map((c) => (c.slug === editing.slug ? values : c)),
-			);
-		} else {
-			setCategories((prev) => [...prev, values]);
-		}
-		setIsFormOpen(false);
-		setEditing(null);
+	async function handleSubmit(values: CategoryFormValues, image?: File) {
 		setFormError(null);
+		setIsSubmitting(true);
+		try {
+			if (editing) {
+				const updated = await updateCategory(editing.id!, values, image);
+				setCategories((prev) =>
+					prev.map((c) => (c.id === editing.id ? updated : c)),
+				);
+			} else {
+				const created = await createCategory(values, image);
+				setCategories((prev) => [created, ...prev]);
+			}
+			setIsFormOpen(false);
+			setEditing(null);
+		} catch (err) {
+			setFormError(err instanceof Error ? err.message : "Erro inesperado.");
+		} finally {
+			setIsSubmitting(false);
+		}
 	}
 
-	function confirmDelete() {
+	async function confirmDelete() {
 		if (!deleteTarget) return;
-		setCategories((prev) => prev.filter((c) => c.slug !== deleteTarget.slug));
-		setDeleteTarget(null);
+		setDeleteError(null);
+		try {
+			await apiDelete(`/admin/categories/${deleteTarget.id}`);
+			setCategories((prev) => prev.filter((c) => c.id !== deleteTarget.id));
+			setDeleteTarget(null);
+		} catch (err) {
+			if (err instanceof ApiError && err.code === "CONFLICT") {
+				setDeleteError(
+					"Não é possível excluir: há produtos vinculados a esta categoria.",
+				);
+			} else {
+				setDeleteError(err instanceof Error ? err.message : "Erro inesperado.");
+			}
+		}
 	}
 
 	return (
@@ -113,34 +198,63 @@ export function AdminCategoriesPage() {
 					/>
 				</div>
 
-				<Card className="mt-6 divide-y divide-slate-200">
-					{filtered.length === 0 ? (
-						<div className="flex flex-col items-center gap-2 px-4 py-16 text-center">
-							<Tag aria-hidden="true" className="size-8 text-slate-300" />
-							<P className="text-slate-500">
-								{query
-									? "Nenhuma categoria encontrada para a busca."
-									: "Nenhuma categoria cadastrada."}
-							</P>
-						</div>
-					) : (
-						filtered.map((category) => (
-							<AdminListRow
-								key={category.slug}
-								title={category.label}
-								subtitle={
-									<span className="font-mono text-slate-500">
-										{category.slug}
-									</span>
-								}
-								editLabel={`Editar ${category.label}`}
-								deleteLabel={`Excluir ${category.label}`}
-								onEdit={() => openForm(category)}
-								onDelete={() => setDeleteTarget(category)}
-							/>
-						))
-					)}
-				</Card>
+				{isLoading ? (
+					<Card className="mt-6 divide-y divide-slate-200">
+						{Array.from({ length: 6 }).map((_, i) => (
+							<div key={i} className="flex items-center gap-4 p-4">
+								<Skeleton className="size-14 shrink-0 rounded-xl" />
+								<div className="flex-1 space-y-2">
+									<Skeleton className="h-4 w-40" />
+									<Skeleton className="h-3 w-24" />
+								</div>
+								<div className="flex gap-1.5">
+									<Skeleton className="size-8 rounded-md" />
+									<Skeleton className="size-8 rounded-md" />
+								</div>
+							</div>
+						))}
+					</Card>
+				) : (
+					<Card className="mt-6 divide-y divide-slate-200">
+						{filtered.length === 0 ? (
+							<div className="flex flex-col items-center gap-2 px-4 py-16 text-center">
+								<Tag aria-hidden="true" className="size-8 text-slate-300" />
+								<P className="text-slate-500">
+									{query
+										? "Nenhuma categoria encontrada para a busca."
+										: "Nenhuma categoria cadastrada."}
+								</P>
+							</div>
+						) : (
+							filtered.map((category) => (
+								<AdminListRow
+									key={category.id}
+									thumbnail={category.image ?? undefined}
+									title={category.title ?? "—"}
+									subtitle={
+										<span className="flex items-center gap-2">
+											<span className="font-mono text-slate-500">
+												{category.slug}
+											</span>
+											{category.featured && (
+												<span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-700">
+													Destaque
+												</span>
+											)}
+										</span>
+									}
+									editLabel={`Editar ${category.title}`}
+									deleteLabel={`Excluir ${category.title}`}
+									onEdit={() => openForm(category)}
+									onDelete={() => {
+										setDeleteError(null);
+										setDeleteTarget(category);
+									}}
+								/>
+							))
+						)}
+					</Card>
+				)}
 			</main>
 
 			{/* Formulário de criação/edição */}
@@ -152,8 +266,22 @@ export function AdminCategoriesPage() {
 				subtitle="Defina o nome da categoria."
 			>
 				<CategoryForm
-					defaultValues={editing ?? emptyCategoryForm}
-					submitLabel={editing ? "Salvar alterações" : "Criar categoria"}
+					defaultValues={
+						editing
+							? {
+									title: editing.title ?? "",
+									featured: editing.featured ?? false,
+								}
+							: emptyCategoryForm
+					}
+					currentImage={editing?.image ?? undefined}
+					submitLabel={
+						isSubmitting
+							? "Salvando…"
+							: editing
+								? "Salvar alterações"
+								: "Criar categoria"
+					}
 					error={formError}
 					onSubmit={handleSubmit}
 					onCancel={() => setIsFormOpen(false)}
@@ -164,7 +292,10 @@ export function AdminCategoriesPage() {
 			<Dialog
 				open={deleteTarget !== null}
 				onOpenChange={(open) => {
-					if (!open) setDeleteTarget(null);
+					if (!open) {
+						setDeleteTarget(null);
+						setDeleteError(null);
+					}
 				}}
 			>
 				<DialogContent
@@ -179,12 +310,21 @@ export function AdminCategoriesPage() {
 					<div className="h-px w-full bg-slate-200" />
 					<DialogDescription className="mx-6 my-4 text-slate-600">
 						{deleteTarget
-							? `A categoria “${deleteTarget.label}” será removida. Esta ação não pode ser desfeita.`
+							? `A categoria "${deleteTarget.title}" será removida. Esta ação não pode ser desfeita.`
 							: ""}
 					</DialogDescription>
+					{deleteError && (
+						<p className="mx-6 mb-4 text-[13px] text-red-600">{deleteError}</p>
+					)}
 					<div className="h-px w-full bg-slate-200" />
 					<DialogFooter className="mx-0 flex flex-row justify-between! gap-3 border-t-0 bg-transparent px-5 pb-7">
-						<Button variant="ghost" onClick={() => setDeleteTarget(null)}>
+						<Button
+							variant="ghost"
+							onClick={() => {
+								setDeleteTarget(null);
+								setDeleteError(null);
+							}}
+						>
 							Cancelar
 						</Button>
 						<Button variant="destructive" onClick={confirmDelete}>

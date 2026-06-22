@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Pencil, Trash2 } from "lucide-react";
+import { Package, Pencil, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -14,6 +14,8 @@ interface AdminListRowProps {
 	deleteLabel: string;
 	onEdit: () => void;
 	onDelete: () => void;
+	/** Optional extra action buttons rendered before the edit/delete buttons. */
+	extraActions?: ReactNode;
 }
 
 /** A single row in an admin listing: optional thumbnail, content, and actions. */
@@ -26,23 +28,29 @@ export function AdminListRow({
 	deleteLabel,
 	onEdit,
 	onDelete,
+	extraActions,
 }: AdminListRowProps) {
 	if (largeImage) {
 		return (
 			<Card className="border-transparent p-6 shadow-none">
 				<div className="flex items-start gap-4">
-					{thumbnail && (
+					{thumbnail ? (
 						<img
 							src={thumbnail}
 							alt=""
 							className="size-40 shrink-0 rounded-md object-cover"
 						/>
+					) : (
+						<div className="flex size-40 shrink-0 items-center justify-center rounded-md bg-slate-100">
+							<Package aria-hidden="true" className="size-10 text-slate-400" />
+						</div>
 					)}
 					<div className="min-w-0 flex-1">
 						<LabelLarge className="block text-slate-900">{title}</LabelLarge>
 						{subtitle && <P className="mt-1 text-slate-500">{subtitle}</P>}
 					</div>
 					<div className="flex shrink-0 items-center gap-1.5">
+						{extraActions}
 						<Button
 							variant="ghost"
 							size="icon-sm"
@@ -69,12 +77,16 @@ export function AdminListRow({
 
 	return (
 		<div className="flex items-center gap-4 p-4">
-			{thumbnail && (
+			{thumbnail ? (
 				<img
 					src={thumbnail}
 					alt=""
 					className="size-14 shrink-0 rounded-xl object-cover"
 				/>
+			) : (
+				<div className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-slate-100">
+					<Package aria-hidden="true" className="size-6 text-slate-400" />
+				</div>
 			)}
 			<div className="min-w-0 flex-1">
 				<p className="truncate font-['Poppins',sans-serif] text-[14px] leading-5 font-medium text-slate-900">
@@ -87,6 +99,7 @@ export function AdminListRow({
 				)}
 			</div>
 			<div className="flex shrink-0 items-center gap-1.5">
+				{extraActions}
 				<Button
 					variant="ghost"
 					size="icon-sm"

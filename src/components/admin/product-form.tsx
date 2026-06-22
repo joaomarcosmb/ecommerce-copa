@@ -1,11 +1,11 @@
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
 	Form,
-	FormActions,
 	FormBody,
 	FormField,
 	FormItem,
@@ -19,19 +19,18 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { PRODUCT_CATEGORY_LABELS } from "@/components/ecommerce-showcase/data";
+import type { CategoryResponse } from "@/api/generated/model";
 
 import { AdminField } from "./admin-field";
-import {
-	PRODUCT_CATEGORY_VALUES,
-	productSchema,
-	type ProductFormValues,
-} from "./schemas";
+import { productSchema, type ProductFormValues } from "./schemas";
 import { DialogFooter } from "../ui/dialog";
 
 interface ProductFormProps {
 	defaultValues: ProductFormValues;
 	submitLabel: string;
+	categories: CategoryResponse[];
+	isSubmitting?: boolean;
+	error?: string | null;
 	onSubmit: (values: ProductFormValues) => void;
 	onCancel: () => void;
 }
@@ -39,6 +38,9 @@ interface ProductFormProps {
 export function ProductForm({
 	defaultValues,
 	submitLabel,
+	categories,
+	isSubmitting,
+	error,
 	onSubmit,
 	onCancel,
 }: ProductFormProps) {
@@ -47,8 +49,10 @@ export function ProductForm({
 		defaultValues,
 	});
 
-	const images = useFieldArray({ control: form.control, name: "images" });
-	const variants = useFieldArray({ control: form.control, name: "variants" });
+	const selectors = useFieldArray({
+		control: form.control,
+		name: "schemaSelectors",
+	});
 
 	return (
 		<Form {...form}>
@@ -57,121 +61,42 @@ export function ProductForm({
 				className="flex min-h-0 flex-1 flex-col"
 			>
 				<FormBody className="space-y-5 overflow-y-auto px-7 py-6 sm:px-9 sm:py-7">
-					<AdminField<ProductFormValues>
-						name="title"
-						label="Título"
-						placeholder="Álbum Oficial FIFA Copa do Mundo 2026™"
-					/>
+					{error && (
+						<Alert variant="error">
+							<AlertDescription>{error}</AlertDescription>
+						</Alert>
+					)}
 
-					<div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-						<AdminField<ProductFormValues>
-							name="price"
-							label="Preço (R$)"
-							type="number"
-							step="0.01"
-							placeholder="49.90"
-						/>
-						<AdminField<ProductFormValues>
-							name="originalPrice"
-							label="Preço original (R$)"
-							type="number"
-							step="0.01"
-							placeholder="59.90"
-							optional
-						/>
-					</div>
-
-					<div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-						<FormField<ProductFormValues>
-							name="category"
-							render={({ field }) => (
-								<FormItem className="space-y-2">
-									<FormLabel>Categoria</FormLabel>
-									<Select value={field.value} onValueChange={field.onChange}>
-										<SelectTrigger className="w-full">
-											<SelectValue placeholder="Selecione" />
-										</SelectTrigger>
-										<SelectContent>
-											{PRODUCT_CATEGORY_VALUES.map((value) => (
-												<SelectItem key={value} value={value}>
-													{PRODUCT_CATEGORY_LABELS[value]}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<AdminField<ProductFormValues>
-							name="badge"
-							label="Selo"
-							placeholder="Novo, Promo, Hot…"
-							optional
-						/>
-					</div>
-
-					<AdminField<ProductFormValues>
-						name="image"
-						label="Imagem principal (URL)"
-						placeholder="https://…"
-					/>
-
-					{/* Imagens adicionais */}
-					<div className="space-y-3">
-						<div className="flex items-center justify-between">
-							<FormLabel className="cursor-default">
-								Imagens adicionais
-								<span className="ml-1 font-normal text-slate-400">
-									(opcional)
-								</span>
-							</FormLabel>
-							<Button
-								type="button"
-								variant="ghost"
-								size="sm"
-								onClick={() => images.append({ url: "" })}
-							>
-								<Plus aria-hidden="true" className="size-4" />
-								Adicionar
-							</Button>
-						</div>
-						{images.fields.length === 0 ? (
-							<p className="font-['Poppins',sans-serif] text-[13px] text-slate-400">
-								Nenhuma imagem adicional.
-							</p>
-						) : (
-							<div className="space-y-3">
-								{images.fields.map((item, index) => (
-									<div key={item.id} className="flex items-start gap-2">
-										<div className="flex-1">
-											<AdminField<ProductFormValues>
-												name={`images.${index}.url`}
-												label={`Imagem ${index + 1}`}
-												placeholder="https://…"
-											/>
-										</div>
-										<Button
-											type="button"
-											variant="ghost"
-											size="icon-sm"
-											className="mt-8 shrink-0 text-red-700 hover:bg-red-50"
-											aria-label={`Remover imagem ${index + 1}`}
-											onClick={() => images.remove(index)}
-										>
-											<Trash2 aria-hidden="true" className="size-4.5" />
-										</Button>
-									</div>
-								))}
-							</div>
+					<FormField<ProductFormValues>
+						name="categoryId"
+						render={({ field }) => (
+							<FormItem className="space-y-2">
+								<FormLabel>Categoria</FormLabel>
+								<Select
+									value={field.value as string}
+									onValueChange={field.onChange}
+								>
+									<SelectTrigger className="w-full">
+										<SelectValue placeholder="Selecione uma categoria" />
+									</SelectTrigger>
+									<SelectContent>
+										{categories.map((c) => (
+											<SelectItem key={c.id} value={c.id!}>
+												{c.title}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+								<FormMessage />
+							</FormItem>
 						)}
-					</div>
+					/>
 
-					{/* Variantes */}
+					{/* Seletores de variação */}
 					<div className="space-y-3">
 						<div className="flex items-center justify-between">
 							<FormLabel className="cursor-default">
-								Variantes
+								Seletores de variação
 								<span className="ml-1 font-normal text-slate-400">
 									(opcional)
 								</span>
@@ -180,33 +105,32 @@ export function ProductForm({
 								type="button"
 								variant="ghost"
 								size="sm"
-								onClick={() => variants.append({ label: "", productId: "" })}
+								onClick={() => selectors.append({ key: "", label: "" })}
 							>
 								<Plus aria-hidden="true" className="size-4" />
-								Adicionar
+								Adicionar seletor
 							</Button>
 						</div>
-						{variants.fields.length === 0 ? (
+						{selectors.fields.length === 0 ? (
 							<p className="font-['Poppins',sans-serif] text-[13px] text-slate-400">
-								Nenhuma variante.
+								Sem seletores definidos.
 							</p>
 						) : (
 							<div className="space-y-3">
-								{variants.fields.map((item, index) => (
+								{selectors.fields.map((item, index) => (
 									<div key={item.id} className="flex items-start gap-2">
 										<div className="flex-1">
 											<AdminField<ProductFormValues>
-												name={`variants.${index}.label`}
-												label="Rótulo"
-												placeholder="Holográfica"
+												name={`schemaSelectors.${index}.key`}
+												label="Chave"
+												placeholder="size"
 											/>
 										</div>
-										<div className="w-32">
+										<div className="flex-1">
 											<AdminField<ProductFormValues>
-												name={`variants.${index}.productId`}
-												label="ID do produto"
-												type="number"
-												placeholder="102"
+												name={`schemaSelectors.${index}.label`}
+												label="Rótulo"
+												placeholder="Tamanho"
 											/>
 										</div>
 										<Button
@@ -214,8 +138,8 @@ export function ProductForm({
 											variant="ghost"
 											size="icon-sm"
 											className="mt-8 shrink-0 text-red-700 hover:bg-red-50"
-											aria-label={`Remover variante ${index + 1}`}
-											onClick={() => variants.remove(index)}
+											aria-label={`Remover seletor ${index + 1}`}
+											onClick={() => selectors.remove(index)}
 										>
 											<Trash2 aria-hidden="true" className="size-4.5" />
 										</Button>
@@ -230,7 +154,7 @@ export function ProductForm({
 					<Button type="button" variant="ghost" onClick={onCancel}>
 						Cancelar
 					</Button>
-					<Button type="submit" variant="primary">
+					<Button type="submit" variant="primary" disabled={isSubmitting}>
 						{submitLabel}
 					</Button>
 				</DialogFooter>
