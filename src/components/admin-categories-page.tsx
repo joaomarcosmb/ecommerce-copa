@@ -17,7 +17,7 @@ import type {
 	CategoryResponse,
 	CategoryListResponse,
 } from "@/api/generated/model";
-import { ApiError, apiDelete, apiGet } from "@/lib/api";
+import { ApiError, apiDelete, apiGet, apiPatch, apiPost } from "@/lib/api";
 
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -43,26 +43,27 @@ async function createCategory(
 	values: CategoryFormValues,
 	image?: File,
 ): Promise<CategoryResponse> {
-	const fd = new FormData();
-	fd.append("title", values.title);
-	fd.append("featured", String(values.featured ?? false));
-	if (image) fd.append("image", image);
-
-	const res = await fetch("/api/admin/categories", {
-		method: "POST",
-		credentials: "include",
-		body: fd,
-	});
-	const json = await res.json();
-	if (!res.ok) {
-		const e = json?.error ?? {};
-		throw new ApiError(
-			e.code ?? "ERROR",
-			e.message ?? "Erro ao criar categoria.",
-			e.details,
-		);
+	if (image) {
+		const fd = new FormData();
+		fd.append("title", values.title);
+		fd.append("featured", String(values.featured ?? false));
+		fd.append("image", image);
+		const res = await fetch("/api/admin/categories", {
+			method: "POST",
+			credentials: "include",
+			body: fd,
+		});
+		const json = await res.json();
+		if (!res.ok) {
+			const e = json?.error ?? {};
+			throw new ApiError(e.code ?? "ERROR", e.message ?? "Erro ao criar categoria.", e.details);
+		}
+		return json.data as CategoryResponse;
 	}
-	return json.data as CategoryResponse;
+	return apiPost<CategoryResponse>("/admin/categories", {
+		title: values.title,
+		featured: values.featured || undefined,
+	});
 }
 
 async function updateCategory(
@@ -70,26 +71,27 @@ async function updateCategory(
 	values: CategoryFormValues,
 	image?: File,
 ): Promise<CategoryResponse> {
-	const fd = new FormData();
-	fd.append("title", values.title);
-	fd.append("featured", String(values.featured ?? false));
-	if (image) fd.append("image", image);
-
-	const res = await fetch(`/api/admin/categories/${id}`, {
-		method: "PATCH",
-		credentials: "include",
-		body: fd,
-	});
-	const json = await res.json();
-	if (!res.ok) {
-		const e = json?.error ?? {};
-		throw new ApiError(
-			e.code ?? "ERROR",
-			e.message ?? "Erro ao atualizar categoria.",
-			e.details,
-		);
+	if (image) {
+		const fd = new FormData();
+		fd.append("title", values.title);
+		fd.append("featured", String(values.featured ?? false));
+		fd.append("image", image);
+		const res = await fetch(`/api/admin/categories/${id}`, {
+			method: "PATCH",
+			credentials: "include",
+			body: fd,
+		});
+		const json = await res.json();
+		if (!res.ok) {
+			const e = json?.error ?? {};
+			throw new ApiError(e.code ?? "ERROR", e.message ?? "Erro ao atualizar categoria.", e.details);
+		}
+		return json.data as CategoryResponse;
 	}
-	return json.data as CategoryResponse;
+	return apiPatch<CategoryResponse>(`/admin/categories/${id}`, {
+		title: values.title,
+		featured: values.featured || undefined,
+	});
 }
 
 export function AdminCategoriesPage() {
