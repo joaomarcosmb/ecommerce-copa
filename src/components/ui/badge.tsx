@@ -23,7 +23,7 @@ function Badge({ variant = "default", children, className = "" }: BadgeProps) {
 		<span
 			className={cn(
 				"inline-flex items-center px-3 py-0.5 rounded-full",
-				"text-[11px] leading-4 font-['Poppins',sans-serif] font-medium",
+				"text-[11px] leading-4 font-sans font-medium",
 				variants[variant],
 				className,
 			)}

@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
+import { Search } from "lucide-react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -17,7 +18,6 @@ import { BreadcrumbNav } from "./ecommerce-showcase/breadcrumb-nav";
 import {
 	PRODUCT_CATEGORY_LABELS,
 	PRODUCT_CATEGORY_ORDER,
-	type Product,
 	type ProductCategory,
 } from "./ecommerce-showcase/data";
 import { ProductCard } from "./ecommerce-showcase/product-card";
@@ -41,13 +41,16 @@ export function CatalogPage() {
 	const [selectedCategories, setSelectedCategories] = useState<
 		ProductCategory[]
 	>([]);
+	const [searchQuery, setSearchQuery] = useState("");
 
 	useEffect(() => {
 		const params = new URLSearchParams(window.location.search);
 		const category = params.get("category") as ProductCategory | null;
+		const q = params.get("q");
 		if (category && PRODUCT_CATEGORY_ORDER.includes(category)) {
 			setSelectedCategories([category]);
 		}
+		if (q) setSearchQuery(q);
 	}, []);
 
 	const toggleCategory = (category: ProductCategory) => {
@@ -59,47 +62,64 @@ export function CatalogPage() {
 	};
 
 	const visibleProducts = useMemo(() => {
+		const q = searchQuery.trim().toLowerCase();
 		const filtered = products.filter(
 			(p) =>
-				selectedCategories.length === 0 ||
-				selectedCategories.includes(p.category),
+				(selectedCategories.length === 0 ||
+					selectedCategories.includes(p.category?.slug as ProductCategory)) &&
+				(!q || p.title?.toLowerCase().includes(q)),
 		);
 
 		const sorted = [...filtered];
 		switch (sort) {
 			case "price-asc":
-				sorted.sort((a, b) => a.price - b.price);
+				sorted.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
 				break;
 			case "price-desc":
-				sorted.sort((a, b) => b.price - a.price);
+				sorted.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
 				break;
 			case "rating":
-				sorted.sort((a, b) => b.rating - a.rating);
+				sorted.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
 				break;
 			default:
 				break;
 		}
 
 		return sorted.slice(0, GRID_SIZE);
-	}, [products, selectedCategories, sort]);
+	}, [products, selectedCategories, sort, searchQuery]);
 
-	const pageTitle =
-		selectedCategories.length === 1
+	const isSearching = Boolean(searchQuery.trim());
+
+	const pageTitle = isSearching
+		? "Resultados da busca"
+		: selectedCategories.length === 1
 			? PRODUCT_CATEGORY_LABELS[selectedCategories[0]]
 			: "Todos os produtos";
 
-	const breadcrumbItems = [
-		{ label: "Início", href: "/" },
-		{ label: pageTitle },
-	];
+	const breadcrumbItems = isSearching
+		? [
+				{ label: "Início", href: "/" },
+				{ label: "Catálogo", href: "/catalog" },
+				{ label: `"${searchQuery.trim()}"` },
+			]
+		: [{ label: "Início", href: "/" }, { label: pageTitle }];
 
 	return (
 		<AppShell>
 			<BreadcrumbNav items={breadcrumbItems} className="mx-6 mt-6" />
 			<main className="px-6 py-6">
-				<h1 className="font-big-shoulders text-3xl font-bold leading-tight text-slate-900">
-					{pageTitle}
-				</h1>
+				{isSearching ? (
+					<div>
+						<h1 className="font-big-shoulders text-3xl font-bold leading-tight text-slate-900">
+							Exibindo resultados para{" "}
+							<span className="text-blue-600">"{searchQuery.trim()}"</span>
+						</h1>
+					</div>
+				) : (
+					<h1 className="font-big-shoulders text-3xl font-bold leading-tight text-slate-900">
+						{pageTitle}
+					</h1>
+				)}
 
 				<div className="mt-6 grid grid-cols-[260px_1fr] gap-8">
 					{/* Filters – vertical column */}
@@ -149,12 +169,34 @@ export function CatalogPage() {
 							</div>
 						</div>
 
+						{visibleProducts.length === 0 && (
+							<div className="flex flex-col items-center justify-center py-20 text-center">
+								<Search
+									className="mb-4 size-10 text-slate-300"
+									aria-hidden="true"
+								/>
+								<p className="font-sans text-base font-medium text-slate-600">
+									Nenhum produto encontrado
+								</p>
+								{isSearching && (
+									<p className="mt-1 font-sans text-sm text-slate-400">
+										Tente buscar por outro termo ou{" "}
+										<a
+											href="/catalog"
+											className="text-blue-600 hover:underline"
+										>
+											veja todos os produtos
+										</a>
+									</p>
+								)}
+							</div>
+						)}
+
 						<div className="grid grid-cols-4 gap-6">
-							{visibleProducts.map((product: Product, i) => (
+							{visibleProducts.map((product, i) => (
 								<ProductCard
 									key={product.id}
 									product={product}
-									onAddToCart={() => {}}
 									priority={i === 0}
 								/>
 							))}

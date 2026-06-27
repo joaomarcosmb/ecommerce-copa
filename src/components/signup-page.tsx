@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Form, FormActions, FormBody } from "@/components/ui/form";
 import { useAuth } from "@/hooks/use-auth";
+import { maskCpf } from "@/lib/masks";
 
 export function SignUpPage() {
 	const { signup, isLoading, error } = useAuth();
@@ -26,7 +27,6 @@ export function SignUpPage() {
 
 	async function onSubmit(values: SignUpValues) {
 		await signup(values);
-		// TODO: on success, redirect to the account/home page.
 	}
 
 	return (
@@ -56,7 +56,7 @@ export function SignUpPage() {
 						<div className="grid grid-cols-2 divide-x divide-slate-100">
 							{/* Coluna 1 — Informações pessoais */}
 							<div className="space-y-5 pr-8">
-								<p className="font-['Poppins',sans-serif] text-[11px] font-semibold uppercase text-slate-400">
+								<p className="font-sans text-[11px] font-semibold uppercase text-slate-400">
 									Informações pessoais
 								</p>
 								<div className="grid grid-cols-2 gap-4">
@@ -87,12 +87,13 @@ export function SignUpPage() {
 									type="text"
 									placeholder="000.000.000-00"
 									autoComplete="off"
+									mask={maskCpf}
 								/>
 							</div>
 
 							{/* Coluna 2 — Dados de acesso */}
 							<div className="space-y-5 pl-8">
-								<p className="font-['Poppins',sans-serif] text-[11px] font-semibold uppercase text-slate-400">
+								<p className="font-sans text-[11px] font-semibold uppercase text-slate-400">
 									Dados de acesso
 								</p>
 								<AuthField<SignUpValues>

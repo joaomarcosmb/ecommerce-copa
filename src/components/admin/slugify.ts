@@ -2,7 +2,7 @@
  * Generates a URL-friendly slug from an arbitrary label.
  * Strips accents, lowercases, and collapses non-alphanumerics into hyphens.
  */
-const COMBINING_MARKS = new RegExp("[\\u0300-\\u036f]", "g");
+const COMBINING_MARKS = /[\u0300-\u036f]/g;
 
 export function slugify(value: string): string {
 	return value

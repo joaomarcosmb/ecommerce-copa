@@ -10,24 +10,36 @@ interface Tab {
 interface TabsProps {
 	tabs: Tab[];
 	defaultTab?: number;
+	activeTab?: number;
+	onTabChange?: (index: number) => void;
 }
 
-function Tabs({ tabs, defaultTab = 0 }: TabsProps) {
+function Tabs({
+	tabs,
+	defaultTab = 0,
+	activeTab: controlledTab,
+	onTabChange,
+}: TabsProps) {
 	const tabsId = React.useId();
-	const [activeTab, setActiveTab] = React.useState(() => defaultTab);
+	const [internalTab, setInternalTab] = React.useState(() => defaultTab);
+
+	const activeTab = controlledTab ?? internalTab;
+	const setActiveTab = (index: number) => {
+		setInternalTab(index);
+		onTabChange?.(index);
+	};
+
 	const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
 		if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") {
 			return;
 		}
 
 		event.preventDefault();
-		setActiveTab((current) => {
-			if (event.key === "ArrowRight") {
-				return (current + 1) % tabs.length;
-			}
-
-			return (current - 1 + tabs.length) % tabs.length;
-		});
+		setActiveTab(
+			event.key === "ArrowRight"
+				? (activeTab + 1) % tabs.length
+				: (activeTab - 1 + tabs.length) % tabs.length,
+		);
 	};
 
 	return (
@@ -45,7 +57,7 @@ function Tabs({ tabs, defaultTab = 0 }: TabsProps) {
 						onClick={() => setActiveTab(index)}
 						onKeyDown={handleKeyDown}
 						className={cn(
-							"flex items-center gap-2 px-4 py-3 text-[14px] leading-5 font-['Poppins',sans-serif] font-medium",
+							"flex items-center gap-2 px-4 py-3 text-[14px] leading-5 font-sans font-medium",
 							"transition-[color,border-color] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300",
 							activeTab === index
 								? "border-b-2 border-blue-700 text-blue-700"

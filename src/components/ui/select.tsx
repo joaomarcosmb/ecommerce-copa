@@ -49,7 +49,7 @@ function SelectTrigger({
 			{label && (
 				<label
 					id={labelId}
-					className="text-[14px] leading-5 font-['Poppins',sans-serif] font-medium text-slate-900"
+					className="text-[14px] leading-5 font-sans font-medium text-slate-900"
 				>
 					{label}
 				</label>

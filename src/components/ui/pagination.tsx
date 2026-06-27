@@ -21,7 +21,7 @@ export function Pagination({
 	const canGoNext = currentPage < totalPages;
 
 	const navButtonBase =
-		"inline-flex size-9 items-center justify-center rounded-full font-['Poppins',sans-serif] text-sm transition-[background-color,color] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2";
+		"inline-flex size-9 items-center justify-center rounded-full font-sans text-sm transition-[background-color,color] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2";
 
 	return (
 		<nav

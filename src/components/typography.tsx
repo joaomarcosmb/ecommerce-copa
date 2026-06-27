@@ -27,10 +27,7 @@ function H2({ className, ...props }: React.ComponentProps<"h2">) {
 function H3({ className, ...props }: React.ComponentProps<"h3">) {
 	return (
 		<h3
-			className={cn(
-				"font-['Poppins',sans-serif] text-[16px] leading-6 font-medium",
-				className,
-			)}
+			className={cn("font-sans text-[16px] leading-6 font-medium", className)}
 			{...props}
 		/>
 	);
@@ -40,7 +37,7 @@ function P({ className, ...props }: React.ComponentProps<"p">) {
 	return (
 		<p
 			className={cn(
-				"font-['Poppins',sans-serif] text-[14px] leading-5 tracking-[0.25px]",
+				"font-sans text-[14px] leading-5 tracking-[0.25px]",
 				className,
 			)}
 			{...props}
@@ -52,7 +49,7 @@ function BodySmall({ className, ...props }: React.ComponentProps<"p">) {
 	return (
 		<p
 			className={cn(
-				"font-['Poppins',sans-serif] text-[12px] leading-4 font-normal tracking-[0.4px]",
+				"font-sans text-[12px] leading-4 font-normal tracking-[0.4px]",
 				className,
 			)}
 			{...props}
@@ -64,7 +61,7 @@ function LabelLarge({ className, ...props }: React.ComponentProps<"span">) {
 	return (
 		<span
 			className={cn(
-				"font-['Poppins',sans-serif] text-[14px] leading-5 font-medium tracking-[0.1px]",
+				"font-sans text-[14px] leading-5 font-medium tracking-[0.1px]",
 				className,
 			)}
 			{...props}
@@ -76,7 +73,7 @@ function LabelMedium({ className, ...props }: React.ComponentProps<"span">) {
 	return (
 		<span
 			className={cn(
-				"font-['Poppins',sans-serif] text-[12px] leading-4 font-medium tracking-[0.5px]",
+				"font-sans text-[12px] leading-4 font-medium tracking-[0.5px]",
 				className,
 			)}
 			{...props}
@@ -88,7 +85,7 @@ function LabelSmall({ className, ...props }: React.ComponentProps<"span">) {
 	return (
 		<span
 			className={cn(
-				"font-['Poppins',sans-serif] text-[11px] leading-4 font-medium tracking-[0.5px]",
+				"font-sans text-[11px] leading-4 font-medium tracking-[0.5px]",
 				className,
 			)}
 			{...props}

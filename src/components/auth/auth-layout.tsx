@@ -39,7 +39,7 @@ export function AuthLayout({
 						{children}
 					</div>
 				</div>
-				<p className="mt-6 text-center font-['Poppins',sans-serif] text-[14px] leading-5 text-slate-600">
+				<p className="mt-6 text-center font-sans text-[14px] leading-5 text-slate-600">
 					{footer}
 				</p>
 			</div>

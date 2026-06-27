@@ -25,7 +25,7 @@ function Checkbox({ label, className = "", ...props }: CheckboxProps) {
 				/>
 			</div>
 			{label && (
-				<span className="font-['Poppins',sans-serif] text-[14px] leading-5 text-slate-900 transition-colors group-hover:text-blue-700">
+				<span className="font-sans text-[14px] leading-5 text-slate-900 transition-colors group-hover:text-blue-700">
 					{label}
 				</span>
 			)}

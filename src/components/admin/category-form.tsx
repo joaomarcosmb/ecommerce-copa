@@ -91,7 +91,7 @@ export function CategoryForm({
 						<input
 							type="file"
 							accept="image/*"
-							className="block w-full font-['Poppins',sans-serif] text-[14px] text-slate-700 file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-1.5 file:text-[13px] file:font-medium file:text-blue-700 hover:file:bg-blue-100"
+							className="block w-full font-sans text-[14px] text-slate-700 file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-1.5 file:text-[13px] file:font-medium file:text-blue-700 hover:file:bg-blue-100"
 							onChange={handleFileChange}
 						/>
 					</div>

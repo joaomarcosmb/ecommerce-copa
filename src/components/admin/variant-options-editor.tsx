@@ -44,7 +44,7 @@ export function VariantOptionsEditor({
 	if (options.length === 0) {
 		return (
 			<div className="flex flex-col items-start gap-3">
-				<p className="font-['Poppins',sans-serif] text-[14px] text-slate-500">
+				<p className="font-sans text-[14px] text-slate-500">
 					Sem opções. O produto terá uma única variante.
 				</p>
 				<Button type="button" variant="outline" size="sm" onClick={addOption}>
@@ -68,7 +68,7 @@ export function VariantOptionsEditor({
 							value={option.name}
 							onChange={(e) => update(index, { name: e.target.value })}
 							placeholder="Nome da opção (ex.: Tamanho)"
-							className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2 font-['Poppins',sans-serif] text-[14px] text-slate-900 placeholder:text-slate-400 focus-visible:border-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+							className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2 font-sans text-[14px] text-slate-900 placeholder:text-slate-400 focus-visible:border-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
 						/>
 						<Button
 							type="button"
@@ -86,7 +86,7 @@ export function VariantOptionsEditor({
 						{option.values.map((value) => (
 							<span
 								key={value}
-								className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 py-1 pl-3 pr-1.5 font-['Poppins',sans-serif] text-[13px] font-medium text-blue-800"
+								className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 py-1 pl-3 pr-1.5 font-sans text-[13px] font-medium text-blue-800"
 							>
 								{value}
 								<button
@@ -112,7 +112,7 @@ export function VariantOptionsEditor({
 							}}
 							onBlur={() => addValue(index)}
 							placeholder="Adicionar valor e Enter"
-							className="max-w-sm flex-1 rounded-xl border border-transparent bg-transparent px-4 py-2 font-['Poppins',sans-serif] text-[13px] text-slate-900 placeholder:text-slate-400 focus-visible:border-slate-200 focus-visible:bg-white focus-visible:outline-none"
+							className="max-w-sm flex-1 rounded-xl border border-transparent bg-transparent px-4 py-2 font-sans text-[13px] text-slate-900 placeholder:text-slate-400 focus-visible:border-slate-200 focus-visible:bg-white focus-visible:outline-none"
 						/>
 					</div>
 				</div>

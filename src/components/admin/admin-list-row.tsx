@@ -89,7 +89,7 @@ export function AdminListRow({
 				</div>
 			)}
 			<div className="min-w-0 flex-1">
-				<p className="truncate font-['Poppins',sans-serif] text-[14px] leading-5 font-medium text-slate-900">
+				<p className="truncate font-sans text-[14px] leading-5 font-medium text-slate-900">
 					{title}
 				</p>
 				{subtitle && (

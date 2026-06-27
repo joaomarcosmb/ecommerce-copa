@@ -106,7 +106,7 @@ function FormTitle({
 		<Comp
 			data-slot="form-title"
 			className={cn(
-				"font-['Poppins',sans-serif] text-[18px] leading-7 font-semibold text-slate-950",
+				"font-sans text-[18px] leading-7 font-semibold text-slate-950",
 				className,
 			)}
 			{...props}
@@ -119,7 +119,7 @@ function FormLead({ className, ...props }: React.ComponentProps<"p">) {
 		<p
 			data-slot="form-lead"
 			className={cn(
-				"max-w-[48ch] font-['Poppins',sans-serif] text-[14px] leading-6 text-slate-500 -mt-2",
+				"max-w-[48ch] font-sans text-[14px] leading-6 text-slate-500 -mt-2",
 				className,
 			)}
 			{...props}
@@ -159,7 +159,7 @@ function FormLabel({ className, ...props }: React.ComponentProps<"label">) {
 			data-slot="form-label"
 			htmlFor={formItemId}
 			className={cn(
-				"block font-['Poppins',sans-serif] text-[14px] leading-6 font-semibold text-slate-950",
+				"block font-sans text-[14px] leading-6 font-semibold text-slate-950",
 				error && "text-red-700",
 				className,
 			)}
@@ -193,7 +193,7 @@ function FormDescription({ className, ...props }: React.ComponentProps<"p">) {
 			data-slot="form-description"
 			id={formDescriptionId}
 			className={cn(
-				"font-['Poppins',sans-serif] text-[13px] leading-6 text-slate-500",
+				"font-sans text-[13px] leading-6 text-slate-500",
 				className,
 			)}
 			{...props}
@@ -217,10 +217,7 @@ function FormMessage({
 		<p
 			data-slot="form-message"
 			id={formMessageId}
-			className={cn(
-				"font-['Poppins',sans-serif] text-[12px] leading-5 text-red-700",
-				className,
-			)}
+			className={cn("font-sans text-[12px] leading-5 text-red-700", className)}
 			{...props}
 		>
 			{body}
@@ -237,7 +234,7 @@ function FormTextarea({
 			data-slot="form-textarea"
 			className={cn(
 				"min-h-40 w-full resize-none rounded-[18px] border border-slate-200 bg-white px-4 py-4",
-				"font-['Poppins',sans-serif] text-[14px] leading-6 text-slate-700 placeholder:text-slate-400",
+				"font-sans text-[14px] leading-6 text-slate-700 placeholder:text-slate-400",
 				"shadow-sm transition-[border-color,box-shadow] duration-200",
 				"focus-visible:border-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-1",
 				"disabled:cursor-not-allowed disabled:opacity-50",
@@ -253,7 +250,7 @@ function FormMetaRow({ className, ...props }: React.ComponentProps<"div">) {
 		<div
 			data-slot="form-meta-row"
 			className={cn(
-				"flex items-center justify-between gap-3 font-['Poppins',sans-serif] text-[12px] leading-5 text-slate-500",
+				"flex items-center justify-between gap-3 font-sans text-[12px] leading-5 text-slate-500",
 				className,
 			)}
 			{...props}

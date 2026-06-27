@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Check } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/format";
@@ -24,27 +25,40 @@ function StepIndicator({
 	activeStep,
 	onStepChange,
 }: StepIndicatorProps) {
-	const stepClass = (index: number) =>
-		cn(
-			"flex flex-1 items-center justify-center py-3.5 transition-colors duration-200",
-			"font-['Poppins',sans-serif] text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-300",
-			activeStep === index
-				? "bg-blue-700 text-white"
-				: "text-slate-500 hover:bg-slate-50",
-		);
-
 	return (
-		<div className="flex w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200">
-			{steps.map((label, index) => (
-				<button
-					key={label}
-					type="button"
-					className={stepClass(index)}
-					onClick={() => onStepChange(index)}
-				>
-					{label}
-				</button>
-			))}
+		<div className="flex w-full max-w-2xl flex-col items-center gap-1">
+			<p className="font-sans text-xs font-medium text-slate-600">
+				Etapa {activeStep + 1} de {steps.length}
+			</p>
+			<div className="flex w-full overflow-hidden rounded-2xl border border-slate-200">
+				{steps.map((label, index) => {
+					const isDone = index < activeStep;
+					const isActive = index === activeStep;
+					const isFuture = index > activeStep;
+
+					return (
+						<button
+							key={label}
+							type="button"
+							disabled={isFuture}
+							onClick={() => isDone && onStepChange(index)}
+							className={cn(
+								"flex flex-1 items-center justify-center gap-2 py-3.5 transition-colors duration-200",
+								"font-sans text-sm font-semibold",
+								"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-300",
+								isActive && "bg-blue-700 text-white",
+								isDone && "cursor-pointer text-slate-600 hover:bg-slate-50",
+								isFuture && "cursor-not-allowed text-slate-300",
+							)}
+						>
+							{isDone && (
+								<Check className="size-3.5 shrink-0" aria-hidden="true" />
+							)}
+							{label}
+						</button>
+					);
+				})}
+			</div>
 		</div>
 	);
 }

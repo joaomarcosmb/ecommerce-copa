@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MapPin, Plus } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { useForm, useFormContext } from "react-hook-form";
 import { z } from "zod";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -17,6 +18,8 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { apiGet, apiPost } from "@/lib/api";
+import { maskCep } from "@/lib/masks";
+import { fetchAddressByCep } from "@/lib/via-cep";
 import type {
 	AddressListResponse,
 	AddressResponse,
@@ -40,7 +43,7 @@ type AddressValues = z.infer<typeof addressSchema>;
 
 const inputClass = cn(
 	"w-full rounded-xl border border-slate-200 bg-white px-4 py-2 shadow-sm",
-	"text-[14px] leading-5 font-['Poppins',sans-serif] text-slate-900 placeholder:text-slate-400",
+	"text-[14px] leading-5 font-sans text-slate-900 placeholder:text-slate-400",
 	"focus-visible:border-blue-600 focus-visible:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-1",
 	"transition-[background-color,border-color,box-shadow] duration-200",
 	"disabled:cursor-not-allowed disabled:opacity-50",
@@ -77,6 +80,64 @@ function AddressField({
 									"border-red-600 focus-visible:border-red-600 focus-visible:ring-red-200",
 							)}
 						/>
+					</FormControl>
+					<FormMessage />
+				</FormItem>
+			)}
+		/>
+	);
+}
+
+function CepField() {
+	const { setValue, trigger } = useFormContext<AddressValues>();
+	const [isFetching, setIsFetching] = useState(false);
+
+	async function handleCepChange(masked: string) {
+		if (masked.length !== 9) return;
+		setIsFetching(true);
+		const result = await fetchAddressByCep(masked);
+		setIsFetching(false);
+		if (!result) return;
+		setValue("street", result.street, { shouldValidate: true });
+		setValue("neighborhood", result.neighborhood, { shouldValidate: true });
+		setValue("city", result.city, { shouldValidate: true });
+		setValue("state", result.state, { shouldValidate: true });
+		trigger(["street", "neighborhood", "city", "state"]);
+	}
+
+	return (
+		<FormField<AddressValues>
+			name="postalCode"
+			render={({ field, fieldState }) => (
+				<FormItem className="space-y-2">
+					<FormLabel>CEP</FormLabel>
+					<FormControl>
+						<div className="relative">
+							<input
+								{...field}
+								value={field.value ?? ""}
+								placeholder="00000-000"
+								autoComplete="postal-code"
+								inputMode="numeric"
+								onChange={(e) => {
+									const masked = maskCep(e.target.value);
+									field.onChange(masked);
+									handleCepChange(masked);
+								}}
+								className={cn(
+									inputClass,
+									isFetching && "pr-10",
+									fieldState.error &&
+										"border-red-600 focus-visible:border-red-600 focus-visible:ring-red-200",
+								)}
+							/>
+							{isFetching && (
+								<Loader2
+									className="absolute right-3 top-1/2 -translate-y-1/2 size-4 animate-spin text-slate-400"
+									aria-label="Buscando CEP…"
+								/>
+							)}
+						</div>
 					</FormControl>
 					<FormMessage />
 				</FormItem>
@@ -198,12 +259,7 @@ function NewAddressForm({ onSaved, onCancel }: NewAddressFormProps) {
 
 					<div className="grid grid-cols-2 divide-x divide-slate-100 max-w-4xl mx-auto">
 						<div className="space-y-5 pr-8">
-							<AddressField
-								name="postalCode"
-								label="CEP"
-								placeholder="00000-000"
-								autoComplete="postal-code"
-							/>
+							<CepField />
 							<AddressField
 								name="street"
 								label="Endereço"

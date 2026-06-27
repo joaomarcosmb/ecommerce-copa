@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Loader2 } from "lucide-react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -14,6 +16,8 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
+import { maskCep } from "@/lib/masks";
+import { fetchAddressByCep } from "@/lib/via-cep";
 
 const addressSchema = z.object({
 	name: z.string().min(1, "Informe o nome."),
@@ -22,7 +26,7 @@ const addressSchema = z.object({
 	neighborhood: z.string().min(1, "Informe o bairro."),
 	city: z.string().min(1, "Informe a cidade."),
 	state: z.string().min(1, "Informe o estado."),
-	postalCode: z.string().min(1, "Informe o CEP."),
+	postalCode: z.string().regex(/^\d{5}-\d{3}$/, "CEP inválido (ex: 01234-010)"),
 	complement: z.string().optional(),
 	isDefault: z.boolean().optional(),
 });
@@ -50,6 +54,21 @@ export function AddressForm({
 		resolver: zodResolver(addressSchema),
 		defaultValues,
 	});
+	const [isFetchingCep, setIsFetchingCep] = useState(false);
+
+	async function handleCepChange(masked: string) {
+		if (masked.length !== 9) return;
+		setIsFetchingCep(true);
+		const result = await fetchAddressByCep(masked);
+		setIsFetchingCep(false);
+		if (!result) return;
+		form.setValue("street", result.street, { shouldValidate: true });
+		form.setValue("neighborhood", result.neighborhood, {
+			shouldValidate: true,
+		});
+		form.setValue("city", result.city, { shouldValidate: true });
+		form.setValue("state", result.state, { shouldValidate: true });
+	}
 
 	return (
 		<Form {...form}>
@@ -169,7 +188,25 @@ export function AddressForm({
 						<FormItem>
 							<FormLabel>CEP</FormLabel>
 							<FormControl>
-								<Input placeholder="00000-000" {...field} />
+								<div className="relative">
+									<Input
+										{...field}
+										placeholder="00000-000"
+										inputMode="numeric"
+										className={isFetchingCep ? "pr-10" : undefined}
+										onChange={(e) => {
+											const masked = maskCep(e.target.value);
+											field.onChange(masked);
+											handleCepChange(masked);
+										}}
+									/>
+									{isFetchingCep && (
+										<Loader2
+											className="absolute right-3 top-1/2 -translate-y-1/2 size-4 animate-spin text-slate-400"
+											aria-label="Buscando CEP…"
+										/>
+									)}
+								</div>
 							</FormControl>
 							<FormMessage />
 						</FormItem>

@@ -66,9 +66,7 @@ export function ProductImagesField({
 				className="flex size-60 flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-slate-300 text-slate-400 transition hover:border-blue-500 hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
 			>
 				<ImagePlus aria-hidden="true" className="size-12" />
-				<span className="font-['Poppins',sans-serif] text-[12px]">
-					Adicionar
-				</span>
+				<span className="font-sans text-[12px]">Adicionar</span>
 			</button>
 
 			<input

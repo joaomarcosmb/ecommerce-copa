@@ -11,9 +11,10 @@ import {
 } from "@/components/auth/schemas";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Form, FormActions, FormBody, FormMetaRow } from "@/components/ui/form";
+import { Form, FormActions, FormBody } from "@/components/ui/form";
 import { apiPost } from "@/lib/api";
+import { useCart } from "@/contexts/cart-context";
+import { maskCpf } from "@/lib/masks";
 import { H2, P } from "../typography";
 
 type Mode = "signup" | "login";
@@ -25,7 +26,7 @@ interface ModeFooterProps {
 
 function ModeFooter({ mode, onSwitch }: ModeFooterProps) {
 	return (
-		<p className="-mt-3 text-center font-['Poppins',sans-serif] text-sm text-slate-500">
+		<p className="-mt-3 text-center font-sans text-sm text-slate-500">
 			{mode === "signup" ? (
 				<>
 					Já tem conta?{" "}
@@ -61,6 +62,7 @@ interface SignupFormProps {
 function SignupForm({ onSuccess, onSwitchMode }: SignupFormProps) {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const { mergeGuestCartOnLogin } = useCart();
 
 	const form = useForm<SignUpValues>({
 		resolver: zodResolver(signUpSchema),
@@ -90,6 +92,7 @@ function SignupForm({ onSuccess, onSwitchMode }: SignupFormProps) {
 				email: values.email,
 				password: values.password,
 			});
+			await mergeGuestCartOnLogin();
 			onSuccess();
 		} catch {
 			setError(
@@ -118,7 +121,7 @@ function SignupForm({ onSuccess, onSwitchMode }: SignupFormProps) {
 					</P>
 					<div className="grid grid-cols-2 divide-x divide-slate-100 max-w-4xl mx-auto">
 						<div className="space-y-5 pr-8">
-							<p className="font-['Poppins',sans-serif] text-[11px] font-semibold uppercase text-slate-400">
+							<p className="font-sans text-[11px] font-semibold uppercase text-slate-400">
 								Informações pessoais
 							</p>
 							<div className="grid grid-cols-2 gap-4">
@@ -149,11 +152,12 @@ function SignupForm({ onSuccess, onSwitchMode }: SignupFormProps) {
 								type="text"
 								placeholder="000.000.000-00"
 								autoComplete="off"
+								mask={maskCpf}
 							/>
 						</div>
 
 						<div className="space-y-5 pl-8">
-							<p className="font-['Poppins',sans-serif] text-[11px] font-semibold uppercase text-slate-400">
+							<p className="font-sans text-[11px] font-semibold uppercase text-slate-400">
 								Dados de acesso
 							</p>
 							<AuthField<SignUpValues>
@@ -206,6 +210,7 @@ interface LoginFormProps {
 function LoginForm({ onSuccess, onSwitchMode }: LoginFormProps) {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const { mergeGuestCartOnLogin } = useCart();
 
 	const form = useForm<SignInValues>({
 		resolver: zodResolver(signInSchema),
@@ -220,6 +225,7 @@ function LoginForm({ onSuccess, onSwitchMode }: LoginFormProps) {
 				email: values.email,
 				password: values.password,
 			});
+			await mergeGuestCartOnLogin();
 			onSuccess();
 		} catch {
 			setError(

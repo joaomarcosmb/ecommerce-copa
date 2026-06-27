@@ -1,11 +1,9 @@
 @import "tailwindcss";
-@source "../**/*.{astro,js,ts,jsx,tsx}";
-
 @import "tw-animate-css";
-
 @import "shadcn/tailwind.css";
-
 @import "@fontsource-variable/inter";
+
+@source "../**/*.{astro,js,ts,jsx,tsx}";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -140,7 +138,7 @@
 }
 
 @theme inline {
-	--font-sans: "Inter Variable", sans-serif;
+	--font-sans: "Poppins", sans-serif;
 	--font-big-shoulders: "Big Shoulders Display", sans-serif;
 
 	--color-sidebar-ring: var(--sidebar-ring);

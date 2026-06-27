@@ -70,7 +70,7 @@ function SectionCard({
 				{title}
 			</h2>
 			{description && (
-				<p className="mt-1 font-['Poppins',sans-serif] text-[14px] text-slate-500">
+				<p className="mt-1 font-sans text-[14px] text-slate-500">
 					{description}
 				</p>
 			)}
@@ -93,8 +93,6 @@ export function ProductEditor({ productId }: ProductEditorProps) {
 		defaultValues: emptyProductForm,
 	});
 
-	// Em edição a página é estática; o id vem da query (?id=…), como nas demais
-	// páginas admin. O prop continua suportado para uso direto.
 	const resolvedId =
 		productId ??
 		(typeof window !== "undefined"
@@ -264,9 +262,7 @@ export function ProductEditor({ productId }: ProductEditorProps) {
 						<AlertDescription>{loadError}</AlertDescription>
 					</Alert>
 				) : isLoading ? (
-					<p className="mt-8 font-['Poppins',sans-serif] text-slate-500">
-						Carregando…
-					</p>
+					<p className="mt-8 font-sans text-slate-500">Carregando…</p>
 				) : (
 					<Form {...form}>
 						<form
@@ -363,7 +359,7 @@ export function ProductEditor({ productId }: ProductEditorProps) {
 									onApplyToAll={handleApplyToAll}
 								/>
 								{form.formState.errors.variants?.root && (
-									<p className="mt-3 font-['Poppins',sans-serif] text-[12px] text-red-700">
+									<p className="mt-3 font-sans text-[12px] text-red-700">
 										{form.formState.errors.variants.root.message}
 									</p>
 								)}

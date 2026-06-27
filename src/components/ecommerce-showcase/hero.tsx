@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { Pause, Play } from "lucide-react";
+
 import {
 	Carousel,
 	CarouselContent,
@@ -17,6 +19,7 @@ const AUTOPLAY_INTERVAL_MS = 8000;
 export function HeroSection() {
 	const [api, setApi] = useState<CarouselApi>();
 	const [current, setCurrent] = useState(0);
+	const [isPaused, setIsPaused] = useState(false);
 	const isPausedRef = useRef(false);
 	const { data: slides } = useHeroSlides();
 
@@ -28,6 +31,10 @@ export function HeroSection() {
 	}, []);
 
 	useEffect(() => {
+		isPausedRef.current = isPaused;
+	}, [isPaused]);
+
+	useEffect(() => {
 		if (!api) return;
 
 		setCurrent(api.selectedScrollSnap());
@@ -36,7 +43,7 @@ export function HeroSection() {
 		const stop = startAutoplay(api);
 
 		const onVisibilityChange = () => {
-			isPausedRef.current = document.hidden;
+			isPausedRef.current = document.hidden || isPaused;
 		};
 		document.addEventListener("visibilitychange", onVisibilityChange);
 
@@ -44,7 +51,7 @@ export function HeroSection() {
 			stop();
 			document.removeEventListener("visibilitychange", onVisibilityChange);
 		};
-	}, [api, startAutoplay]);
+	}, [api, startAutoplay, isPaused]);
 
 	return (
 		<section
@@ -53,7 +60,7 @@ export function HeroSection() {
 				isPausedRef.current = true;
 			}}
 			onMouseLeave={() => {
-				isPausedRef.current = false;
+				isPausedRef.current = isPaused;
 			}}
 		>
 			<Carousel setApi={setApi} opts={{ loop: true }} className="h-full">
@@ -85,9 +92,9 @@ export function HeroSection() {
 				</CarouselContent>
 
 				<div
-					className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 gap-3"
 					role="tablist"
 					aria-label="Slides do banner"
+					className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 items-center gap-3"
 				>
 					{slides.map((slide, i) => (
 						<button
@@ -101,6 +108,24 @@ export function HeroSection() {
 						/>
 					))}
 				</div>
+
+				<button
+					type="button"
+					onClick={() => setIsPaused((p) => !p)}
+					aria-label={
+						isPaused
+							? "Retomar apresentação automática"
+							: "Pausar apresentação automática"
+					}
+					aria-pressed={isPaused}
+					className="absolute bottom-5 right-8 z-10 flex size-7 items-center justify-center rounded-full text-white/70 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+				>
+					{isPaused ? (
+						<Play className="size-4 fill-current" aria-hidden="true" />
+					) : (
+						<Pause className="size-4 fill-current" aria-hidden="true" />
+					)}
+				</button>
 
 				<CarouselPrevious
 					className="left-8 top-1/2 size-8 -translate-y-1/2 cursor-pointer bg-transparent text-primary-foreground transition-colors hover:bg-white/30"

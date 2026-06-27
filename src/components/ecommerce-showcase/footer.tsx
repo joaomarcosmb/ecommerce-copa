@@ -52,10 +52,10 @@ export function Footer() {
 							Categorias
 						</h3>
 						<ul className="flex flex-col gap-3">
-							{categories.map(({ label }) => (
-								<li key={label}>
+							{categories.map(({ label, slug }) => (
+								<li key={slug}>
 									<a
-										href="#"
+										href={`/catalog?category=${slug}`}
 										className="text-sm text-slate-400 transition-colors hover:text-white"
 									>
 										{label}

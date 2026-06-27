@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ShoppingCart } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -72,13 +72,30 @@ function ProductPageContent({
 	const [selectedImage, setSelectedImage] = useState(0);
 	const [quantity, setQuantity] = useState(1);
 	const [isAddingToCart, setIsAddingToCart] = useState(false);
+	const [activeTab, setActiveTab] = useState(0);
+	const tabsSectionRef = useRef<HTMLElement>(null);
 	const { addItem } = useCart();
+
+	function openReviewsTab() {
+		setActiveTab(1);
+		tabsSectionRef.current?.scrollIntoView({
+			behavior: "smooth",
+			block: "start",
+		});
+	}
+
+	const skuMeta = {
+		title: selectedSku.title ?? undefined,
+		photo: selectedSku.photo ?? undefined,
+		unitPrice: selectedSku.price ?? undefined,
+		stock: selectedSku.stock ?? undefined,
+	};
 
 	async function handleAddToCart() {
 		if (!selectedSku?.id) return;
 		setIsAddingToCart(true);
 		try {
-			await addItem(selectedSku.id, quantity);
+			await addItem(selectedSku.id, quantity, skuMeta);
 		} finally {
 			setIsAddingToCart(false);
 		}
@@ -88,7 +105,7 @@ function ProductPageContent({
 		if (!selectedSku?.id) return;
 		setIsAddingToCart(true);
 		try {
-			await addItem(selectedSku.id, quantity);
+			await addItem(selectedSku.id, quantity, skuMeta);
 			window.location.href = "/cart?step=1";
 		} finally {
 			setIsAddingToCart(false);
@@ -185,6 +202,7 @@ function ProductPageContent({
 								<Button
 									variant="link"
 									className="h-auto p-0 text-sm font-medium"
+									onClick={openReviewsTab}
 								>
 									Ver avaliações
 								</Button>
@@ -275,8 +293,8 @@ function ProductPageContent({
 				</div>
 
 				{/* Tabs */}
-				<section className="mt-10 px-6">
-					<Tabs tabs={tabs} />
+				<section ref={tabsSectionRef} className="mt-10 px-6">
+					<Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
 				</section>
 
 				{/* Related products */}

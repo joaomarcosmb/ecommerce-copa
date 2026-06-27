@@ -19,7 +19,6 @@ export function SignInPage() {
 
 	async function onSubmit(values: SignInValues) {
 		await login(values);
-		// TODO: on success, redirect to the account/home page.
 	}
 
 	return (

@@ -29,7 +29,7 @@ function Input({
 			{label && (
 				<label
 					htmlFor={inputId}
-					className="text-[14px] leading-5 font-['Poppins',sans-serif] font-medium text-slate-900"
+					className="text-[14px] leading-5 font-sans font-medium text-slate-900"
 				>
 					{label}
 				</label>
@@ -51,7 +51,7 @@ function Input({
 					className={`
             w-full px-4 py-2 rounded-xl 
             border border-slate-200 bg-white shadow-sm
-            text-[14px] leading-5 font-['Poppins',sans-serif] text-slate-900
+            text-[14px] leading-5 font-sans text-slate-900
             placeholder:text-slate-400
             focus-visible:border-blue-600 focus-visible:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-1
             transition-[background-color,border-color,box-shadow] duration-200
@@ -66,7 +66,7 @@ function Input({
 			{error && (
 				<p
 					id={errorId}
-					className="text-[12px] leading-4 font-['Poppins',sans-serif] text-red-700"
+					className="text-[12px] leading-4 font-sans text-red-700"
 				>
 					{error}
 				</p>
@@ -74,7 +74,7 @@ function Input({
 			{helperText && !error && (
 				<p
 					id={helperTextId}
-					className="text-[12px] leading-4 font-['Poppins',sans-serif] text-slate-400"
+					className="text-[12px] leading-4 font-sans text-slate-400"
 				>
 					{helperText}
 				</p>

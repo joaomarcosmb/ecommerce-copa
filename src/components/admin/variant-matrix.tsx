@@ -13,7 +13,7 @@ interface VariantMatrixProps {
 }
 
 const cellInput =
-	"w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 font-['Poppins',sans-serif] text-[13px] text-slate-900 placeholder:text-slate-400 focus-visible:border-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300";
+	"w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 font-sans text-[13px] text-slate-900 placeholder:text-slate-400 focus-visible:border-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300";
 
 function label(variant: VariantDraft): string {
 	return variant.optionValues.length > 0
@@ -53,7 +53,7 @@ export function VariantMatrix({
 	return (
 		<div className="space-y-4">
 			<div className="flex flex-wrap items-center justify-between">
-				<p className="font-['Poppins',sans-serif] text-[13px] text-slate-500">
+				<p className="font-sans text-[13px] text-slate-500">
 					{hasOptions
 						? `${variants.length} combinaç${variants.length === 1 ? "ão" : "ões"}`
 						: "Produto sem variações"}
@@ -75,7 +75,7 @@ export function VariantMatrix({
 
 			{bulkOpen && (
 				<div className="flex flex-wrap items-end gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-					<label className="flex flex-col gap-1 font-['Poppins',sans-serif] text-[12px] text-slate-600">
+					<label className="flex flex-col gap-1 font-sans text-[12px] text-slate-600">
 						Preço (R$)
 						<input
 							value={bulkPrice}
@@ -85,7 +85,7 @@ export function VariantMatrix({
 							className={cellInput}
 						/>
 					</label>
-					<label className="flex flex-col gap-1 font-['Poppins',sans-serif] text-[12px] text-slate-600">
+					<label className="flex flex-col gap-1 font-sans text-[12px] text-slate-600">
 						Estoque
 						<input
 							value={bulkStock}
@@ -105,7 +105,7 @@ export function VariantMatrix({
 			<div className="hidden overflow-hidden rounded-2xl border border-slate-200 sm:block">
 				<table className="w-full border-collapse">
 					<thead>
-						<tr className="bg-slate-50 text-left font-['Poppins',sans-serif] text-[12px] font-semibold uppercase tracking-wide text-slate-500">
+						<tr className="bg-slate-50 text-left font-sans text-[12px] font-semibold uppercase tracking-wide text-slate-500">
 							<th className="px-3 py-2.5">Variante</th>
 							<th className="px-3 py-2.5">Preço (R$)</th>
 							<th className="px-3 py-2.5">Preço orig.</th>
@@ -120,7 +120,7 @@ export function VariantMatrix({
 								key={variant.optionValues.join("|") || "default"}
 								className="border-t border-slate-100"
 							>
-								<td className="px-3 py-2 font-['Poppins',sans-serif] text-[13px] font-medium text-slate-900">
+								<td className="px-3 py-2 font-sans text-[13px] font-medium text-slate-900">
 									{label(variant)}
 								</td>
 								<td className="px-3 py-2">
@@ -187,7 +187,7 @@ export function VariantMatrix({
 						className="rounded-2xl border border-slate-200 p-4"
 					>
 						<div className="mb-3 flex items-center justify-between">
-							<span className="font-['Poppins',sans-serif] text-[14px] font-semibold text-slate-900">
+							<span className="font-sans text-[14px] font-semibold text-slate-900">
 								{label(variant)}
 							</span>
 							<Button
@@ -203,7 +203,7 @@ export function VariantMatrix({
 							</Button>
 						</div>
 						<div className="grid grid-cols-2 gap-3">
-							<label className="flex flex-col gap-1 font-['Poppins',sans-serif] text-[12px] text-slate-600">
+							<label className="flex flex-col gap-1 font-sans text-[12px] text-slate-600">
 								Preço (R$)
 								<input
 									value={variant.price}
@@ -212,7 +212,7 @@ export function VariantMatrix({
 									className={cellInput}
 								/>
 							</label>
-							<label className="flex flex-col gap-1 font-['Poppins',sans-serif] text-[12px] text-slate-600">
+							<label className="flex flex-col gap-1 font-sans text-[12px] text-slate-600">
 								Preço orig.
 								<input
 									value={variant.originalPrice}
@@ -223,7 +223,7 @@ export function VariantMatrix({
 									className={cellInput}
 								/>
 							</label>
-							<label className="flex flex-col gap-1 font-['Poppins',sans-serif] text-[12px] text-slate-600">
+							<label className="flex flex-col gap-1 font-sans text-[12px] text-slate-600">
 								Estoque
 								<input
 									value={variant.stock}
@@ -232,7 +232,7 @@ export function VariantMatrix({
 									className={cellInput}
 								/>
 							</label>
-							<label className="flex flex-col gap-1 font-['Poppins',sans-serif] text-[12px] text-slate-600">
+							<label className="flex flex-col gap-1 font-sans text-[12px] text-slate-600">
 								SKU
 								<input
 									value={variant.sku}
