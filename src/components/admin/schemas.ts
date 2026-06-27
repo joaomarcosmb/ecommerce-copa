@@ -7,31 +7,30 @@ export const categorySchema = z.object({
 
 export type CategoryFormValues = z.infer<typeof categorySchema>;
 
-export const productSchema = z.object({
-	categoryId: z.string().min(1, "Selecione uma categoria."),
-	schemaSelectors: z.array(
-		z.object({
-			key: z.string().trim().min(1, "Informe a chave."),
-			label: z.string().trim().min(1, "Informe o rótulo."),
-		}),
-	),
+export const optionSchema = z.object({
+	name: z.string().trim().min(1, "Informe o nome da opção."),
+	values: z
+		.array(z.string().trim().min(1))
+		.min(1, "Adicione ao menos um valor.")
+		.refine(
+			(vals) => new Set(vals.map((v) => v.toLowerCase())).size === vals.length,
+			"Valores não podem se repetir.",
+		),
 });
 
-export type ProductFormValues = z.infer<typeof productSchema>;
-
-export const emptyProductForm: ProductFormValues = {
-	categoryId: "",
-	schemaSelectors: [],
-};
-
-export const skuSchema = z.object({
-	title: z.string().trim().min(1, "Informe o título."),
-	description: z.string().trim().min(1, "Informe a descrição."),
+export const variantSchema = z.object({
+	optionValues: z.array(z.string()),
 	price: z
 		.string()
 		.min(1, "Informe o preço.")
 		.refine((v) => Number(v) > 0, "Deve ser maior que zero."),
-	originalPrice: z.string().optional(),
+	originalPrice: z
+		.string()
+		.optional()
+		.refine(
+			(v) => !v || Number(v) > 0,
+			"Preço original deve ser maior que zero.",
+		),
 	stock: z
 		.string()
 		.min(1, "Informe o estoque.")
@@ -39,21 +38,41 @@ export const skuSchema = z.object({
 			(v) => Number.isInteger(Number(v)) && Number(v) >= 0,
 			"Estoque inválido.",
 		),
-	attributes: z.array(
-		z.object({
-			key: z.string().trim().min(1, "Informe a chave."),
-			value: z.string().trim().min(1, "Informe o valor."),
-		}),
-	),
+	sku: z.string().trim().min(1, "Informe o SKU."),
+	image: z.any().optional(),
 });
 
-export type SkuFormValues = z.infer<typeof skuSchema>;
+export const productSchema = z.object({
+	name: z.string().trim().min(2, "Informe o nome (mínimo 2 caracteres)."),
+	description: z.string().trim().optional(),
+	categoryId: z.string().min(1, "Selecione uma categoria."),
+	images: z.array(z.any()),
+	options: z.array(optionSchema),
+	variants: z
+		.array(variantSchema)
+		.min(1, "O produto precisa de ao menos uma variante.")
+		.refine((vs) => {
+			const skus = vs.map((v) => v.sku.trim().toLowerCase()).filter(Boolean);
+			return new Set(skus).size === skus.length;
+		}, "Os SKUs das variantes devem ser únicos."),
+});
 
-export const emptySkuForm: SkuFormValues = {
-	title: "",
+export type ProductFormValues = z.infer<typeof productSchema>;
+
+export const emptyProductForm: ProductFormValues = {
+	name: "",
 	description: "",
-	price: "",
-	originalPrice: "",
-	stock: "0",
-	attributes: [],
+	categoryId: "",
+	images: [],
+	options: [],
+	variants: [
+		{
+			optionValues: [],
+			price: "",
+			originalPrice: "",
+			stock: "0",
+			sku: "",
+			image: undefined,
+		},
+	],
 };

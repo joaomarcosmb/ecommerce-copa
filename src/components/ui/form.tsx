@@ -238,8 +238,8 @@ function FormTextarea({
 			className={cn(
 				"min-h-40 w-full resize-none rounded-[18px] border border-slate-200 bg-white px-4 py-4",
 				"font-['Poppins',sans-serif] text-[14px] leading-6 text-slate-700 placeholder:text-slate-400",
-				"shadow-[inset_0_1px_2px_rgba(15,23,42,0.03)] transition-[border-color,box-shadow] duration-200",
-				"focus-visible:border-slate-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-100",
+				"shadow-sm transition-[border-color,box-shadow] duration-200",
+				"focus-visible:border-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-1",
 				"disabled:cursor-not-allowed disabled:opacity-50",
 				className,
 			)}

@@ -15,18 +15,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { P } from "@/components/typography";
 import type {
-	CategoryListResponse,
-	CategoryResponse,
 	ProductListResponse,
 	ProductResponse,
 } from "@/api/generated/model";
-import { apiDelete, apiGet, apiPatch, apiPost } from "@/lib/api";
-
+import { apiDelete, apiGet } from "@/lib/api";
+import { MOCK_PRODUCTS, PREVIEW_MOCK } from "@/lib/admin-products-mock";
+import { resolveMediaUrl } from "@/lib/format";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import { AdminFormDialog } from "./admin/admin-form-dialog";
-import { ProductForm } from "./admin/product-form";
-import { emptyProductForm, type ProductFormValues } from "./admin/schemas";
 import { AppShell } from "./ecommerce-showcase/app-shell";
 import { BreadcrumbNav } from "./ecommerce-showcase/breadcrumb-nav";
 
@@ -36,50 +32,35 @@ const breadcrumbItems = [
 	{ label: "Produtos" },
 ];
 
-function schemaSelectorsToPojo(
-	selectors: { key: string; label: string }[],
-): Record<string, unknown> {
-	return { selectors };
-}
-
-function pojoToSchemaSelectors(
-	schema: Record<string, unknown>,
-): { key: string; label: string }[] {
-	const raw = schema as { selectors?: { key: string; label: string }[] };
-	return raw?.selectors ?? [];
-}
-
-interface ProductCardProps {
-	product: ProductResponse;
-	categories: CategoryResponse[];
-	onEdit: () => void;
-	onDelete: () => void;
-}
+type ProductRow = ProductResponse & {
+	name?: string;
+	images?: string[];
+	variantCount?: number;
+};
 
 function ProductCard({
 	product,
-	categories,
-	onEdit,
 	onDelete,
-}: ProductCardProps) {
-	const category = categories.find((c) => c.id === product.category?.id);
-	const schemaSelectors = pojoToSchemaSelectors(
-		(product.schema ?? {}) as Record<string, unknown>,
-	);
+}: {
+	product: ProductRow;
+	onDelete: () => void;
+}) {
+	const cover = resolveMediaUrl(product.images?.[0]);
+	const name = product.name ?? "Produto sem nome";
 
 	return (
 		<div className="relative">
 			<a
-				href={`/admin/products/skus?id=${product.id}`}
-				aria-label={`Ver variantes de ${product.category?.title ?? "produto"}`}
+				href={`/admin/products/edit?id=${product.id}`}
+				aria-label={`Editar ${name}`}
 				className="block"
 			>
-				<Card className="border-transparent p-6 shadow-none transition-colors hover:bg-slate-50 cursor-pointer">
+				<Card className="cursor-pointer border-transparent p-6 shadow-none transition-colors hover:bg-slate-50">
 					<div className="flex items-start gap-4 pr-20">
-						{category?.image ? (
+						{cover ? (
 							<img
-								src={category.image}
-								alt={category.title ?? ""}
+								src={cover}
+								alt=""
 								className="size-16 shrink-0 rounded-lg object-cover"
 							/>
 						) : (
@@ -89,16 +70,14 @@ function ProductCard({
 						)}
 						<div className="min-w-0">
 							<h2 className="font-big-shoulders text-xl font-bold text-slate-900">
-								{product.category?.title ?? "—"}
+								{name}
 							</h2>
 							<p className="mt-0.5 text-sm text-slate-500">
-								{product.skuCount ?? 0} variantes
+								{product.category?.title ?? "Sem categoria"}
 							</p>
-							{schemaSelectors.length > 0 && (
-								<p className="mt-1 text-sm text-slate-400">
-									Seletores: {schemaSelectors.map((s) => s.label).join(", ")}
-								</p>
-							)}
+							<p className="mt-1 text-sm text-slate-400">
+								{product.variantCount ?? 0} variantes
+							</p>
 						</div>
 					</div>
 				</Card>
@@ -108,15 +87,17 @@ function ProductCard({
 				<Button
 					variant="ghost"
 					size="icon-sm"
-					aria-label={`Editar produto ${product.category?.title ?? ""}`}
-					onClick={onEdit}
+					aria-label={`Editar ${name}`}
+					asChild
 				>
-					<Pencil aria-hidden="true" className="size-4" />
+					<a href={`/admin/products/edit?id=${product.id}`}>
+						<Pencil aria-hidden="true" className="size-4" />
+					</a>
 				</Button>
 				<Button
 					variant="ghost"
 					size="icon-sm"
-					aria-label={`Excluir produto ${product.category?.title ?? ""}`}
+					aria-label={`Excluir ${name}`}
 					onClick={onDelete}
 					className="text-red-600 hover:bg-red-50 hover:text-red-700"
 				>
@@ -129,30 +110,20 @@ function ProductCard({
 
 export function AdminProductsPage() {
 	const { user, isLoading: authLoading } = useCurrentUser();
-	const [products, setProducts] = useState<ProductResponse[]>([]);
-	const [categories, setCategories] = useState<CategoryResponse[]>([]);
+	const [products, setProducts] = useState<ProductRow[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [query, setQuery] = useState("");
-
-	const [editing, setEditing] = useState<ProductResponse | null>(null);
-	const [isFormOpen, setIsFormOpen] = useState(false);
-	const [formError, setFormError] = useState<string | null>(null);
-	const [isSubmitting, setIsSubmitting] = useState(false);
-
-	const [deleteTarget, setDeleteTarget] = useState<ProductResponse | null>(
-		null,
-	);
+	const [deleteTarget, setDeleteTarget] = useState<ProductRow | null>(null);
 	const [deleteError, setDeleteError] = useState<string | null>(null);
 
 	useEffect(() => {
-		Promise.all([
-			apiGet<ProductListResponse>("/admin/products"),
-			apiGet<CategoryListResponse>("/admin/categories"),
-		])
-			.then(([productsRes, categoriesRes]) => {
-				setProducts(productsRes.items ?? []);
-				setCategories(categoriesRes.items ?? []);
-			})
+		if (PREVIEW_MOCK) {
+			setProducts(MOCK_PRODUCTS as ProductRow[]);
+			setIsLoading(false);
+			return;
+		}
+		apiGet<ProductListResponse>("/admin/products")
+			.then((res) => setProducts((res.items ?? []) as ProductRow[]))
 			.catch(() => {})
 			.finally(() => setIsLoading(false));
 	}, []);
@@ -160,73 +131,26 @@ export function AdminProductsPage() {
 	const filtered = useMemo(() => {
 		const q = query.trim().toLowerCase();
 		if (!q) return products;
-		return products.filter((p) =>
-			(p.category?.title ?? "").toLowerCase().includes(q),
-		);
+		return products.filter((p) => (p.name ?? "").toLowerCase().includes(q));
 	}, [products, query]);
 
-	if (!authLoading && user === null) {
+	if (!PREVIEW_MOCK && !authLoading && user === null) {
 		window.location.href = "/signin";
 		return null;
 	}
-
-	if (!authLoading && user?.role !== "ADMIN") {
+	if (!PREVIEW_MOCK && !authLoading && user?.role !== "ADMIN") {
 		window.location.href = "/account";
 		return null;
-	}
-
-	function openCreate() {
-		setEditing(null);
-		setFormError(null);
-		setIsFormOpen(true);
-	}
-
-	function openEdit(product: ProductResponse) {
-		setEditing(product);
-		setFormError(null);
-		setIsFormOpen(true);
-	}
-
-	function productToFormValues(product: ProductResponse): ProductFormValues {
-		const schema = (product.schema ?? {}) as Record<string, unknown>;
-		return {
-			categoryId: product.category?.id ?? "",
-			schemaSelectors: pojoToSchemaSelectors(schema),
-		};
-	}
-
-	async function handleSubmit(values: ProductFormValues) {
-		setFormError(null);
-		setIsSubmitting(true);
-		const schema = schemaSelectorsToPojo(values.schemaSelectors);
-		try {
-			if (editing) {
-				const updated = await apiPatch<ProductResponse>(
-					`/admin/products/${editing.id}`,
-					{ categoryId: values.categoryId, schema },
-				);
-				setProducts((prev) =>
-					prev.map((p) => (p.id === editing.id ? updated : p)),
-				);
-			} else {
-				const created = await apiPost<ProductResponse>("/admin/products", {
-					categoryId: values.categoryId,
-					schema,
-				});
-				setProducts((prev) => [created, ...prev]);
-			}
-			setIsFormOpen(false);
-			setEditing(null);
-		} catch (err) {
-			setFormError(err instanceof Error ? err.message : "Erro inesperado.");
-		} finally {
-			setIsSubmitting(false);
-		}
 	}
 
 	async function confirmDelete() {
 		if (!deleteTarget) return;
 		setDeleteError(null);
+		if (PREVIEW_MOCK) {
+			setProducts((prev) => prev.filter((p) => p.id !== deleteTarget.id));
+			setDeleteTarget(null);
+			return;
+		}
 		try {
 			await apiDelete(`/admin/products/${deleteTarget.id}`);
 			setProducts((prev) => prev.filter((p) => p.id !== deleteTarget.id));
@@ -245,16 +169,18 @@ export function AdminProductsPage() {
 					<h1 className="font-big-shoulders text-4xl font-bold text-slate-900">
 						Produtos
 					</h1>
-					<Button variant="primary" className="shrink-0" onClick={openCreate}>
-						<Plus aria-hidden="true" className="size-4" />
-						Novo produto
+					<Button variant="primary" className="shrink-0" asChild>
+						<a href="/admin/products/new">
+							<Plus aria-hidden="true" className="size-4" />
+							Novo produto
+						</a>
 					</Button>
 				</div>
 
 				<div className="mt-6 max-w-md">
 					<Input
 						type="search"
-						placeholder="Buscar por categoria…"
+						placeholder="Buscar por nome…"
 						aria-label="Buscar produtos"
 						icon={<Search aria-hidden="true" className="size-4" />}
 						value={query}
@@ -265,6 +191,7 @@ export function AdminProductsPage() {
 				{isLoading ? (
 					<div className="mt-8 space-y-4">
 						{Array.from({ length: 4 }).map((_, i) => (
+							// biome-ignore lint/suspicious/noArrayIndexKey: skeleton placeholders have no identity
 							<Card key={i} className="border-transparent p-6 shadow-none">
 								<div className="flex items-start gap-4 pr-20">
 									<Skeleton className="size-16 shrink-0 rounded-lg" />
@@ -291,8 +218,6 @@ export function AdminProductsPage() {
 							<ProductCard
 								key={product.id}
 								product={product}
-								categories={categories}
-								onEdit={() => openEdit(product)}
 								onDelete={() => {
 									setDeleteError(null);
 									setDeleteTarget(product);
@@ -303,34 +228,6 @@ export function AdminProductsPage() {
 				)}
 			</main>
 
-			{/* Formulário de produto */}
-			<AdminFormDialog
-				open={isFormOpen}
-				onOpenChange={setIsFormOpen}
-				icon={Package}
-				title={editing ? "Editar produto" : "Novo produto"}
-				subtitle="Configure o agrupador de produto."
-			>
-				<ProductForm
-					defaultValues={
-						editing ? productToFormValues(editing) : emptyProductForm
-					}
-					submitLabel={
-						isSubmitting
-							? "Salvando…"
-							: editing
-								? "Salvar alterações"
-								: "Criar produto"
-					}
-					categories={categories}
-					isSubmitting={isSubmitting}
-					error={formError}
-					onSubmit={handleSubmit}
-					onCancel={() => setIsFormOpen(false)}
-				/>
-			</AdminFormDialog>
-
-			{/* Confirmação de exclusão */}
 			<Dialog
 				open={deleteTarget !== null}
 				onOpenChange={(open) => {
@@ -352,7 +249,7 @@ export function AdminProductsPage() {
 					<div className="h-px w-full bg-slate-200" />
 					<DialogDescription className="mx-6 my-4 text-slate-600">
 						{deleteTarget
-							? `O produto da categoria "${deleteTarget.category?.title ?? "—"}" será removido. Esta ação não pode ser desfeita.`
+							? `O produto "${deleteTarget.name ?? "—"}" e suas variantes serão removidos. Esta ação não pode ser desfeita.`
 							: ""}
 					</DialogDescription>
 					{deleteError && (
