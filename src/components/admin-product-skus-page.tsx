@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useCurrentUser } from "@/hooks/use-current-user";
 import { Package, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -122,6 +123,8 @@ function skuToFormValues(
 }
 
 export function AdminProductSkusPage() {
+	const { user, isLoading: authLoading } = useCurrentUser();
+
 	const productId =
 		typeof window !== "undefined"
 			? (new URLSearchParams(window.location.search).get("id") ?? "")
@@ -170,6 +173,16 @@ export function AdminProductSkusPage() {
 			})
 			.finally(() => setIsLoading(false));
 	}, [productId]);
+
+	if (!authLoading && user === null) {
+		window.location.href = "/signin";
+		return null;
+	}
+
+	if (!authLoading && user?.role !== "ADMIN") {
+		window.location.href = "/account";
+		return null;
+	}
 
 	const schemaAttrs = productSchema;
 

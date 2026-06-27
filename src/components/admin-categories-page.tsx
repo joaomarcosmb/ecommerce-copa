@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useCurrentUser } from "@/hooks/use-current-user";
 import { Plus, Search, Tag } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -98,6 +99,7 @@ async function updateCategory(
 }
 
 export function AdminCategoriesPage() {
+	const { user, isLoading: authLoading } = useCurrentUser();
 	const [categories, setCategories] = useState<CategoryResponse[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [query, setQuery] = useState("");
@@ -126,6 +128,16 @@ export function AdminCategoriesPage() {
 				(c.slug ?? "").toLowerCase().includes(q),
 		);
 	}, [categories, query]);
+
+	if (!authLoading && user === null) {
+		window.location.href = "/signin";
+		return null;
+	}
+
+	if (!authLoading && user?.role !== "ADMIN") {
+		window.location.href = "/account";
+		return null;
+	}
 
 	function openForm(category: CategoryResponse | null) {
 		setEditing(category);

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useCurrentUser } from "@/hooks/use-current-user";
 import { Package, Pencil, Plus, Search, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -127,6 +128,7 @@ function ProductCard({
 }
 
 export function AdminProductsPage() {
+	const { user, isLoading: authLoading } = useCurrentUser();
 	const [products, setProducts] = useState<ProductResponse[]>([]);
 	const [categories, setCategories] = useState<CategoryResponse[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
@@ -162,6 +164,16 @@ export function AdminProductsPage() {
 			(p.category?.title ?? "").toLowerCase().includes(q),
 		);
 	}, [products, query]);
+
+	if (!authLoading && user === null) {
+		window.location.href = "/signin";
+		return null;
+	}
+
+	if (!authLoading && user?.role !== "ADMIN") {
+		window.location.href = "/account";
+		return null;
+	}
 
 	function openCreate() {
 		setEditing(null);
