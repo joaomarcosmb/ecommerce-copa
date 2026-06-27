@@ -237,7 +237,7 @@ export type Category = {
 
 export const categories: Category[] = [
 	{ label: "Álbuns", slug: "albuns" },
-	{ label: "Figurinhas", slug: "stickers" },
+	{ label: "Figurinhas", slug: "figurinhas" },
 	{ label: "Kits", slug: "kits" },
 	{ label: "Acessórios", slug: "accessories" },
 	{ label: "Promoções", slug: "promos" },
@@ -278,7 +278,7 @@ export const heroSlides: HeroSlide[] = [
 		subtitle:
 			"Monte sua coleção com os produtos oficiais FIFA. Álbuns, figurinhas e kits colecionáveis.",
 		cta: "Ver kits oficiais",
-		link: "/category/kits",
+		link: "/catalog?category=kits",
 	},
 	{
 		id: 2,
@@ -287,7 +287,7 @@ export const heroSlides: HeroSlide[] = [
 		subtitle:
 			"640 figurinhas para coletar. Edições capa dura, holográfica e limitada disponíveis.",
 		cta: "Comprar álbum",
-		link: "/category/albuns",
+		link: "/catalog?category=albuns",
 	},
 	{
 		id: 3,
@@ -296,6 +296,6 @@ export const heroSlides: HeroSlide[] = [
 		subtitle:
 			"Holográficas, douradas e edições exclusivas. Complete seu álbum agora!",
 		cta: "Ver figurinhas",
-		link: "/category/figurinhas",
+		link: "/catalog?category=figurinhas",
 	},
 ];

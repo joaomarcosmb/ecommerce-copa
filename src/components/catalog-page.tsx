@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -42,6 +42,14 @@ export function CatalogPage() {
 		ProductCategory[]
 	>([]);
 
+	useEffect(() => {
+		const params = new URLSearchParams(window.location.search);
+		const category = params.get("category") as ProductCategory | null;
+		if (category && PRODUCT_CATEGORY_ORDER.includes(category)) {
+			setSelectedCategories([category]);
+		}
+	}, []);
+
 	const toggleCategory = (category: ProductCategory) => {
 		setSelectedCategories((prev) =>
 			prev.includes(category)
@@ -75,9 +83,14 @@ export function CatalogPage() {
 		return sorted.slice(0, GRID_SIZE);
 	}, [products, selectedCategories, sort]);
 
+	const pageTitle =
+		selectedCategories.length === 1
+			? PRODUCT_CATEGORY_LABELS[selectedCategories[0]]
+			: "Todos os produtos";
+
 	const breadcrumbItems = [
 		{ label: "Início", href: "/" },
-		{ label: "Produtos da categoria A" },
+		{ label: pageTitle },
 	];
 
 	return (
@@ -85,7 +98,7 @@ export function CatalogPage() {
 			<BreadcrumbNav items={breadcrumbItems} className="mx-6 mt-6" />
 			<main className="px-6 py-6">
 				<h1 className="font-big-shoulders text-3xl font-bold leading-tight text-slate-900">
-					Produtos da categoria A
+					{pageTitle}
 				</h1>
 
 				<div className="mt-6 grid grid-cols-[260px_1fr] gap-8">

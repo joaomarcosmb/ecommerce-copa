@@ -30,7 +30,7 @@ export function SpotlightCategories() {
 				{categories.map((cat) => (
 					<li key={cat.slug}>
 						<a
-							href={`/category/${cat.slug}`}
+							href={`/catalog?category=${cat.slug}`}
 							className="group flex flex-col items-center gap-2"
 						>
 							<div className="relative h-100 w-75">

@@ -100,7 +100,7 @@ export function Header() {
 							{categories.map((cat) => (
 								<li key={cat.slug}>
 									<a
-										href={`/category/${cat.slug}`}
+										href={`/catalog?category=${cat.slug}`}
 										className="whitespace-nowrap font-sans text-[14px] font-medium text-white/80 transition-colors hover:text-primary-foreground"
 									>
 										{cat.label}

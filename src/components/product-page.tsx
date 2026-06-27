@@ -109,7 +109,7 @@ function ProductPageContent({
 		{ label: "Início", href: "/" },
 		{
 			label: product.category?.title ?? "Produtos",
-			href: `/category/${product.category?.slug ?? ""}`,
+			href: `/catalog?category=${product.category?.slug ?? ""}`,
 		},
 		{ label: selectedSku.title ?? "Produto" },
 	];
@@ -165,7 +165,7 @@ function ProductPageContent({
 								variant="link"
 								className="h-auto p-0 text-sm font-medium"
 							>
-								<a href={`/category/${product.category?.slug ?? ""}`}>
+								<a href={`/catalog?category=${product.category?.slug ?? ""}`}>
 									{product.category?.title}
 								</a>
 							</Button>
