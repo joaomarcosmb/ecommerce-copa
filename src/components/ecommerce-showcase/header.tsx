@@ -239,7 +239,7 @@ export function Header() {
 										type="button"
 										aria-label={isSearchOpen ? "Pesquisar" : "Abrir busca"}
 										onClick={isSearchOpen ? navigateToSearch : openSearch}
-										className="flex size-9 shrink-0 items-center justify-center text-white transition-opacity hover:opacity-70"
+										className="flex size-9 shrink-0 items-center justify-center text-white transition-opacity hover:bg-white/10"
 									>
 										<Search aria-hidden="true" className="size-5" />
 									</button>
