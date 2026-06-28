@@ -257,8 +257,8 @@ function NewAddressForm({ onSaved, onCancel }: NewAddressFormProps) {
 						placeholder="Ex: Casa, Trabalho..."
 					/>
 
-					<div className="grid grid-cols-2 divide-x divide-slate-100 max-w-4xl mx-auto">
-						<div className="space-y-5 pr-8">
+					<div className="mx-auto grid max-w-4xl grid-cols-1 gap-5 md:grid-cols-2 md:gap-0 md:divide-x md:divide-slate-100">
+						<div className="space-y-5 md:pr-8">
 							<CepField />
 							<AddressField
 								name="street"
@@ -282,7 +282,7 @@ function NewAddressForm({ onSaved, onCancel }: NewAddressFormProps) {
 							</div>
 						</div>
 
-						<div className="space-y-5 pl-8">
+						<div className="space-y-5 md:pl-8">
 							<AddressField
 								name="neighborhood"
 								label="Bairro"
@@ -396,7 +396,7 @@ export function CartAddressForm({ onSuccess }: CartAddressFormProps) {
 							Preencha os dados abaixo ou{" "}
 							<button
 								type="button"
-								className="text-blue-700 underline hover:no-underline"
+								className="text-blue-700 underline hover:no-underline text-sm"
 								onClick={() => setShowNewForm(false)}
 							>
 								use um endereço salvo

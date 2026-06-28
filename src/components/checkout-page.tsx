@@ -97,8 +97,12 @@ function CheckoutPageContent() {
 		<main className="mx-auto max-w-370 px-4 py-8 sm:px-6 lg:px-8 pb-0">
 			{/* Success header */}
 			<div className="flex flex-col items-center gap-3 text-center">
-				<div className="flex size-16 items-center justify-center rounded-full bg-green-100">
-					<CheckCircle2 className="size-9 text-green-700" aria-hidden="true" />
+				<div className="flex size-20 items-center justify-center">
+					<img
+						src="/soccer-ball.gif"
+						aria-label="Animação de bola de futebol"
+						className="rotate-30"
+					/>
 				</div>
 				<h1 className="font-big-shoulders text-4xl font-bold text-slate-900">
 					Pedido confirmado!
@@ -111,11 +115,11 @@ function CheckoutPageContent() {
 				</P>
 			</div>
 
-			<div className="mt-8 grid grid-cols-[1fr_400px] gap-6">
+			<div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_400px]">
 				{/* Main column */}
 				<div className="flex flex-col gap-6">
 					{/* Items */}
-					<section className="rounded-2xl border border-slate-200 bg-white px-8 py-6">
+					<section className="rounded-2xl border border-slate-200 bg-white px-5 py-6 sm:px-8">
 						<h2 className="font-big-shoulders text-xl font-bold text-slate-900">
 							Itens do pedido
 						</h2>
@@ -131,7 +135,7 @@ function CheckoutPageContent() {
 					</section>
 
 					{/* Delivery */}
-					<section className="rounded-2xl border border-slate-200 bg-white px-8 py-6">
+					<section className="rounded-2xl border border-slate-200 bg-white px-5 py-6 sm:px-8">
 						<h2 className="font-big-shoulders text-xl font-bold text-slate-900">
 							Entrega
 						</h2>
@@ -167,7 +171,7 @@ function CheckoutPageContent() {
 				</div>
 
 				{/* Order summary */}
-				<aside className="flex flex-col gap-5 self-start rounded-2xl border border-slate-200 bg-white px-8 py-6">
+				<aside className="flex flex-col gap-5 self-start rounded-2xl border border-slate-200 bg-white px-5 py-6 sm:px-8 lg:sticky lg:top-24">
 					<h2 className="font-big-shoulders text-xl font-bold text-slate-900">
 						Resumo do pedido
 					</h2>
@@ -196,12 +200,6 @@ function CheckoutPageContent() {
 						<Button variant="primary" size="lg" className="w-full" asChild>
 							<a href="/orders">Ver meus pedidos</a>
 						</Button>
-						<a
-							href="/"
-							className="text-sm text-slate-500 transition-colors duration-200 hover:text-slate-800"
-						>
-							Continuar comprando
-						</a>
 					</div>
 				</aside>
 			</div>

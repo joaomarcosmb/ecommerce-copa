@@ -14,23 +14,25 @@ export function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
 		: null;
 
 	return (
-		<div className="flex items-start gap-5 py-5">
+		<div className="flex items-start gap-3 py-5 sm:gap-5">
 			<img
 				src={resolveMediaUrl(item.photo) ?? ""}
 				alt={item.title ?? ""}
 				width={96}
 				height={96}
-				className="size-24 flex-shrink-0 rounded-xl object-cover"
+				className="size-20 flex-shrink-0 rounded-xl object-cover sm:size-24"
 			/>
 
-			<div className="flex flex-1 items-start gap-4">
+			<div className="flex flex-1 items-start gap-2 sm:gap-4">
 				<div className="flex flex-1 flex-col gap-1.5">
 					<p className="font-medium leading-snug text-slate-900">
 						{item.title}
 					</p>
 					{attrs && <p className="text-sm text-slate-500">Variação: {attrs}</p>}
 					<div className="mt-1 flex items-center gap-3">
-						<span className="text-sm text-slate-500">Quantidade</span>
+						<span className="hidden text-sm text-slate-500 sm:inline">
+							Quantidade
+						</span>
 						<QuantityStepper
 							value={item.amount ?? 1}
 							max={item.stock}

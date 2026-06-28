@@ -43,8 +43,8 @@ function StepIndicator({
 							disabled={isFuture}
 							onClick={() => isDone && onStepChange(index)}
 							className={cn(
-								"flex flex-1 items-center justify-center gap-2 py-3.5 transition-colors duration-200",
-								"font-sans text-sm font-semibold",
+								"flex flex-1 items-center justify-center gap-1.5 px-2 py-3 text-center transition-colors duration-200 sm:gap-2 sm:py-3.5",
+								"font-sans text-sm font-semibold sm:text-sm",
 								"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-300",
 								isActive && "bg-blue-700 text-white",
 								isDone && "cursor-pointer text-slate-600 hover:bg-slate-50",
@@ -117,9 +117,9 @@ function CartPageContent() {
 				/>
 			</div>
 
-			<div className="mt-6 grid grid-cols-[1fr_400px] gap-6">
+			<div className="mt-8 md:mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_400px]">
 				{/* Main column */}
-				<div className="rounded-2xl border border-slate-200 bg-white px-8 py-2">
+				<div className="rounded-2xl border border-slate-200 bg-white px-4 py-2 sm:px-8">
 					{isReviewStep ? (
 						cartLoading ? (
 							<div className="flex flex-col gap-4 py-8">
@@ -174,7 +174,7 @@ function CartPageContent() {
 				</div>
 
 				{/* Order summary */}
-				<aside className="flex flex-col gap-5 self-start rounded-2xl border border-slate-200 bg-white px-8 py-6">
+				<aside className="flex flex-col gap-5 self-start rounded-2xl border border-slate-200 bg-white px-5 py-6 sm:px-8 lg:sticky lg:top-24">
 					<h2 className="font-big-shoulders text-xl font-bold text-slate-900">
 						Resumo do pedido
 					</h2>

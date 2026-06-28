@@ -25,7 +25,7 @@ export function HeroSection() {
 
 	const startAutoplay = useCallback((carouselApi: CarouselApi) => {
 		const id = window.setInterval(() => {
-			if (!isPausedRef.current) carouselApi.scrollNext();
+			if (!isPausedRef.current) carouselApi?.scrollNext();
 		}, AUTOPLAY_INTERVAL_MS);
 		return () => window.clearInterval(id);
 	}, []);
@@ -55,7 +55,7 @@ export function HeroSection() {
 
 	return (
 		<section
-			className="relative h-175.5 w-full overflow-hidden"
+			className="relative h-[68vh] min-h-100 w-full overflow-hidden sm:h-150 lg:h-175.5"
 			onMouseEnter={() => {
 				isPausedRef.current = true;
 			}}
@@ -66,7 +66,10 @@ export function HeroSection() {
 			<Carousel setApi={setApi} opts={{ loop: true }} className="h-full">
 				<CarouselContent className="ml-0 h-full">
 					{slides.map((slide, index) => (
-						<CarouselItem key={slide.id} className="relative h-175.5 pl-0">
+						<CarouselItem
+							key={slide.id}
+							className="relative h-[68vh] min-h-100 pl-0 sm:h-150 lg:h-175.5"
+						>
 							<img
 								src={slide.image}
 								alt={slide.title}
@@ -75,14 +78,13 @@ export function HeroSection() {
 								fetchPriority={index === 0 ? "high" : "auto"}
 							/>
 							<div className="absolute inset-0 bg-black/50" />
-							{/* TODO: Review mobile layout for this section */}
-							<div className="relative z-10 flex h-full items-center px-4 sm:px-6 lg:px-30">
-								<div className="max-w-lg">
-									<H1 className="font-big-shoulders font-bold text-white">
+							<div className="relative z-10 flex h-full items-center px-10 sm:px-10 lg:px-30">
+								<div className="w-full max-w-lg">
+									<H1 className="font-big-shoulders text-[32px] leading-9 font-bold text-white sm:text-5xl sm:leading-[1.1] lg:text-[57px] lg:leading-16">
 										{slide.title}
 									</H1>
-									<P className="mt-4 text-white/90">{slide.subtitle}</P>
-									<Button size="lg" className="mt-8" asChild>
+									<P className="mt-3 text-white/90 sm:mt-4">{slide.subtitle}</P>
+									<Button size="lg" className="mt-6 sm:mt-8" asChild>
 										<a href={slide.link}>{slide.cta}</a>
 									</Button>
 								</div>
@@ -128,11 +130,11 @@ export function HeroSection() {
 				</button>
 
 				<CarouselPrevious
-					className="left-8 top-1/2 size-8 -translate-y-1/2 cursor-pointer bg-transparent text-primary-foreground transition-colors hover:bg-white/30"
+					className="left-8 top-1/2 hidden size-8 -translate-y-1/2 cursor-pointer bg-transparent text-primary-foreground transition-colors hover:bg-white/30 sm:flex"
 					aria-label="Banner anterior"
 				/>
 				<CarouselNext
-					className="right-8 top-1/2 size-8 -translate-y-1/2 cursor-pointer bg-transparent text-primary-foreground transition-colors hover:bg-white/30"
+					className="right-8 top-1/2 hidden size-8 -translate-y-1/2 cursor-pointer bg-transparent text-primary-foreground transition-colors hover:bg-white/30 sm:flex"
 					aria-label="Próximo banner"
 				/>
 			</Carousel>

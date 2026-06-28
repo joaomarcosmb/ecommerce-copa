@@ -107,7 +107,7 @@ export function ProductCard({
 						}
 						className={cn(
 							"absolute bottom-3 right-3 z-10 flex size-10 items-center justify-center rounded-full text-white shadow-lg",
-							"opacity-0 transition-[opacity,background-color] duration-200 focus-visible:opacity-100 group-hover:opacity-100",
+							"opacity-100 transition-[opacity,background-color] duration-200 focus-visible:opacity-100 lg:opacity-0 lg:group-hover:opacity-100",
 							addState === "done"
 								? "bg-green-500"
 								: "bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400",

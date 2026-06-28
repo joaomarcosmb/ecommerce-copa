@@ -144,7 +144,7 @@ function ProductPageContent({
 		{
 			label: `Avaliações (${(selectedSku.reviewCount ?? 0).toLocaleString("pt-BR")})`,
 			content: (
-				<div className="grid grid-cols-[300px_1fr] gap-8">
+				<div className="grid grid-cols-1 gap-8 md:grid-cols-[300px_1fr]">
 					<RatingBreakdown
 						rating={selectedSku.rating ?? 0}
 						reviewCount={selectedSku.reviewCount ?? 0}
@@ -161,10 +161,10 @@ function ProductPageContent({
 
 	return (
 		<>
-			<BreadcrumbNav items={breadcrumbItems} className="mx-6 mt-6" />
-			<main>
-				<div className="grid grid-cols-4 gap-6 py-6 pr-6">
-					<div className="col-span-3">
+			<BreadcrumbNav items={breadcrumbItems} className="mx-4 mt-6 sm:mx-6" />
+			<main className="pb-24 lg:pb-0">
+				<div className="grid grid-cols-1 gap-6 px-4 py-6 sm:px-6 lg:grid-cols-4 lg:pl-0">
+					<div className="lg:col-span-3">
 						<ProductImageGallery
 							images={images}
 							title={selectedSku.title ?? ""}
@@ -174,7 +174,7 @@ function ProductPageContent({
 						/>
 					</div>
 
-					<div className="col-span-1 flex flex-col gap-6">
+					<div className="flex flex-col gap-6 lg:col-span-1">
 						{/* Category + title */}
 						<div>
 							<Button
@@ -293,13 +293,16 @@ function ProductPageContent({
 				</div>
 
 				{/* Tabs */}
-				<section ref={tabsSectionRef} className="mt-10 px-6">
+				<section ref={tabsSectionRef} className="mt-10 px-4 sm:px-6">
 					<Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
 				</section>
 
 				{/* Related products */}
 				{relatedSkus.length > 0 && (
-					<section aria-labelledby="related-heading" className="mt-10 px-6">
+					<section
+						aria-labelledby="related-heading"
+						className="mt-10 px-4 sm:px-6"
+					>
 						<h2
 							id="related-heading"
 							className="mb-6 font-big-shoulders text-2xl font-bold text-slate-900"
@@ -314,6 +317,37 @@ function ProductPageContent({
 					</section>
 				)}
 			</main>
+
+			{/* Sticky mobile buy bar */}
+			<div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white shadow-[0_-4px_20px_rgba(15,23,42,0.08)] lg:hidden">
+				<div className="flex h-1">
+					<div className="flex-1 bg-blue-700" />
+					<div className="flex-1 bg-green-500" />
+					<div className="flex-1 bg-red-700" />
+				</div>
+				<div className="flex items-center gap-3 px-4 pb-[max(0.625rem,env(safe-area-inset-bottom))] pt-2.5">
+					<div className="min-w-0 flex-1">
+						<ProductPricing
+							price={selectedSku.price ?? 0}
+							originalPrice={selectedSku.originalPrice}
+							compact
+						/>
+					</div>
+					<Button
+						size="lg"
+						className="shrink-0"
+						disabled={selectedSku.stock === 0 || isAddingToCart}
+						onClick={handleAddToCart}
+					>
+						<ShoppingCart className="size-4" aria-hidden="true" />
+						{selectedSku.stock === 0
+							? "Esgotado"
+							: isAddingToCart
+								? "Adicionando…"
+								: "Adicionar"}
+					</Button>
+				</div>
+			</div>
 		</>
 	);
 }

@@ -119,8 +119,8 @@ function SignupForm({ onSuccess, onSwitchMode }: SignupFormProps) {
 					<P className="text-center text-slate-600">
 						Crie uma conta para finalizar seu pedido e acompanhar suas compras.
 					</P>
-					<div className="grid grid-cols-2 divide-x divide-slate-100 max-w-4xl mx-auto">
-						<div className="space-y-5 pr-8">
+					<div className="mx-auto grid max-w-4xl grid-cols-1 gap-5 md:grid-cols-2 md:gap-0 md:divide-x md:divide-slate-100">
+						<div className="space-y-5 md:pr-8">
 							<p className="font-sans text-[11px] font-semibold uppercase text-slate-400">
 								Informações pessoais
 							</p>
@@ -156,7 +156,7 @@ function SignupForm({ onSuccess, onSwitchMode }: SignupFormProps) {
 							/>
 						</div>
 
-						<div className="space-y-5 pl-8">
+						<div className="space-y-5 md:pl-8">
 							<p className="font-sans text-[11px] font-semibold uppercase text-slate-400">
 								Dados de acesso
 							</p>

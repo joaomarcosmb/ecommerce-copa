@@ -4,7 +4,7 @@ function H1({ className, ...props }: React.ComponentProps<"h1">) {
 	return (
 		<h1
 			className={cn(
-				"font-['Big_Shoulders',sans-serif] text-[57px] leading-16 tracking-[-0.25px]",
+				"font-['Big_Shoulders',sans-serif] text-4xl leading-tight tracking-[-0.25px] sm:text-5xl sm:leading-[1.1] lg:text-[57px] lg:leading-16",
 				className,
 			)}
 			{...props}
@@ -16,7 +16,7 @@ function H2({ className, ...props }: React.ComponentProps<"h2">) {
 	return (
 		<h2
 			className={cn(
-				"font-['Big_Shoulders',sans-serif] text-[28px] leading-9",
+				"font-['Big_Shoulders',sans-serif] text-2xl leading-8 sm:text-[28px] sm:leading-9",
 				className,
 			)}
 			{...props}
