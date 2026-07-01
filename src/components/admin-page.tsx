@@ -1,4 +1,4 @@
-import { FileText, Package, Tag } from "lucide-react";
+import { FileText, Package, ShoppingBag, Tag } from "lucide-react";
 import { useState } from "react";
 
 import { useCurrentUser } from "@/hooks/use-current-user";
@@ -40,6 +40,12 @@ export function AdminPage() {
 							icon={Tag}
 							title="Gerenciar categorias"
 							description="Organize as categorias usadas na loja."
+						/>
+						<AdminEntityCard
+							href="/admin/orders"
+							icon={ShoppingBag}
+							title="Gerenciar compras"
+							description="Visualize e exclua as compras de qualquer cliente."
 						/>
 						<AdminEntityCard
 							onClick={() => setReportsOpen(true)}
