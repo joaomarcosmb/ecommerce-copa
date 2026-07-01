@@ -70,7 +70,7 @@ export type createResponseSuccess = createResponse200 & {
 export type createResponse = createResponseSuccess;
 
 export const getCreateUrl = () => {
-	return `http://localhost:8080/api/reviews`;
+	return `https://ecommerce-copa-api.onrender.com/api/reviews`;
 };
 
 /**
@@ -106,7 +106,7 @@ export type listMineResponseSuccess = listMineResponse200 & {
 export type listMineResponse = listMineResponseSuccess;
 
 export const getListMineUrl = () => {
-	return `http://localhost:8080/api/orders`;
+	return `https://ecommerce-copa-api.onrender.com/api/orders`;
 };
 
 /**
@@ -139,7 +139,7 @@ export type create1ResponseSuccess = create1Response200 & {
 export type create1Response = create1ResponseSuccess;
 
 export const getCreate1Url = () => {
-	return `http://localhost:8080/api/orders`;
+	return `https://ecommerce-copa-api.onrender.com/api/orders`;
 };
 
 /**
@@ -175,7 +175,7 @@ export type addItemResponseSuccess = addItemResponse200 & {
 export type addItemResponse = addItemResponseSuccess;
 
 export const getAddItemUrl = () => {
-	return `http://localhost:8080/api/cart/items`;
+	return `https://ecommerce-copa-api.onrender.com/api/cart/items`;
 };
 
 /**
@@ -211,7 +211,7 @@ export type registerClientResponseSuccess = registerClientResponse200 & {
 export type registerClientResponse = registerClientResponseSuccess;
 
 export const getRegisterClientUrl = () => {
-	return `http://localhost:8080/api/auth/register/client`;
+	return `https://ecommerce-copa-api.onrender.com/api/auth/register/client`;
 };
 
 /**
@@ -251,7 +251,7 @@ export type logoutResponseSuccess = logoutResponse200 & {
 export type logoutResponse = logoutResponseSuccess;
 
 export const getLogoutUrl = () => {
-	return `http://localhost:8080/api/auth/logout`;
+	return `https://ecommerce-copa-api.onrender.com/api/auth/logout`;
 };
 
 /**
@@ -284,7 +284,7 @@ export type loginResponseSuccess = loginResponse200 & {
 export type loginResponse = loginResponseSuccess;
 
 export const getLoginUrl = () => {
-	return `http://localhost:8080/api/auth/login`;
+	return `https://ecommerce-copa-api.onrender.com/api/auth/login`;
 };
 
 /**
@@ -320,7 +320,7 @@ export type listResponseSuccess = listResponse200 & {
 export type listResponse = listResponseSuccess;
 
 export const getListUrl = () => {
-	return `http://localhost:8080/api/admin/tags`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/tags`;
 };
 
 /**
@@ -350,7 +350,7 @@ export type create2ResponseSuccess = create2Response200 & {
 export type create2Response = create2ResponseSuccess;
 
 export const getCreate2Url = () => {
-	return `http://localhost:8080/api/admin/tags`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/tags`;
 };
 
 /**
@@ -396,8 +396,8 @@ export const getList1Url = (params?: List1Params) => {
 	const stringifiedParams = normalizedParams.toString();
 
 	return stringifiedParams.length > 0
-		? `http://localhost:8080/api/admin/products?${stringifiedParams}`
-		: `http://localhost:8080/api/admin/products`;
+		? `https://ecommerce-copa-api.onrender.com/api/admin/products?${stringifiedParams}`
+		: `https://ecommerce-copa-api.onrender.com/api/admin/products`;
 };
 
 /**
@@ -431,7 +431,7 @@ export type create3ResponseSuccess = create3Response200 & {
 export type create3Response = create3ResponseSuccess;
 
 export const getCreate3Url = () => {
-	return `http://localhost:8080/api/admin/products`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/products`;
 };
 
 /**
@@ -480,7 +480,7 @@ export type createVariantResponseSuccess = createVariantResponse200 & {
 export type createVariantResponse = createVariantResponseSuccess;
 
 export const getCreateVariantUrl = (productId: string) => {
-	return `http://localhost:8080/api/admin/products/${productId}/variants`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/products/${productId}/variants`;
 };
 
 /**
@@ -537,7 +537,7 @@ export type addVariantPhotoResponseSuccess = addVariantPhotoResponse200 & {
 export type addVariantPhotoResponse = addVariantPhotoResponseSuccess;
 
 export const getAddVariantPhotoUrl = (productId: string, skuId: string) => {
-	return `http://localhost:8080/api/admin/products/${productId}/variants/${skuId}/photos`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/products/${productId}/variants/${skuId}/photos`;
 };
 
 /**
@@ -599,8 +599,8 @@ export const getDeleteVariantPhotoUrl = (
 	const stringifiedParams = normalizedParams.toString();
 
 	return stringifiedParams.length > 0
-		? `http://localhost:8080/api/admin/products/${productId}/variants/${skuId}/photos?${stringifiedParams}`
-		: `http://localhost:8080/api/admin/products/${productId}/variants/${skuId}/photos`;
+		? `https://ecommerce-copa-api.onrender.com/api/admin/products/${productId}/variants/${skuId}/photos?${stringifiedParams}`
+		: `https://ecommerce-copa-api.onrender.com/api/admin/products/${productId}/variants/${skuId}/photos`;
 };
 
 /**
@@ -640,7 +640,7 @@ export type list2ResponseSuccess = list2Response200 & {
 export type list2Response = list2ResponseSuccess;
 
 export const getList2Url = () => {
-	return `http://localhost:8080/api/admin/categories`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/categories`;
 };
 
 /**
@@ -670,7 +670,7 @@ export type create4ResponseSuccess = create4Response200 & {
 export type create4Response = create4ResponseSuccess;
 
 export const getCreate4Url = () => {
-	return `http://localhost:8080/api/admin/categories`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/categories`;
 };
 
 /**
@@ -716,7 +716,7 @@ export type list3ResponseSuccess = list3Response200 & {
 export type list3Response = list3ResponseSuccess;
 
 export const getList3Url = () => {
-	return `http://localhost:8080/api/addresses`;
+	return `https://ecommerce-copa-api.onrender.com/api/addresses`;
 };
 
 /**
@@ -746,7 +746,7 @@ export type create5ResponseSuccess = create5Response200 & {
 export type create5Response = create5ResponseSuccess;
 
 export const getCreate5Url = () => {
-	return `http://localhost:8080/api/addresses`;
+	return `https://ecommerce-copa-api.onrender.com/api/addresses`;
 };
 
 /**
@@ -781,7 +781,7 @@ export type deleteMyPhotoResponseSuccess = deleteMyPhotoResponse200 & {
 export type deleteMyPhotoResponse = deleteMyPhotoResponseSuccess;
 
 export const getDeleteMyPhotoUrl = () => {
-	return `http://localhost:8080/api/users/me/photo`;
+	return `https://ecommerce-copa-api.onrender.com/api/users/me/photo`;
 };
 
 /**
@@ -818,7 +818,7 @@ export type updateMyPhotoResponseSuccess = updateMyPhotoResponse200 & {
 export type updateMyPhotoResponse = updateMyPhotoResponseSuccess;
 
 export const getUpdateMyPhotoUrl = () => {
-	return `http://localhost:8080/api/users/me/photo`;
+	return `https://ecommerce-copa-api.onrender.com/api/users/me/photo`;
 };
 
 /**
@@ -862,7 +862,7 @@ export type _deleteResponseSuccess = _deleteResponse200 & {
 export type _deleteResponse = _deleteResponseSuccess;
 
 export const getDeleteUrl = (skuId: string) => {
-	return `http://localhost:8080/api/reviews/${skuId}`;
+	return `https://ecommerce-copa-api.onrender.com/api/reviews/${skuId}`;
 };
 
 /**
@@ -896,7 +896,7 @@ export type updateResponseSuccess = updateResponse200 & {
 export type updateResponse = updateResponseSuccess;
 
 export const getUpdateUrl = (skuId: string) => {
-	return `http://localhost:8080/api/reviews/${skuId}`;
+	return `https://ecommerce-copa-api.onrender.com/api/reviews/${skuId}`;
 };
 
 /**
@@ -933,7 +933,7 @@ export type meResponseSuccess = meResponse200 & {
 export type meResponse = meResponseSuccess;
 
 export const getMeUrl = () => {
-	return `http://localhost:8080/api/clients/me`;
+	return `https://ecommerce-copa-api.onrender.com/api/clients/me`;
 };
 
 /**
@@ -964,7 +964,7 @@ export type deleteMeResponseSuccess = deleteMeResponse200 & {
 export type deleteMeResponse = deleteMeResponseSuccess;
 
 export const getDeleteMeUrl = () => {
-	return `http://localhost:8080/api/clients/me`;
+	return `https://ecommerce-copa-api.onrender.com/api/clients/me`;
 };
 
 /**
@@ -997,7 +997,7 @@ export type updateMeResponseSuccess = updateMeResponse200 & {
 export type updateMeResponse = updateMeResponseSuccess;
 
 export const getUpdateMeUrl = () => {
-	return `http://localhost:8080/api/clients/me`;
+	return `https://ecommerce-copa-api.onrender.com/api/clients/me`;
 };
 
 /**
@@ -1033,7 +1033,7 @@ export type deleteItemResponseSuccess = deleteItemResponse200 & {
 export type deleteItemResponse = deleteItemResponseSuccess;
 
 export const getDeleteItemUrl = (skuId: string) => {
-	return `http://localhost:8080/api/cart/items/${skuId}`;
+	return `https://ecommerce-copa-api.onrender.com/api/cart/items/${skuId}`;
 };
 
 /**
@@ -1070,7 +1070,7 @@ export type updateItemResponseSuccess = updateItemResponse200 & {
 export type updateItemResponse = updateItemResponseSuccess;
 
 export const getUpdateItemUrl = (skuId: string) => {
-	return `http://localhost:8080/api/cart/items/${skuId}`;
+	return `https://ecommerce-copa-api.onrender.com/api/cart/items/${skuId}`;
 };
 
 /**
@@ -1111,7 +1111,7 @@ export type findByIdResponseSuccess = findByIdResponse200 & {
 export type findByIdResponse = findByIdResponseSuccess;
 
 export const getFindByIdUrl = (id: string) => {
-	return `http://localhost:8080/api/admin/tags/${id}`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/tags/${id}`;
 };
 
 /**
@@ -1144,7 +1144,7 @@ export type delete1ResponseSuccess = delete1Response200 & {
 export type delete1Response = delete1ResponseSuccess;
 
 export const getDelete1Url = (id: string) => {
-	return `http://localhost:8080/api/admin/tags/${id}`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/tags/${id}`;
 };
 
 /**
@@ -1178,7 +1178,7 @@ export type update1ResponseSuccess = update1Response200 & {
 export type update1Response = update1ResponseSuccess;
 
 export const getUpdate1Url = (id: string) => {
-	return `http://localhost:8080/api/admin/tags/${id}`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/tags/${id}`;
 };
 
 /**
@@ -1214,7 +1214,7 @@ export type deleteVariantResponseSuccess = deleteVariantResponse200 & {
 export type deleteVariantResponse = deleteVariantResponseSuccess;
 
 export const getDeleteVariantUrl = (productId: string, skuId: string) => {
-	return `http://localhost:8080/api/admin/products/${productId}/variants/${skuId}`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/products/${productId}/variants/${skuId}`;
 };
 
 /**
@@ -1255,7 +1255,7 @@ export type updateVariantResponseSuccess = updateVariantResponse200 & {
 export type updateVariantResponse = updateVariantResponseSuccess;
 
 export const getUpdateVariantUrl = (productId: string, skuId: string) => {
-	return `http://localhost:8080/api/admin/products/${productId}/variants/${skuId}`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/products/${productId}/variants/${skuId}`;
 };
 
 /**
@@ -1301,7 +1301,7 @@ export const getReorderVariantPhotosUrl = (
 	productId: string,
 	skuId: string,
 ) => {
-	return `http://localhost:8080/api/admin/products/${productId}/variants/${skuId}/photos/reorder`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/products/${productId}/variants/${skuId}/photos/reorder`;
 };
 
 /**
@@ -1343,7 +1343,7 @@ export type findById1ResponseSuccess = findById1Response200 & {
 export type findById1Response = findById1ResponseSuccess;
 
 export const getFindById1Url = (id: string) => {
-	return `http://localhost:8080/api/admin/products/${id}`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/products/${id}`;
 };
 
 /**
@@ -1380,7 +1380,7 @@ export type delete2ResponseSuccess = delete2Response200 & {
 export type delete2Response = delete2ResponseSuccess;
 
 export const getDelete2Url = (id: string) => {
-	return `http://localhost:8080/api/admin/products/${id}`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/products/${id}`;
 };
 
 /**
@@ -1414,7 +1414,7 @@ export type update2ResponseSuccess = update2Response200 & {
 export type update2Response = update2ResponseSuccess;
 
 export const getUpdate2Url = (id: string) => {
-	return `http://localhost:8080/api/admin/products/${id}`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/products/${id}`;
 };
 
 /**
@@ -1451,7 +1451,7 @@ export type updateStatusResponseSuccess = updateStatusResponse200 & {
 export type updateStatusResponse = updateStatusResponseSuccess;
 
 export const getUpdateStatusUrl = (id: string) => {
-	return `http://localhost:8080/api/admin/orders/${id}/status`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/orders/${id}/status`;
 };
 
 /**
@@ -1492,7 +1492,7 @@ export type me1ResponseSuccess = me1Response200 & {
 export type me1Response = me1ResponseSuccess;
 
 export const getMe1Url = () => {
-	return `http://localhost:8080/api/admin/me`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/me`;
 };
 
 /**
@@ -1523,7 +1523,7 @@ export type updateMe1ResponseSuccess = updateMe1Response200 & {
 export type updateMe1Response = updateMe1ResponseSuccess;
 
 export const getUpdateMe1Url = () => {
-	return `http://localhost:8080/api/admin/me`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/me`;
 };
 
 /**
@@ -1563,7 +1563,7 @@ export type findById2ResponseSuccess = findById2Response200 & {
 export type findById2Response = findById2ResponseSuccess;
 
 export const getFindById2Url = (id: string) => {
-	return `http://localhost:8080/api/admin/categories/${id}`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/categories/${id}`;
 };
 
 /**
@@ -1600,7 +1600,7 @@ export type delete3ResponseSuccess = delete3Response200 & {
 export type delete3Response = delete3ResponseSuccess;
 
 export const getDelete3Url = (id: string) => {
-	return `http://localhost:8080/api/admin/categories/${id}`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/categories/${id}`;
 };
 
 /**
@@ -1634,7 +1634,7 @@ export type update3ResponseSuccess = update3Response200 & {
 export type update3Response = update3ResponseSuccess;
 
 export const getUpdate3Url = (id: string) => {
-	return `http://localhost:8080/api/admin/categories/${id}`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/categories/${id}`;
 };
 
 /**
@@ -1687,7 +1687,7 @@ export type findById3ResponseSuccess = findById3Response200 & {
 export type findById3Response = findById3ResponseSuccess;
 
 export const getFindById3Url = (id: string) => {
-	return `http://localhost:8080/api/addresses/${id}`;
+	return `https://ecommerce-copa-api.onrender.com/api/addresses/${id}`;
 };
 
 /**
@@ -1724,7 +1724,7 @@ export type delete4ResponseSuccess = delete4Response200 & {
 export type delete4Response = delete4ResponseSuccess;
 
 export const getDelete4Url = (id: string) => {
-	return `http://localhost:8080/api/addresses/${id}`;
+	return `https://ecommerce-copa-api.onrender.com/api/addresses/${id}`;
 };
 
 /**
@@ -1758,7 +1758,7 @@ export type update4ResponseSuccess = update4Response200 & {
 export type update4Response = update4ResponseSuccess;
 
 export const getUpdate4Url = (id: string) => {
-	return `http://localhost:8080/api/addresses/${id}`;
+	return `https://ecommerce-copa-api.onrender.com/api/addresses/${id}`;
 };
 
 /**
@@ -1794,7 +1794,7 @@ export type listMine1ResponseSuccess = listMine1Response200 & {
 export type listMine1Response = listMine1ResponseSuccess;
 
 export const getListMine1Url = () => {
-	return `http://localhost:8080/api/reviews/me`;
+	return `https://ecommerce-copa-api.onrender.com/api/reviews/me`;
 };
 
 /**
@@ -1830,7 +1830,7 @@ export type findMineResponseSuccess = findMineResponse200 & {
 export type findMineResponse = findMineResponseSuccess;
 
 export const getFindMineUrl = (id: string) => {
-	return `http://localhost:8080/api/orders/${id}`;
+	return `https://ecommerce-copa-api.onrender.com/api/orders/${id}`;
 };
 
 /**
@@ -1874,8 +1874,8 @@ export const getListSkusUrl = (params?: ListSkusParams) => {
 	const stringifiedParams = normalizedParams.toString();
 
 	return stringifiedParams.length > 0
-		? `http://localhost:8080/api/catalog/skus?${stringifiedParams}`
-		: `http://localhost:8080/api/catalog/skus`;
+		? `https://ecommerce-copa-api.onrender.com/api/catalog/skus?${stringifiedParams}`
+		: `https://ecommerce-copa-api.onrender.com/api/catalog/skus`;
 };
 
 /**
@@ -1909,7 +1909,7 @@ export type listSkuReviewsResponseSuccess = listSkuReviewsResponse200 & {
 export type listSkuReviewsResponse = listSkuReviewsResponseSuccess;
 
 export const getListSkuReviewsUrl = (skuId: string) => {
-	return `http://localhost:8080/api/catalog/skus/${skuId}/reviews`;
+	return `https://ecommerce-copa-api.onrender.com/api/catalog/skus/${skuId}/reviews`;
 };
 
 /**
@@ -1961,8 +1961,8 @@ export const getFindProductUrl = (
 	const stringifiedParams = normalizedParams.toString();
 
 	return stringifiedParams.length > 0
-		? `http://localhost:8080/api/catalog/products/${productId}?${stringifiedParams}`
-		: `http://localhost:8080/api/catalog/products/${productId}`;
+		? `https://ecommerce-copa-api.onrender.com/api/catalog/products/${productId}?${stringifiedParams}`
+		: `https://ecommerce-copa-api.onrender.com/api/catalog/products/${productId}`;
 };
 
 /**
@@ -2001,7 +2001,7 @@ export type listCategoriesResponseSuccess = listCategoriesResponse200 & {
 export type listCategoriesResponse = listCategoriesResponseSuccess;
 
 export const getListCategoriesUrl = () => {
-	return `http://localhost:8080/api/catalog/categories`;
+	return `https://ecommerce-copa-api.onrender.com/api/catalog/categories`;
 };
 
 /**
@@ -2037,7 +2037,7 @@ export type getMyCartResponseSuccess = getMyCartResponse200 & {
 export type getMyCartResponse = getMyCartResponseSuccess;
 
 export const getGetMyCartUrl = () => {
-	return `http://localhost:8080/api/cart`;
+	return `https://ecommerce-copa-api.onrender.com/api/cart`;
 };
 
 /**
@@ -2073,7 +2073,7 @@ export type clearResponseSuccess = clearResponse200 & {
 export type clearResponse = clearResponseSuccess;
 
 export const getClearUrl = () => {
-	return `http://localhost:8080/api/cart`;
+	return `https://ecommerce-copa-api.onrender.com/api/cart`;
 };
 
 /**
@@ -2103,7 +2103,7 @@ export type me2ResponseSuccess = me2Response200 & {
 export type me2Response = me2ResponseSuccess;
 
 export const getMe2Url = () => {
-	return `http://localhost:8080/api/auth/me`;
+	return `https://ecommerce-copa-api.onrender.com/api/auth/me`;
 };
 
 /**
@@ -2145,8 +2145,8 @@ export const getPurchasesByClientUrl = (params: PurchasesByClientParams) => {
 	const stringifiedParams = normalizedParams.toString();
 
 	return stringifiedParams.length > 0
-		? `http://localhost:8080/api/admin/reports/purchases-by-client?${stringifiedParams}`
-		: `http://localhost:8080/api/admin/reports/purchases-by-client`;
+		? `https://ecommerce-copa-api.onrender.com/api/admin/reports/purchases-by-client?${stringifiedParams}`
+		: `https://ecommerce-copa-api.onrender.com/api/admin/reports/purchases-by-client`;
 };
 
 /**
@@ -2184,7 +2184,7 @@ export type outOfStockResponseSuccess = outOfStockResponse200 & {
 export type outOfStockResponse = outOfStockResponseSuccess;
 
 export const getOutOfStockUrl = () => {
-	return `http://localhost:8080/api/admin/reports/out-of-stock-skus`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/reports/out-of-stock-skus`;
 };
 
 /**
@@ -2231,8 +2231,8 @@ export const getDailyRevenueUrl = (params: DailyRevenueParams) => {
 	const stringifiedParams = normalizedParams.toString();
 
 	return stringifiedParams.length > 0
-		? `http://localhost:8080/api/admin/reports/daily-revenue?${stringifiedParams}`
-		: `http://localhost:8080/api/admin/reports/daily-revenue`;
+		? `https://ecommerce-copa-api.onrender.com/api/admin/reports/daily-revenue?${stringifiedParams}`
+		: `https://ecommerce-copa-api.onrender.com/api/admin/reports/daily-revenue`;
 };
 
 /**
@@ -2270,7 +2270,7 @@ export type list4ResponseSuccess = list4Response200 & {
 export type list4Response = list4ResponseSuccess;
 
 export const getList4Url = () => {
-	return `http://localhost:8080/api/admin/orders`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/orders`;
 };
 
 /**
@@ -2300,7 +2300,7 @@ export type findById4ResponseSuccess = findById4Response200 & {
 export type findById4Response = findById4ResponseSuccess;
 
 export const getFindById4Url = (id: string) => {
-	return `http://localhost:8080/api/admin/orders/${id}`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/orders/${id}`;
 };
 
 /**
@@ -2337,7 +2337,7 @@ export type cancelResponseSuccess = cancelResponse200 & {
 export type cancelResponse = cancelResponseSuccess;
 
 export const getCancelUrl = (id: string) => {
-	return `http://localhost:8080/api/admin/orders/${id}`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/orders/${id}`;
 };
 
 /**
@@ -2371,7 +2371,7 @@ export type list5ResponseSuccess = list5Response200 & {
 export type list5Response = list5ResponseSuccess;
 
 export const getList5Url = () => {
-	return `http://localhost:8080/api/admin/clients`;
+	return `https://ecommerce-copa-api.onrender.com/api/admin/clients`;
 };
 
 /**
@@ -2402,7 +2402,7 @@ export type deleteMe1ResponseSuccess = deleteMe1Response200 & {
 export type deleteMe1Response = deleteMe1ResponseSuccess;
 
 export const getDeleteMe1Url = () => {
-	return `http://localhost:8080/api/users/me`;
+	return `https://ecommerce-copa-api.onrender.com/api/users/me`;
 };
 
 /**

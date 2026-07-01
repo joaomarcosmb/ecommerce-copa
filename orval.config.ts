@@ -6,12 +6,12 @@ export default defineConfig({
 			mode: "single",
 			target: "src/api/generated/endpoints.ts",
 			schemas: "src/api/generated/model",
-			baseUrl: "http://localhost:8080",
+			baseUrl: "https://ecommerce-copa-api.onrender.com",
 			client: "fetch",
 			formatter: "biome",
 		},
 		input: {
-			target: "http://localhost:8080/api-docs",
+			target: "https://ecommerce-copa-api.onrender.com/api-docs",
 		},
 	},
 });
