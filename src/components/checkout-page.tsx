@@ -64,7 +64,8 @@ function CheckoutPageContent({ order }: { order: OrderResponse }) {
 	const subtotal =
 		order.totalValue ??
 		items.reduce(
-			(sum, item) => sum + (item.subtotal ?? (item.price ?? 0) * (item.amount ?? 0)),
+			(sum, item) =>
+				sum + (item.subtotal ?? (item.price ?? 0) * (item.amount ?? 0)),
 			0,
 		);
 	const total = subtotal + SHIPPING;

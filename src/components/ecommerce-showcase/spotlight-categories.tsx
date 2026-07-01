@@ -6,6 +6,7 @@ import type {
 	CategoryResponse,
 } from "@/api/generated/model";
 import { H2 } from "../typography";
+import { resolveMediaUrl } from "@/lib/format";
 
 export function SpotlightCategories() {
 	const [categories, setCategories] = useState<CategoryResponse[]>([]);
@@ -41,7 +42,7 @@ export function SpotlightCategories() {
 
 								<div className="relative h-full w-full overflow-hidden rounded-2xl transition-transform duration-300 group-hover:rotate-4 group-hover:shadow-lg">
 									<img
-										src={cat.image ?? ""}
+										src={resolveMediaUrl(cat.image) ?? ""}
 										alt={`Categoria ${cat.title}`}
 										className="h-full w-full object-cover transition-transform duration-300"
 									/>

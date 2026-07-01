@@ -1,6 +1,7 @@
 import { defineConfig } from "orval";
 
-const apiUrl = process.env.PUBLIC_API_URL ?? "https://ecommerce-copa-api.onrender.com";
+const apiUrl =
+	process.env.PUBLIC_API_URL ?? "https://ecommerce-copa-api.onrender.com";
 
 export default defineConfig({
 	api: {
