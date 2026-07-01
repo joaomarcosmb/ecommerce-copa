@@ -1,27 +1,40 @@
 import * as React from "react";
+import { Slot } from "radix-ui";
 
 import { cn } from "@/lib/utils";
 
-interface CardProps {
-	children: React.ReactNode;
-	className?: string;
+interface CardProps extends React.ComponentProps<"div"> {
 	hover?: boolean;
+	/** Border only, no resting shadow */
+	flat?: boolean;
+	/** Render as the single child element (e.g. an `<a>`) instead of a `<div>`. */
+	asChild?: boolean;
 }
 
-function Card({ children, className = "", hover = false }: CardProps) {
+function Card({
+	children,
+	className = "",
+	hover = false,
+	flat = false,
+	asChild = false,
+	...props
+}: CardProps) {
+	const Comp = asChild ? Slot.Root : "div";
+
 	return (
-		<div
+		<Comp
 			data-slot="card"
 			className={cn(
 				"group/card rounded-2xl border border-slate-200 bg-white transition-[transform,border-color,box-shadow] duration-200",
 				hover
 					? "hover:-translate-y-1 hover:border-blue-700 hover:shadow-xl"
-					: "shadow-sm",
+					: !flat && "shadow-sm",
 				className,
 			)}
+			{...props}
 		>
 			{children}
-		</div>
+		</Comp>
 	);
 }
 

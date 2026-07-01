@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Plus, Trash2, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { fieldInputClassName } from "@/components/ui/form";
+import { cn } from "@/lib/utils";
 import type { ProductOption } from "./variant-matrix-utils";
 
 interface VariantOptionsEditorProps {
@@ -68,7 +70,7 @@ export function VariantOptionsEditor({
 							value={option.name}
 							onChange={(e) => update(index, { name: e.target.value })}
 							placeholder="Nome da opção (ex.: Tamanho)"
-							className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2 font-sans text-[14px] text-slate-900 placeholder:text-slate-400 focus-visible:border-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+							className={cn(fieldInputClassName, "flex-1")}
 						/>
 						<Button
 							type="button"

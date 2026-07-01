@@ -225,6 +225,37 @@ function FormMessage({
 	);
 }
 
+/**
+ * Canonical styling for single-line text inputs.
+ */
+const fieldInputClassName = cn(
+	"w-full rounded-xl border border-slate-200 bg-white px-4 py-2 shadow-sm",
+	"text-[14px] leading-5 font-sans text-slate-900 placeholder:text-slate-400",
+	"focus-visible:border-blue-600 focus-visible:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-1",
+	"transition-[background-color,border-color,box-shadow] duration-200",
+	"disabled:cursor-not-allowed disabled:opacity-50",
+);
+
+const fieldErrorClassName =
+	"border-red-600 focus-visible:border-red-600 focus-visible:ring-red-200";
+
+/** Styled `<input>` wired to the surrounding `FormField` for error state. */
+function FormInput({ className, ...props }: React.ComponentProps<"input">) {
+	const { error } = useFormField();
+
+	return (
+		<input
+			data-slot="form-input"
+			className={cn(
+				fieldInputClassName,
+				error && fieldErrorClassName,
+				className,
+			)}
+			{...props}
+		/>
+	);
+}
+
 function FormTextarea({
 	className,
 	...props
@@ -269,6 +300,8 @@ function FormActions({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 export {
+	fieldErrorClassName,
+	fieldInputClassName,
 	Form,
 	FormActions,
 	FormBody,
@@ -276,6 +309,7 @@ export {
 	FormDescription,
 	FormField,
 	FormHeader,
+	FormInput,
 	FormItem,
 	FormLabel,
 	FormLead,

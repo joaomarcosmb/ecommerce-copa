@@ -1,5 +1,8 @@
 import * as React from "react";
 
+import { cn } from "@/lib/utils";
+import { fieldErrorClassName, fieldInputClassName } from "@/components/ui/form";
+
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 	label?: string;
 	error?: string;
@@ -48,18 +51,12 @@ function Input({
 					aria-invalid={Boolean(error)}
 					aria-describedby={descriptionId}
 					spellCheck={spellCheck}
-					className={`
-            w-full px-4 py-2 rounded-xl 
-            border border-slate-200 bg-white shadow-sm
-            text-[14px] leading-5 font-sans text-slate-900
-            placeholder:text-slate-400
-            focus-visible:border-blue-600 focus-visible:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-1
-            transition-[background-color,border-color,box-shadow] duration-200
-            disabled:opacity-50 disabled:cursor-not-allowed
-            ${icon ? "pl-12" : ""}
-            ${error ? "border-red-600 focus-visible:border-red-600 focus-visible:ring-red-200" : ""}
-            ${className}
-          `}
+					className={cn(
+						fieldInputClassName,
+						icon && "pl-12",
+						error && fieldErrorClassName,
+						className,
+					)}
 					{...props}
 				/>
 			</div>

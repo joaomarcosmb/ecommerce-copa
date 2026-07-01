@@ -1,6 +1,7 @@
-import { CheckCircle2, MapPin, Truck } from "lucide-react";
+import { MapPin, Truck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { LabelLarge, P } from "@/components/typography";
 import { formatCurrency, formatDate } from "@/lib/format";
 
@@ -119,89 +120,99 @@ function CheckoutPageContent() {
 				{/* Main column */}
 				<div className="flex flex-col gap-6">
 					{/* Items */}
-					<section className="rounded-2xl border border-slate-200 bg-white px-5 py-6 sm:px-8">
-						<h2 className="font-big-shoulders text-xl font-bold text-slate-900">
-							Itens do pedido
-						</h2>
-						<ul className="mt-2">
-							{order.items.map((item, index) => (
-								<OrderItemRow
-									key={item.id}
-									item={item}
-									isLast={index === order.items.length - 1}
-								/>
-							))}
-						</ul>
-					</section>
+					<Card asChild flat className="px-5 py-6 sm:px-8">
+						<section>
+							<h2 className="font-big-shoulders text-xl font-bold text-slate-900">
+								Itens do pedido
+							</h2>
+							<ul className="mt-2">
+								{order.items.map((item, index) => (
+									<OrderItemRow
+										key={item.id}
+										item={item}
+										isLast={index === order.items.length - 1}
+									/>
+								))}
+							</ul>
+						</section>
+					</Card>
 
 					{/* Delivery */}
-					<section className="rounded-2xl border border-slate-200 bg-white px-5 py-6 sm:px-8">
-						<h2 className="font-big-shoulders text-xl font-bold text-slate-900">
-							Entrega
-						</h2>
+					<Card asChild flat className="px-5 py-6 sm:px-8">
+						<section>
+							<h2 className="font-big-shoulders text-xl font-bold text-slate-900">
+								Entrega
+							</h2>
 
-						<div className="mt-4 flex items-start gap-4">
-							<MapPin
-								className="mt-0.5 size-5 shrink-0 text-blue-700"
-								aria-hidden="true"
-							/>
-							<div className="flex-1">
-								<p className="text-sm font-semibold text-slate-900">
-									{order.address.name}
-								</p>
-								<P className="mt-0.5 text-slate-500">{order.address.line}</P>
+							<div className="mt-4 flex items-start gap-4">
+								<MapPin
+									className="mt-0.5 size-5 shrink-0 text-blue-700"
+									aria-hidden="true"
+								/>
+								<div className="flex-1">
+									<p className="text-sm font-semibold text-slate-900">
+										{order.address.name}
+									</p>
+									<P className="mt-0.5 text-slate-500">{order.address.line}</P>
+								</div>
 							</div>
-						</div>
 
-						<div className="mt-4 flex items-start gap-4 border-t border-slate-100 pt-4">
-							<Truck
-								className="mt-0.5 size-5 shrink-0 text-blue-700"
-								aria-hidden="true"
-							/>
-							<div className="flex-1">
-								<p className="text-sm font-semibold text-slate-900">
-									Previsão de entrega
-								</p>
-								<P className="mt-0.5 text-slate-500">
-									{order.estimatedDelivery}
-								</P>
+							<div className="mt-4 flex items-start gap-4 border-t border-slate-100 pt-4">
+								<Truck
+									className="mt-0.5 size-5 shrink-0 text-blue-700"
+									aria-hidden="true"
+								/>
+								<div className="flex-1">
+									<p className="text-sm font-semibold text-slate-900">
+										Previsão de entrega
+									</p>
+									<P className="mt-0.5 text-slate-500">
+										{order.estimatedDelivery}
+									</P>
+								</div>
 							</div>
-						</div>
-					</section>
+						</section>
+					</Card>
 				</div>
 
 				{/* Order summary */}
-				<aside className="flex flex-col gap-5 self-start rounded-2xl border border-slate-200 bg-white px-5 py-6 sm:px-8 lg:sticky lg:top-24">
-					<h2 className="font-big-shoulders text-xl font-bold text-slate-900">
-						Resumo do pedido
-					</h2>
+				<Card
+					asChild
+					flat
+					className="flex flex-col gap-5 self-start px-5 py-6 sm:px-8 lg:sticky lg:top-24"
+				>
+					<aside>
+						<h2 className="font-big-shoulders text-xl font-bold text-slate-900">
+							Resumo do pedido
+						</h2>
 
-					<div className="flex flex-col gap-3">
-						<div className="flex items-center justify-between text-sm text-slate-600">
-							<span>Subtotal</span>
-							<span>{formatCurrency(subtotal)}</span>
+						<div className="flex flex-col gap-3">
+							<div className="flex items-center justify-between text-sm text-slate-600">
+								<span>Subtotal</span>
+								<span>{formatCurrency(subtotal)}</span>
+							</div>
+							<div className="flex items-center justify-between text-sm text-slate-600">
+								<span>Frete</span>
+								<span>{formatCurrency(SHIPPING)}</span>
+							</div>
 						</div>
-						<div className="flex items-center justify-between text-sm text-slate-600">
-							<span>Frete</span>
-							<span>{formatCurrency(SHIPPING)}</span>
-						</div>
-					</div>
 
-					<div className="border-t border-slate-200 pt-4">
-						<div className="flex items-center justify-between">
-							<span className="font-semibold text-slate-900">Total</span>
-							<span className="text-lg font-bold text-slate-900">
-								{formatCurrency(total)}
-							</span>
+						<div className="border-t border-slate-200 pt-4">
+							<div className="flex items-center justify-between">
+								<span className="font-semibold text-slate-900">Total</span>
+								<span className="text-lg font-bold text-slate-900">
+									{formatCurrency(total)}
+								</span>
+							</div>
 						</div>
-					</div>
 
-					<div className="flex flex-col items-center gap-3">
-						<Button variant="primary" size="lg" className="w-full" asChild>
-							<a href="/orders">Ver meus pedidos</a>
-						</Button>
-					</div>
-				</aside>
+						<div className="flex flex-col items-center gap-3">
+							<Button variant="primary" size="lg" className="w-full" asChild>
+								<a href="/orders">Ver meus pedidos</a>
+							</Button>
+						</div>
+					</aside>
+				</Card>
 			</div>
 		</main>
 	);

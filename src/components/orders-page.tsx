@@ -4,15 +4,8 @@ import { formatCurrency, formatDate } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { P, LabelLarge } from "@/components/typography";
+import { ORDER_STATUS_BADGE, type OrderStatus } from "@/lib/order-status";
 import { AppShell } from "./ecommerce-showcase/app-shell";
-import { BreadcrumbNav } from "./ecommerce-showcase/breadcrumb-nav";
-
-type OrderStatus =
-	| "Aguardando pagamento"
-	| "Em processamento"
-	| "Enviado"
-	| "Entregue"
-	| "Cancelado";
 
 type OrderItem = {
 	id: number;
@@ -28,17 +21,6 @@ type Order = {
 	date: string;
 	status: OrderStatus;
 	items: OrderItem[];
-};
-
-const ORDER_STATUS_BADGE: Record<
-	OrderStatus,
-	"warning" | "info" | "default" | "success" | "error"
-> = {
-	"Aguardando pagamento": "warning",
-	"Em processamento": "info",
-	Enviado: "default",
-	Entregue: "success",
-	Cancelado: "error",
 };
 
 const ORDERS: Order[] = [
@@ -150,7 +132,7 @@ function OrderCard({ order }: { order: Order }) {
 						Realizado em: {formatDate(order.date)}
 					</P>
 				</div>
-				<Badge variant={ORDER_STATUS_BADGE[order.status]} className="text-md">
+				<Badge variant={ORDER_STATUS_BADGE[order.status]} size="md">
 					{order.status}
 				</Badge>
 			</div>

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { Plus, Search, Tag } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -256,9 +257,9 @@ export function AdminCategoriesPage() {
 												{category.slug}
 											</span>
 											{category.featured && (
-												<span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-700">
+												<Badge variant="warning" appearance="soft">
 													Destaque
-												</span>
+												</Badge>
 											)}
 										</span>
 									}

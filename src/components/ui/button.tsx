@@ -18,6 +18,8 @@ const buttonVariants = cva(
 				ghost: "text-slate-900 hover:bg-slate-100 active:bg-slate-200",
 				destructive:
 					"bg-red-700 text-white shadow-md hover:bg-red-800 hover:shadow-lg hover:shadow-red-700/30 active:bg-red-900",
+				success:
+					"bg-green-600 text-white shadow-md hover:bg-green-700 hover:shadow-lg hover:shadow-green-600/30 active:bg-green-700",
 				link: "text-blue-700 hover:underline active:text-blue-800",
 			},
 			size: {
@@ -30,6 +32,9 @@ const buttonVariants = cva(
 				"icon-sm":
 					"size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
 				"icon-lg": "size-9",
+				"icon-round-sm": "size-8 rounded-full p-0",
+				"icon-round": "size-10 rounded-full p-0",
+				"icon-round-lg": "size-12 rounded-full p-0",
 			},
 		},
 		defaultVariants: {

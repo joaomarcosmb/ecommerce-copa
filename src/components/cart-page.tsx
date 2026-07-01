@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Check } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/format";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useCart } from "@/contexts/cart-context";
@@ -119,7 +120,7 @@ function CartPageContent() {
 
 			<div className="mt-8 md:mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_400px]">
 				{/* Main column */}
-				<div className="rounded-2xl border border-slate-200 bg-white px-4 py-2 sm:px-8">
+				<Card flat className="px-4 py-2 sm:px-8">
 					{isReviewStep ? (
 						cartLoading ? (
 							<div className="flex flex-col gap-4 py-8">
@@ -171,44 +172,50 @@ function CartPageContent() {
 							/>
 						</div>
 					) : null}
-				</div>
+				</Card>
 
 				{/* Order summary */}
-				<aside className="flex flex-col gap-5 self-start rounded-2xl border border-slate-200 bg-white px-5 py-6 sm:px-8 lg:sticky lg:top-24">
-					<h2 className="font-big-shoulders text-xl font-bold text-slate-900">
-						Resumo do pedido
-					</h2>
+				<Card
+					asChild
+					flat
+					className="flex flex-col gap-5 self-start px-5 py-6 sm:px-8 lg:sticky lg:top-24"
+				>
+					<aside>
+						<h2 className="font-big-shoulders text-xl font-bold text-slate-900">
+							Resumo do pedido
+						</h2>
 
-					<div className="flex flex-col gap-3">
-						<div className="flex items-center justify-between text-sm text-slate-600">
-							<span>Subtotal</span>
-							<span>{formatCurrency(subtotal)}</span>
+						<div className="flex flex-col gap-3">
+							<div className="flex items-center justify-between text-sm text-slate-600">
+								<span>Subtotal</span>
+								<span>{formatCurrency(subtotal)}</span>
+							</div>
+							<div className="flex items-center justify-between text-sm text-slate-600">
+								<span>Frete</span>
+								<span>{formatCurrency(SHIPPING)}</span>
+							</div>
 						</div>
-						<div className="flex items-center justify-between text-sm text-slate-600">
-							<span>Frete</span>
-							<span>{formatCurrency(SHIPPING)}</span>
-						</div>
-					</div>
 
-					<div className="border-t border-slate-200 pt-4">
-						<div className="flex items-center justify-between">
-							<span className="font-semibold text-slate-900">Total</span>
-							<span className="text-lg font-bold text-slate-900">
-								{formatCurrency(total)}
-							</span>
+						<div className="border-t border-slate-200 pt-4">
+							<div className="flex items-center justify-between">
+								<span className="font-semibold text-slate-900">Total</span>
+								<span className="text-lg font-bold text-slate-900">
+									{formatCurrency(total)}
+								</span>
+							</div>
 						</div>
-					</div>
 
-					<div className="flex flex-col items-center gap-3">
-						{summaryButton}
-						<a
-							href="/"
-							className="text-sm text-slate-500 transition-colors duration-200 hover:text-slate-800"
-						>
-							Continuar comprando
-						</a>
-					</div>
-				</aside>
+						<div className="flex flex-col items-center gap-3">
+							{summaryButton}
+							<a
+								href="/"
+								className="text-sm text-slate-500 transition-colors duration-200 hover:text-slate-800"
+							>
+								Continuar comprando
+							</a>
+						</div>
+					</aside>
+				</Card>
 			</div>
 		</main>
 	);
