@@ -5,14 +5,8 @@
  * API backend do Ecommerce Copa com autenticação por sessão, catálogo público e CRUD administrativo.
  * OpenAPI spec version: 1.0.0
  */
+import type { ProductAdminResponse } from "./productAdminResponse.ts";
 
-export type PurchasesByClientParams = {
-	/**
-	 * Data inicial no formato yyyy-MM-dd
-	 */
-	startDate: string;
-	/**
-	 * Data final no formato yyyy-MM-dd
-	 */
-	endDate: string;
-};
+export interface ApiResponseProductAdminResponse {
+	data?: ProductAdminResponse;
+}

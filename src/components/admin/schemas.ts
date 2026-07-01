@@ -8,7 +8,8 @@ export const categorySchema = z.object({
 export type CategoryFormValues = z.infer<typeof categorySchema>;
 
 export const optionSchema = z.object({
-	name: z.string().trim().min(1, "Informe o nome da opção."),
+	label: z.string().trim().min(1, "Informe o nome da opção."),
+	key: z.string().trim().min(1),
 	values: z
 		.array(z.string().trim().min(1))
 		.min(1, "Adicione ao menos um valor.")
@@ -19,7 +20,13 @@ export const optionSchema = z.object({
 });
 
 export const variantSchema = z.object({
-	optionValues: z.array(z.string()),
+	attributeValues: z.record(z.string(), z.string()),
+	title: z.string().trim().min(1, "Informe o título."),
+	description: z
+		.string()
+		.trim()
+		.min(2, "Descrição deve ter entre 2 e 2000 caracteres.")
+		.max(2000, "Descrição deve ter entre 2 e 2000 caracteres."),
 	price: z
 		.string()
 		.min(1, "Informe o preço.")
@@ -38,41 +45,33 @@ export const variantSchema = z.object({
 			(v) => Number.isInteger(Number(v)) && Number(v) >= 0,
 			"Estoque inválido.",
 		),
-	sku: z.string().trim().min(1, "Informe o SKU."),
-	image: z.any().optional(),
+	photos: z.array(z.instanceof(File)),
 });
 
 export const productSchema = z.object({
 	name: z.string().trim().min(2, "Informe o nome (mínimo 2 caracteres)."),
-	description: z.string().trim().optional(),
 	categoryId: z.string().min(1, "Selecione uma categoria."),
-	images: z.array(z.any()),
 	options: z.array(optionSchema),
 	variants: z
 		.array(variantSchema)
-		.min(1, "O produto precisa de ao menos uma variante.")
-		.refine((vs) => {
-			const skus = vs.map((v) => v.sku.trim().toLowerCase()).filter(Boolean);
-			return new Set(skus).size === skus.length;
-		}, "Os SKUs das variantes devem ser únicos."),
+		.min(1, "O produto precisa de ao menos uma variante."),
 });
 
 export type ProductFormValues = z.infer<typeof productSchema>;
 
 export const emptyProductForm: ProductFormValues = {
 	name: "",
-	description: "",
 	categoryId: "",
-	images: [],
 	options: [],
 	variants: [
 		{
-			optionValues: [],
+			attributeValues: {},
+			title: "",
+			description: "",
 			price: "",
 			originalPrice: "",
 			stock: "0",
-			sku: "",
-			image: undefined,
+			photos: [],
 		},
 	],
 };

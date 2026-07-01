@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Lock, LogOut, Pencil, Trash2 } from "lucide-react";
+import { Lock, LogOut, Pencil, MapPinPlus, Trash2 } from "lucide-react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,7 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { LabelLarge, P } from "@/components/typography";
+import { H2, LabelLarge, P } from "@/components/typography";
 import { useClientProfile } from "@/hooks/use-client-profile";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useAuth } from "@/hooks/use-auth";
@@ -211,11 +211,14 @@ function EditProfileDialog({
 			>
 				<DialogHeader className="space-y-0 px-7 pb-5 pt-7">
 					<div className="grid grid-cols-[auto_1fr] items-center gap-4">
-						<span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full text-white bg-slate-700 shadow-md">
+						<span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full text-white bg-blue-700 shadow-md">
 							<Pencil aria-hidden="true" className="size-5" />
 						</span>
-						<DialogTitle className="font-big-shoulders text-xl font-bold text-slate-900">
-							Editar dados pessoais
+						<DialogTitle>
+							<H2>Editar dados pessoais</H2>
+							<P className="text-slate-500">
+								Atualize suas informações pessoais
+							</P>
 						</DialogTitle>
 					</div>
 				</DialogHeader>
@@ -353,11 +356,15 @@ function ChangePasswordDialog({
 			>
 				<DialogHeader className="space-y-0 px-7 pb-5 pt-7">
 					<div className="grid grid-cols-[auto_1fr] items-center gap-4">
-						<span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full bg-slate-700 text-white shadow-md">
+						<span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-700 text-white shadow-md">
 							<Lock aria-hidden="true" className="size-5" />
 						</span>
-						<DialogTitle className="font-big-shoulders text-xl font-bold text-slate-900">
-							Alterar senha
+						<DialogTitle>
+							<H2>Alterar senha</H2>
+							<P className="text-slate-500">
+								{" "}
+								Altere sua senha para manter sua conta segura
+							</P>
 						</DialogTitle>
 					</div>
 				</DialogHeader>
@@ -781,9 +788,25 @@ export function AccountPage() {
 					className="gap-0 overflow-hidden rounded-[28px] border-none p-0 shadow-2xl sm:max-w-lg"
 				>
 					<DialogHeader className="space-y-0 px-7 pb-5 pt-7">
-						<DialogTitle className="font-big-shoulders text-xl font-bold text-slate-900">
-							{editingAddress ? "Editar endereço" : "Adicionar endereço"}
-						</DialogTitle>
+						<div className="grid grid-cols-[auto_1fr] items-center gap-4">
+							<span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full text-white bg-blue-700 shadow-md">
+								{editingAddress ? (
+									<Pencil aria-hidden="true" className="size-5" />
+								) : (
+									<MapPinPlus aria-hidden="true" className="size-5" />
+								)}
+							</span>
+							<DialogTitle>
+								<H2>
+									{editingAddress ? "Editar endereço" : "Adicionar endereço"}
+								</H2>
+								<P className="text-slate-500">
+									{editingAddress
+										? "Atualize os dados do endereço"
+										: "Adicione um novo endereço"}
+								</P>
+							</DialogTitle>
+						</div>
 					</DialogHeader>
 					<div className="w-full h-px bg-slate-200" />
 					<div className="px-7 py-5">
@@ -871,15 +894,18 @@ export function AccountPage() {
 							<span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full text-white bg-red-700 shadow-md">
 								<Trash2 aria-hidden="true" className="size-5" />
 							</span>
-							<DialogTitle className="font-big-shoulders text-xl font-bold text-slate-900">
-								Deseja mesmo excluir sua conta?
+							<DialogTitle>
+								<H2>Excluir conta</H2>
+								<P className="text-slate-500">
+									Deseja mesmo excluir sua conta?
+								</P>
 							</DialogTitle>
 						</div>
 					</DialogHeader>
 					<div className="w-full h-px bg-slate-200"></div>
 					<DialogDescription className="mt-1 mx-6 my-4 text-slate-600">
-						Esta ação é permanente e remove todos os seus dados e coleções. Tem
-						certeza de que deseja continuar?
+						Esta ação é <span className="font-bold">permanente</span> e remove
+						todos os seus dados e coleções.
 					</DialogDescription>
 					<div className="w-full h-px bg-slate-200"></div>
 					<DialogFooter className="flex flex-row justify-between! gap-3 border-t-0 bg-transparent px-5 pb-7 mx-0">

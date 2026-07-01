@@ -5,8 +5,8 @@
  * API backend do Ecommerce Copa com autenticação por sessão, catálogo público e CRUD administrativo.
  * OpenAPI spec version: 1.0.0
  */
-import type { ProductResponse } from "./productResponse.ts";
+import type { ProductSummaryResponse } from "./productSummaryResponse.ts";
 
 export interface ProductListResponse {
-	items?: ProductResponse[];
+	items?: ProductSummaryResponse[];
 }

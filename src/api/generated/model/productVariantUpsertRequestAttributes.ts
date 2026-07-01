@@ -6,13 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type PurchasesByClientParams = {
-	/**
-	 * Data inicial no formato yyyy-MM-dd
-	 */
-	startDate: string;
-	/**
-	 * Data final no formato yyyy-MM-dd
-	 */
-	endDate: string;
-};
+/**
+ * Valores das opções definidas no Product.
+ */
+export type ProductVariantUpsertRequestAttributes = { [key: string]: unknown };

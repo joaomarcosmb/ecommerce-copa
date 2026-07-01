@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import type {
+	AddVariantPhotoBody,
 	ApiResponseAddressListResponse,
 	ApiResponseAddressResponse,
 	ApiResponseAdminMeResponse,
@@ -16,18 +17,14 @@ import type {
 	ApiResponseCategoryListResponse,
 	ApiResponseCategoryResponse,
 	ApiResponseClientMeResponse,
-	ApiResponseClientPurchaseReportResponse,
-	ApiResponseDailyRevenueReportResponse,
+	ApiResponseListClientResponse,
 	ApiResponseOrderListResponse,
 	ApiResponseOrderResponse,
-	ApiResponseOutOfStockSkuReportResponse,
+	ApiResponseProductAdminResponse,
 	ApiResponseProductListResponse,
-	ApiResponseProductResponse,
 	ApiResponseRegisterClientResponse,
 	ApiResponseReviewListResponse,
 	ApiResponseReviewResponse,
-	ApiResponseSkuListResponse,
-	ApiResponseSkuResponse,
 	ApiResponseTagListResponse,
 	ApiResponseTagResponse,
 	ApiResponseUserPhotoResponse,
@@ -35,16 +32,19 @@ import type {
 	CreateAddressRequest,
 	CreateCategoryFormRequest,
 	CreateOrderRequest,
-	CreateProductRequest,
 	CreateReviewRequest,
-	CreateSkuFormRequest,
 	CreateTagRequest,
 	DailyRevenueParams,
+	DeleteVariantPhotoParams,
 	FindProductParams,
 	List1Params,
-	List2Params,
 	ListSkusParams,
 	LoginRequest,
+	ProductMultipartRequest,
+	ProductUpdateRequest,
+	ProductVariantMultipartRequest,
+	ProductVariantPhotoOrderRequest,
+	ProductVariantUpsertRequest,
 	PurchasesByClientParams,
 	RegisterClientRequest,
 	UpdateAddressRequest,
@@ -54,53 +54,9 @@ import type {
 	UpdateClientMeRequest,
 	UpdateMyPhotoBody,
 	UpdateOrderStatusRequest,
-	UpdateProductRequest,
 	UpdateReviewRequest,
-	UpdateSkuFormRequest,
-	UpdateSkuTagsRequest,
 	UpdateTagRequest,
 } from "./model";
-
-export type replaceTagsResponse200 = {
-	data: ApiResponseTagListResponse;
-	status: 200;
-};
-
-export type replaceTagsResponseSuccess = replaceTagsResponse200 & {
-	headers: Headers;
-};
-
-export type replaceTagsResponse = replaceTagsResponseSuccess;
-
-export const getReplaceTagsUrl = (id: string) => {
-	return `http://localhost:8080/api/admin/skus/${id}/tags`;
-};
-
-/**
- * Substitui todas as tags manuais vinculadas ao SKU.
- * @summary Substituir tags do SKU
- */
-export const replaceTags = async (
-	id: string,
-	updateSkuTagsRequest: UpdateSkuTagsRequest,
-	options?: RequestInit,
-): Promise<replaceTagsResponse> => {
-	const res = await fetch(getReplaceTagsUrl(id), {
-		...options,
-		method: "PUT",
-		headers: { "Content-Type": "application/json", ...options?.headers },
-		body: JSON.stringify(updateSkuTagsRequest),
-	});
-
-	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-	const data: replaceTagsResponse["data"] = body !== null ? body : "";
-	return {
-		data,
-		status: res.status,
-		headers: res.headers,
-	} as replaceTagsResponse;
-};
 
 export type createResponse200 = {
 	data: ApiResponseReviewResponse;
@@ -418,7 +374,7 @@ export const create2 = async (
 };
 
 export type list1Response200 = {
-	data: ApiResponseSkuListResponse;
+	data: ApiResponseProductListResponse;
 	status: 200;
 };
 
@@ -440,12 +396,13 @@ export const getList1Url = (params?: List1Params) => {
 	const stringifiedParams = normalizedParams.toString();
 
 	return stringifiedParams.length > 0
-		? `http://localhost:8080/api/admin/skus?${stringifiedParams}`
-		: `http://localhost:8080/api/admin/skus`;
+		? `http://localhost:8080/api/admin/products?${stringifiedParams}`
+		: `http://localhost:8080/api/admin/products`;
 };
 
 /**
- * @summary Listar SKUs
+ * Retorna lista resumida de produtos.
+ * @summary Listar products
  */
 export const list1 = async (
 	params?: List1Params,
@@ -463,7 +420,7 @@ export const list1 = async (
 };
 
 export type create3Response200 = {
-	data: ApiResponseSkuResponse;
+	data: ApiResponseProductAdminResponse;
 	status: 200;
 };
 
@@ -474,44 +431,29 @@ export type create3ResponseSuccess = create3Response200 & {
 export type create3Response = create3ResponseSuccess;
 
 export const getCreate3Url = () => {
-	return `http://localhost:8080/api/admin/skus`;
+	return `http://localhost:8080/api/admin/products`;
 };
 
 /**
- * Cria SKU via multipart/form-data. Envie attributes como JSON string e photo como arquivo opcional.
- * @summary Criar SKU
+ * Cria Product e uma ou mais variantes/SKUs. Descrição, preço e imagem pertencem à variante. No Swagger, use variantImage0 para a imagem de variants[0], variantImage1 para variants[1] etc. Produto sem variação significa options vazio e uma única variante com attributes vazio.
+ * @summary Criar product
  */
 export const create3 = async (
-	createSkuFormRequest?: CreateSkuFormRequest,
+	productMultipartRequest: ProductMultipartRequest,
 	options?: RequestInit,
 ): Promise<create3Response> => {
 	const formData = new FormData();
-	if (createSkuFormRequest?.productId !== undefined) {
-		formData.append(`productId`, createSkuFormRequest.productId);
+	if (productMultipartRequest.data !== undefined) {
+		formData.append(`data`, JSON.stringify(productMultipartRequest.data));
 	}
-	if (createSkuFormRequest?.title !== undefined) {
-		formData.append(`title`, createSkuFormRequest.title);
+	if (productMultipartRequest.variantImage0 !== undefined) {
+		formData.append(`variantImage0`, productMultipartRequest.variantImage0);
 	}
-	if (createSkuFormRequest?.description !== undefined) {
-		formData.append(`description`, createSkuFormRequest.description);
+	if (productMultipartRequest.variantImage1 !== undefined) {
+		formData.append(`variantImage1`, productMultipartRequest.variantImage1);
 	}
-	if (createSkuFormRequest?.price !== undefined) {
-		formData.append(`price`, createSkuFormRequest.price.toString());
-	}
-	if (createSkuFormRequest?.originalPrice !== undefined) {
-		formData.append(
-			`originalPrice`,
-			createSkuFormRequest.originalPrice.toString(),
-		);
-	}
-	if (createSkuFormRequest?.stock !== undefined) {
-		formData.append(`stock`, createSkuFormRequest.stock.toString());
-	}
-	if (createSkuFormRequest?.attributes !== undefined) {
-		formData.append(`attributes`, createSkuFormRequest.attributes);
-	}
-	if (createSkuFormRequest?.photo !== undefined) {
-		formData.append(`photo`, createSkuFormRequest.photo);
+	if (productMultipartRequest.variantImage2 !== undefined) {
+		formData.append(`variantImage2`, productMultipartRequest.variantImage2);
 	}
 
 	const res = await fetch(getCreate3Url(), {
@@ -526,18 +468,126 @@ export const create3 = async (
 	return { data, status: res.status, headers: res.headers } as create3Response;
 };
 
-export type list2Response200 = {
-	data: ApiResponseProductListResponse;
+export type createVariantResponse200 = {
+	data: ApiResponseProductAdminResponse;
 	status: 200;
 };
 
-export type list2ResponseSuccess = list2Response200 & {
+export type createVariantResponseSuccess = createVariantResponse200 & {
 	headers: Headers;
 };
 
-export type list2Response = list2ResponseSuccess;
+export type createVariantResponse = createVariantResponseSuccess;
 
-export const getList2Url = (params?: List2Params) => {
+export const getCreateVariantUrl = (productId: string) => {
+	return `http://localhost:8080/api/admin/products/${productId}/variants`;
+};
+
+/**
+ * Cria uma única variante/SKU para um Product existente. Envie imagens opcionais nos campos images, images[], images[0], image0, image1 etc.
+ * @summary Criar variante do product
+ */
+export const createVariant = async (
+	productId: string,
+	productVariantMultipartRequest: ProductVariantMultipartRequest,
+	options?: RequestInit,
+): Promise<createVariantResponse> => {
+	const formData = new FormData();
+	if (productVariantMultipartRequest.data !== undefined) {
+		formData.append(
+			`data`,
+			JSON.stringify(productVariantMultipartRequest.data),
+		);
+	}
+	if (productVariantMultipartRequest.image0 !== undefined) {
+		formData.append(`image0`, productVariantMultipartRequest.image0);
+	}
+	if (productVariantMultipartRequest.image1 !== undefined) {
+		formData.append(`image1`, productVariantMultipartRequest.image1);
+	}
+	if (productVariantMultipartRequest.image2 !== undefined) {
+		formData.append(`image2`, productVariantMultipartRequest.image2);
+	}
+
+	const res = await fetch(getCreateVariantUrl(productId), {
+		...options,
+		method: "POST",
+		body: formData,
+	});
+
+	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+	const data: createVariantResponse["data"] = body !== null ? body : "";
+	return {
+		data,
+		status: res.status,
+		headers: res.headers,
+	} as createVariantResponse;
+};
+
+export type addVariantPhotoResponse200 = {
+	data: ApiResponseProductAdminResponse;
+	status: 200;
+};
+
+export type addVariantPhotoResponseSuccess = addVariantPhotoResponse200 & {
+	headers: Headers;
+};
+
+export type addVariantPhotoResponse = addVariantPhotoResponseSuccess;
+
+export const getAddVariantPhotoUrl = (productId: string, skuId: string) => {
+	return `http://localhost:8080/api/admin/products/${productId}/variants/${skuId}/photos`;
+};
+
+/**
+ * Adiciona uma foto ao final da galeria da variante/SKU.
+ * @summary Adicionar foto à variante
+ */
+export const addVariantPhoto = async (
+	productId: string,
+	skuId: string,
+	addVariantPhotoBody?: AddVariantPhotoBody,
+	options?: RequestInit,
+): Promise<addVariantPhotoResponse> => {
+	const formData = new FormData();
+	if (addVariantPhotoBody?.image !== undefined) {
+		formData.append(`image`, addVariantPhotoBody.image);
+	}
+
+	const res = await fetch(getAddVariantPhotoUrl(productId, skuId), {
+		...options,
+		method: "POST",
+		body: formData,
+	});
+
+	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+	const data: addVariantPhotoResponse["data"] = body !== null ? body : "";
+	return {
+		data,
+		status: res.status,
+		headers: res.headers,
+	} as addVariantPhotoResponse;
+};
+
+export type deleteVariantPhotoResponse200 = {
+	data: ApiResponseProductAdminResponse;
+	status: 200;
+};
+
+export type deleteVariantPhotoResponseSuccess =
+	deleteVariantPhotoResponse200 & {
+		headers: Headers;
+	};
+
+export type deleteVariantPhotoResponse = deleteVariantPhotoResponseSuccess;
+
+export const getDeleteVariantPhotoUrl = (
+	productId: string,
+	skuId: string,
+	params: DeleteVariantPhotoParams,
+) => {
 	const normalizedParams = new URLSearchParams();
 
 	Object.entries(params || {}).forEach(([key, value]) => {
@@ -549,19 +599,55 @@ export const getList2Url = (params?: List2Params) => {
 	const stringifiedParams = normalizedParams.toString();
 
 	return stringifiedParams.length > 0
-		? `http://localhost:8080/api/admin/products?${stringifiedParams}`
-		: `http://localhost:8080/api/admin/products`;
+		? `http://localhost:8080/api/admin/products/${productId}/variants/${skuId}/photos?${stringifiedParams}`
+		: `http://localhost:8080/api/admin/products/${productId}/variants/${skuId}/photos`;
 };
 
 /**
- * Filtra por slug da categoria quando o parâmetro category for informado.
- * @summary Listar products
+ * Remove uma foto específica da galeria da variante/SKU. Envie o caminho público da foto no query param photo.
+ * @summary Excluir foto da variante
  */
-export const list2 = async (
-	params?: List2Params,
+export const deleteVariantPhoto = async (
+	productId: string,
+	skuId: string,
+	params: DeleteVariantPhotoParams,
 	options?: RequestInit,
-): Promise<list2Response> => {
-	const res = await fetch(getList2Url(params), {
+): Promise<deleteVariantPhotoResponse> => {
+	const res = await fetch(getDeleteVariantPhotoUrl(productId, skuId, params), {
+		...options,
+		method: "DELETE",
+	});
+
+	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+	const data: deleteVariantPhotoResponse["data"] = body !== null ? body : "";
+	return {
+		data,
+		status: res.status,
+		headers: res.headers,
+	} as deleteVariantPhotoResponse;
+};
+
+export type list2Response200 = {
+	data: ApiResponseCategoryListResponse;
+	status: 200;
+};
+
+export type list2ResponseSuccess = list2Response200 & {
+	headers: Headers;
+};
+
+export type list2Response = list2ResponseSuccess;
+
+export const getList2Url = () => {
+	return `http://localhost:8080/api/admin/categories`;
+};
+
+/**
+ * @summary Listar categorias
+ */
+export const list2 = async (options?: RequestInit): Promise<list2Response> => {
+	const res = await fetch(getList2Url(), {
 		...options,
 		method: "GET",
 	});
@@ -573,7 +659,7 @@ export const list2 = async (
 };
 
 export type create4Response200 = {
-	data: ApiResponseProductResponse;
+	data: ApiResponseCategoryResponse;
 	status: 200;
 };
 
@@ -584,22 +670,32 @@ export type create4ResponseSuccess = create4Response200 & {
 export type create4Response = create4ResponseSuccess;
 
 export const getCreate4Url = () => {
-	return `http://localhost:8080/api/admin/products`;
+	return `http://localhost:8080/api/admin/categories`;
 };
 
 /**
- * Cria agrupador de SKUs vinculado a uma categoria e com schema de seletores.
- * @summary Criar product
+ * Cria categoria via multipart/form-data com slug gerado automaticamente a partir do título.
+ * @summary Criar categoria
  */
 export const create4 = async (
-	createProductRequest: CreateProductRequest,
+	createCategoryFormRequest?: CreateCategoryFormRequest,
 	options?: RequestInit,
 ): Promise<create4Response> => {
+	const formData = new FormData();
+	if (createCategoryFormRequest?.title !== undefined) {
+		formData.append(`title`, createCategoryFormRequest.title);
+	}
+	if (createCategoryFormRequest?.image !== undefined) {
+		formData.append(`image`, createCategoryFormRequest.image);
+	}
+	if (createCategoryFormRequest?.featured !== undefined) {
+		formData.append(`featured`, createCategoryFormRequest.featured.toString());
+	}
+
 	const res = await fetch(getCreate4Url(), {
 		...options,
 		method: "POST",
-		headers: { "Content-Type": "application/json", ...options?.headers },
-		body: JSON.stringify(createProductRequest),
+		body: formData,
 	});
 
 	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
@@ -609,7 +705,7 @@ export const create4 = async (
 };
 
 export type list3Response200 = {
-	data: ApiResponseCategoryListResponse;
+	data: ApiResponseAddressListResponse;
 	status: 200;
 };
 
@@ -620,11 +716,11 @@ export type list3ResponseSuccess = list3Response200 & {
 export type list3Response = list3ResponseSuccess;
 
 export const getList3Url = () => {
-	return `http://localhost:8080/api/admin/categories`;
+	return `http://localhost:8080/api/addresses`;
 };
 
 /**
- * @summary Listar categorias
+ * @summary Listar endereços
  */
 export const list3 = async (options?: RequestInit): Promise<list3Response> => {
 	const res = await fetch(getList3Url(), {
@@ -639,7 +735,7 @@ export const list3 = async (options?: RequestInit): Promise<list3Response> => {
 };
 
 export type create5Response200 = {
-	data: ApiResponseCategoryResponse;
+	data: ApiResponseAddressResponse;
 	status: 200;
 };
 
@@ -650,93 +746,17 @@ export type create5ResponseSuccess = create5Response200 & {
 export type create5Response = create5ResponseSuccess;
 
 export const getCreate5Url = () => {
-	return `http://localhost:8080/api/admin/categories`;
-};
-
-/**
- * Cria categoria via multipart/form-data com slug gerado automaticamente a partir do título.
- * @summary Criar categoria
- */
-export const create5 = async (
-	createCategoryFormRequest?: CreateCategoryFormRequest,
-	options?: RequestInit,
-): Promise<create5Response> => {
-	const formData = new FormData();
-	if (createCategoryFormRequest?.title !== undefined) {
-		formData.append(`title`, createCategoryFormRequest.title);
-	}
-	if (createCategoryFormRequest?.image !== undefined) {
-		formData.append(`image`, createCategoryFormRequest.image);
-	}
-	if (createCategoryFormRequest?.featured !== undefined) {
-		formData.append(`featured`, createCategoryFormRequest.featured.toString());
-	}
-
-	const res = await fetch(getCreate5Url(), {
-		...options,
-		method: "POST",
-		body: formData,
-	});
-
-	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-	const data: create5Response["data"] = body !== null ? body : "";
-	return { data, status: res.status, headers: res.headers } as create5Response;
-};
-
-export type list4Response200 = {
-	data: ApiResponseAddressListResponse;
-	status: 200;
-};
-
-export type list4ResponseSuccess = list4Response200 & {
-	headers: Headers;
-};
-
-export type list4Response = list4ResponseSuccess;
-
-export const getList4Url = () => {
-	return `http://localhost:8080/api/addresses`;
-};
-
-/**
- * @summary Listar endereços
- */
-export const list4 = async (options?: RequestInit): Promise<list4Response> => {
-	const res = await fetch(getList4Url(), {
-		...options,
-		method: "GET",
-	});
-
-	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-	const data: list4Response["data"] = body !== null ? body : "";
-	return { data, status: res.status, headers: res.headers } as list4Response;
-};
-
-export type create6Response200 = {
-	data: ApiResponseAddressResponse;
-	status: 200;
-};
-
-export type create6ResponseSuccess = create6Response200 & {
-	headers: Headers;
-};
-
-export type create6Response = create6ResponseSuccess;
-
-export const getCreate6Url = () => {
 	return `http://localhost:8080/api/addresses`;
 };
 
 /**
  * @summary Criar endereço
  */
-export const create6 = async (
+export const create5 = async (
 	createAddressRequest: CreateAddressRequest,
 	options?: RequestInit,
-): Promise<create6Response> => {
-	const res = await fetch(getCreate6Url(), {
+): Promise<create5Response> => {
+	const res = await fetch(getCreate5Url(), {
 		...options,
 		method: "POST",
 		headers: { "Content-Type": "application/json", ...options?.headers },
@@ -745,8 +765,8 @@ export const create6 = async (
 
 	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-	const data: create6Response["data"] = body !== null ? body : "";
-	return { data, status: res.status, headers: res.headers } as create6Response;
+	const data: create5Response["data"] = body !== null ? body : "";
+	return { data, status: res.status, headers: res.headers } as create5Response;
 };
 
 export type deleteMyPhotoResponse200 = {
@@ -1182,8 +1202,137 @@ export const update1 = async (
 	return { data, status: res.status, headers: res.headers } as update1Response;
 };
 
+export type deleteVariantResponse200 = {
+	data: void;
+	status: 200;
+};
+
+export type deleteVariantResponseSuccess = deleteVariantResponse200 & {
+	headers: Headers;
+};
+
+export type deleteVariantResponse = deleteVariantResponseSuccess;
+
+export const getDeleteVariantUrl = (productId: string, skuId: string) => {
+	return `http://localhost:8080/api/admin/products/${productId}/variants/${skuId}`;
+};
+
+/**
+ * Faz soft delete de uma variante/SKU, mantendo as demais variantes ativas.
+ * @summary Excluir variante do product
+ */
+export const deleteVariant = async (
+	productId: string,
+	skuId: string,
+	options?: RequestInit,
+): Promise<deleteVariantResponse> => {
+	const res = await fetch(getDeleteVariantUrl(productId, skuId), {
+		...options,
+		method: "DELETE",
+	});
+
+	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+	const data: deleteVariantResponse["data"] = body
+		? JSON.parse(body)
+		: undefined;
+	return {
+		data,
+		status: res.status,
+		headers: res.headers,
+	} as deleteVariantResponse;
+};
+
+export type updateVariantResponse200 = {
+	data: ApiResponseProductAdminResponse;
+	status: 200;
+};
+
+export type updateVariantResponseSuccess = updateVariantResponse200 & {
+	headers: Headers;
+};
+
+export type updateVariantResponse = updateVariantResponseSuccess;
+
+export const getUpdateVariantUrl = (productId: string, skuId: string) => {
+	return `http://localhost:8080/api/admin/products/${productId}/variants/${skuId}`;
+};
+
+/**
+ * Atualiza dados de uma única variante/SKU. Fotos são gerenciadas pelas rotas específicas de fotos.
+ * @summary Atualizar variante do product
+ */
+export const updateVariant = async (
+	productId: string,
+	skuId: string,
+	productVariantUpsertRequest: ProductVariantUpsertRequest,
+	options?: RequestInit,
+): Promise<updateVariantResponse> => {
+	const res = await fetch(getUpdateVariantUrl(productId, skuId), {
+		...options,
+		method: "PATCH",
+		headers: { "Content-Type": "application/json", ...options?.headers },
+		body: JSON.stringify(productVariantUpsertRequest),
+	});
+
+	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+	const data: updateVariantResponse["data"] = body !== null ? body : "";
+	return {
+		data,
+		status: res.status,
+		headers: res.headers,
+	} as updateVariantResponse;
+};
+
+export type reorderVariantPhotosResponse200 = {
+	data: ApiResponseProductAdminResponse;
+	status: 200;
+};
+
+export type reorderVariantPhotosResponseSuccess =
+	reorderVariantPhotosResponse200 & {
+		headers: Headers;
+	};
+
+export type reorderVariantPhotosResponse = reorderVariantPhotosResponseSuccess;
+
+export const getReorderVariantPhotosUrl = (
+	productId: string,
+	skuId: string,
+) => {
+	return `http://localhost:8080/api/admin/products/${productId}/variants/${skuId}/photos/reorder`;
+};
+
+/**
+ * Recebe exatamente as fotos atuais da variante na nova ordem desejada.
+ * @summary Reordenar fotos da variante
+ */
+export const reorderVariantPhotos = async (
+	productId: string,
+	skuId: string,
+	productVariantPhotoOrderRequest: ProductVariantPhotoOrderRequest,
+	options?: RequestInit,
+): Promise<reorderVariantPhotosResponse> => {
+	const res = await fetch(getReorderVariantPhotosUrl(productId, skuId), {
+		...options,
+		method: "PATCH",
+		headers: { "Content-Type": "application/json", ...options?.headers },
+		body: JSON.stringify(productVariantPhotoOrderRequest),
+	});
+
+	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+	const data: reorderVariantPhotosResponse["data"] = body !== null ? body : "";
+	return {
+		data,
+		status: res.status,
+		headers: res.headers,
+	} as reorderVariantPhotosResponse;
+};
+
 export type findById1Response200 = {
-	data: ApiResponseSkuResponse;
+	data: ApiResponseProductAdminResponse;
 	status: 200;
 };
 
@@ -1194,11 +1343,11 @@ export type findById1ResponseSuccess = findById1Response200 & {
 export type findById1Response = findById1ResponseSuccess;
 
 export const getFindById1Url = (id: string) => {
-	return `http://localhost:8080/api/admin/skus/${id}`;
+	return `http://localhost:8080/api/admin/products/${id}`;
 };
 
 /**
- * @summary Buscar SKU por ID
+ * @summary Buscar product por ID
  */
 export const findById1 = async (
 	id: string,
@@ -1231,12 +1380,12 @@ export type delete2ResponseSuccess = delete2Response200 & {
 export type delete2Response = delete2ResponseSuccess;
 
 export const getDelete2Url = (id: string) => {
-	return `http://localhost:8080/api/admin/skus/${id}`;
+	return `http://localhost:8080/api/admin/products/${id}`;
 };
 
 /**
- * Faz soft delete do SKU preenchendo deletedAt.
- * @summary Excluir SKU
+ * Faz soft delete do product e de todos os SKUs ativos vinculados.
+ * @summary Excluir product
  */
 export const delete2 = async (
 	id: string,
@@ -1254,7 +1403,7 @@ export const delete2 = async (
 };
 
 export type update2Response200 = {
-	data: ApiResponseSkuResponse;
+	data: ApiResponseProductAdminResponse;
 	status: 200;
 };
 
@@ -1265,167 +1414,29 @@ export type update2ResponseSuccess = update2Response200 & {
 export type update2Response = update2ResponseSuccess;
 
 export const getUpdate2Url = (id: string) => {
-	return `http://localhost:8080/api/admin/skus/${id}`;
+	return `http://localhost:8080/api/admin/products/${id}`;
 };
 
 /**
- * Atualiza SKU via multipart/form-data. Use removePhoto=true para remover a foto atual.
- * @summary Atualizar SKU
+ * Atualiza somente metadados do Product. Não cria, remove ou sincroniza variantes/SKUs.
+ * @summary Atualizar dados básicos do product
  */
 export const update2 = async (
 	id: string,
-	updateSkuFormRequest?: UpdateSkuFormRequest,
+	productUpdateRequest: ProductUpdateRequest,
 	options?: RequestInit,
 ): Promise<update2Response> => {
-	const formData = new FormData();
-	if (updateSkuFormRequest?.productId !== undefined) {
-		formData.append(`productId`, updateSkuFormRequest.productId);
-	}
-	if (updateSkuFormRequest?.title !== undefined) {
-		formData.append(`title`, updateSkuFormRequest.title);
-	}
-	if (updateSkuFormRequest?.description !== undefined) {
-		formData.append(`description`, updateSkuFormRequest.description);
-	}
-	if (updateSkuFormRequest?.price !== undefined) {
-		formData.append(`price`, updateSkuFormRequest.price.toString());
-	}
-	if (updateSkuFormRequest?.originalPrice !== undefined) {
-		formData.append(
-			`originalPrice`,
-			updateSkuFormRequest.originalPrice.toString(),
-		);
-	}
-	if (updateSkuFormRequest?.stock !== undefined) {
-		formData.append(`stock`, updateSkuFormRequest.stock.toString());
-	}
-	if (updateSkuFormRequest?.attributes !== undefined) {
-		formData.append(`attributes`, updateSkuFormRequest.attributes);
-	}
-	if (updateSkuFormRequest?.photo !== undefined) {
-		formData.append(`photo`, updateSkuFormRequest.photo);
-	}
-	if (updateSkuFormRequest?.removePhoto !== undefined) {
-		formData.append(`removePhoto`, updateSkuFormRequest.removePhoto.toString());
-	}
-
 	const res = await fetch(getUpdate2Url(id), {
 		...options,
 		method: "PATCH",
-		body: formData,
+		headers: { "Content-Type": "application/json", ...options?.headers },
+		body: JSON.stringify(productUpdateRequest),
 	});
 
 	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
 	const data: update2Response["data"] = body !== null ? body : "";
 	return { data, status: res.status, headers: res.headers } as update2Response;
-};
-
-export type findById2Response200 = {
-	data: ApiResponseProductResponse;
-	status: 200;
-};
-
-export type findById2ResponseSuccess = findById2Response200 & {
-	headers: Headers;
-};
-
-export type findById2Response = findById2ResponseSuccess;
-
-export const getFindById2Url = (id: string) => {
-	return `http://localhost:8080/api/admin/products/${id}`;
-};
-
-/**
- * @summary Buscar product por ID
- */
-export const findById2 = async (
-	id: string,
-	options?: RequestInit,
-): Promise<findById2Response> => {
-	const res = await fetch(getFindById2Url(id), {
-		...options,
-		method: "GET",
-	});
-
-	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-	const data: findById2Response["data"] = body !== null ? body : "";
-	return {
-		data,
-		status: res.status,
-		headers: res.headers,
-	} as findById2Response;
-};
-
-export type delete3Response200 = {
-	data: void;
-	status: 200;
-};
-
-export type delete3ResponseSuccess = delete3Response200 & {
-	headers: Headers;
-};
-
-export type delete3Response = delete3ResponseSuccess;
-
-export const getDelete3Url = (id: string) => {
-	return `http://localhost:8080/api/admin/products/${id}`;
-};
-
-/**
- * Faz soft delete do product e de todos os SKUs ativos vinculados.
- * @summary Excluir product
- */
-export const delete3 = async (
-	id: string,
-	options?: RequestInit,
-): Promise<delete3Response> => {
-	const res = await fetch(getDelete3Url(id), {
-		...options,
-		method: "DELETE",
-	});
-
-	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-	const data: delete3Response["data"] = body ? JSON.parse(body) : undefined;
-	return { data, status: res.status, headers: res.headers } as delete3Response;
-};
-
-export type update3Response200 = {
-	data: ApiResponseProductResponse;
-	status: 200;
-};
-
-export type update3ResponseSuccess = update3Response200 & {
-	headers: Headers;
-};
-
-export type update3Response = update3ResponseSuccess;
-
-export const getUpdate3Url = (id: string) => {
-	return `http://localhost:8080/api/admin/products/${id}`;
-};
-
-/**
- * @summary Atualizar product
- */
-export const update3 = async (
-	id: string,
-	updateProductRequest: UpdateProductRequest,
-	options?: RequestInit,
-): Promise<update3Response> => {
-	const res = await fetch(getUpdate3Url(id), {
-		...options,
-		method: "PATCH",
-		headers: { "Content-Type": "application/json", ...options?.headers },
-		body: JSON.stringify(updateProductRequest),
-	});
-
-	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-	const data: update3Response["data"] = body !== null ? body : "";
-	return { data, status: res.status, headers: res.headers } as update3Response;
 };
 
 export type updateStatusResponse200 = {
@@ -1540,8 +1551,132 @@ export const updateMe1 = async (
 	} as updateMe1Response;
 };
 
-export type findById3Response200 = {
+export type findById2Response200 = {
 	data: ApiResponseCategoryResponse;
+	status: 200;
+};
+
+export type findById2ResponseSuccess = findById2Response200 & {
+	headers: Headers;
+};
+
+export type findById2Response = findById2ResponseSuccess;
+
+export const getFindById2Url = (id: string) => {
+	return `http://localhost:8080/api/admin/categories/${id}`;
+};
+
+/**
+ * @summary Buscar categoria por ID
+ */
+export const findById2 = async (
+	id: string,
+	options?: RequestInit,
+): Promise<findById2Response> => {
+	const res = await fetch(getFindById2Url(id), {
+		...options,
+		method: "GET",
+	});
+
+	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+	const data: findById2Response["data"] = body !== null ? body : "";
+	return {
+		data,
+		status: res.status,
+		headers: res.headers,
+	} as findById2Response;
+};
+
+export type delete3Response200 = {
+	data: void;
+	status: 200;
+};
+
+export type delete3ResponseSuccess = delete3Response200 & {
+	headers: Headers;
+};
+
+export type delete3Response = delete3ResponseSuccess;
+
+export const getDelete3Url = (id: string) => {
+	return `http://localhost:8080/api/admin/categories/${id}`;
+};
+
+/**
+ * Remove categoria somente quando não há products vinculados.
+ * @summary Excluir categoria
+ */
+export const delete3 = async (
+	id: string,
+	options?: RequestInit,
+): Promise<delete3Response> => {
+	const res = await fetch(getDelete3Url(id), {
+		...options,
+		method: "DELETE",
+	});
+
+	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+	const data: delete3Response["data"] = body ? JSON.parse(body) : undefined;
+	return { data, status: res.status, headers: res.headers } as delete3Response;
+};
+
+export type update3Response200 = {
+	data: ApiResponseCategoryResponse;
+	status: 200;
+};
+
+export type update3ResponseSuccess = update3Response200 & {
+	headers: Headers;
+};
+
+export type update3Response = update3ResponseSuccess;
+
+export const getUpdate3Url = (id: string) => {
+	return `http://localhost:8080/api/admin/categories/${id}`;
+};
+
+/**
+ * Atualiza categoria via multipart/form-data. Use removeImage=true para remover a imagem atual.
+ * @summary Atualizar categoria
+ */
+export const update3 = async (
+	id: string,
+	updateCategoryFormRequest?: UpdateCategoryFormRequest,
+	options?: RequestInit,
+): Promise<update3Response> => {
+	const formData = new FormData();
+	if (updateCategoryFormRequest?.title !== undefined) {
+		formData.append(`title`, updateCategoryFormRequest.title);
+	}
+	if (updateCategoryFormRequest?.image !== undefined) {
+		formData.append(`image`, updateCategoryFormRequest.image);
+	}
+	if (updateCategoryFormRequest?.removeImage !== undefined) {
+		formData.append(
+			`removeImage`,
+			updateCategoryFormRequest.removeImage.toString(),
+		);
+	}
+	if (updateCategoryFormRequest?.featured !== undefined) {
+		formData.append(`featured`, updateCategoryFormRequest.featured.toString());
+	}
+
+	const res = await fetch(getUpdate3Url(id), {
+		...options,
+		method: "PATCH",
+		body: formData,
+	});
+
+	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+	const data: update3Response["data"] = body !== null ? body : "";
+	return { data, status: res.status, headers: res.headers } as update3Response;
+};
+
+export type findById3Response200 = {
+	data: ApiResponseAddressResponse;
 	status: 200;
 };
 
@@ -1552,11 +1687,11 @@ export type findById3ResponseSuccess = findById3Response200 & {
 export type findById3Response = findById3ResponseSuccess;
 
 export const getFindById3Url = (id: string) => {
-	return `http://localhost:8080/api/admin/categories/${id}`;
+	return `http://localhost:8080/api/addresses/${id}`;
 };
 
 /**
- * @summary Buscar categoria por ID
+ * @summary Buscar endereço
  */
 export const findById3 = async (
 	id: string,
@@ -1589,12 +1724,12 @@ export type delete4ResponseSuccess = delete4Response200 & {
 export type delete4Response = delete4ResponseSuccess;
 
 export const getDelete4Url = (id: string) => {
-	return `http://localhost:8080/api/admin/categories/${id}`;
+	return `http://localhost:8080/api/addresses/${id}`;
 };
 
 /**
- * Remove categoria somente quando não há products vinculados.
- * @summary Excluir categoria
+ * Faz soft delete preenchendo deletedAt.
+ * @summary Excluir endereço
  */
 export const delete4 = async (
 	id: string,
@@ -1612,7 +1747,7 @@ export const delete4 = async (
 };
 
 export type update4Response200 = {
-	data: ApiResponseCategoryResponse;
+	data: ApiResponseAddressResponse;
 	status: 200;
 };
 
@@ -1623,142 +1758,18 @@ export type update4ResponseSuccess = update4Response200 & {
 export type update4Response = update4ResponseSuccess;
 
 export const getUpdate4Url = (id: string) => {
-	return `http://localhost:8080/api/admin/categories/${id}`;
-};
-
-/**
- * Atualiza categoria via multipart/form-data. Use removeImage=true para remover a imagem atual.
- * @summary Atualizar categoria
- */
-export const update4 = async (
-	id: string,
-	updateCategoryFormRequest?: UpdateCategoryFormRequest,
-	options?: RequestInit,
-): Promise<update4Response> => {
-	const formData = new FormData();
-	if (updateCategoryFormRequest?.title !== undefined) {
-		formData.append(`title`, updateCategoryFormRequest.title);
-	}
-	if (updateCategoryFormRequest?.image !== undefined) {
-		formData.append(`image`, updateCategoryFormRequest.image);
-	}
-	if (updateCategoryFormRequest?.removeImage !== undefined) {
-		formData.append(
-			`removeImage`,
-			updateCategoryFormRequest.removeImage.toString(),
-		);
-	}
-	if (updateCategoryFormRequest?.featured !== undefined) {
-		formData.append(`featured`, updateCategoryFormRequest.featured.toString());
-	}
-
-	const res = await fetch(getUpdate4Url(id), {
-		...options,
-		method: "PATCH",
-		body: formData,
-	});
-
-	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-	const data: update4Response["data"] = body !== null ? body : "";
-	return { data, status: res.status, headers: res.headers } as update4Response;
-};
-
-export type findById4Response200 = {
-	data: ApiResponseAddressResponse;
-	status: 200;
-};
-
-export type findById4ResponseSuccess = findById4Response200 & {
-	headers: Headers;
-};
-
-export type findById4Response = findById4ResponseSuccess;
-
-export const getFindById4Url = (id: string) => {
-	return `http://localhost:8080/api/addresses/${id}`;
-};
-
-/**
- * @summary Buscar endereço
- */
-export const findById4 = async (
-	id: string,
-	options?: RequestInit,
-): Promise<findById4Response> => {
-	const res = await fetch(getFindById4Url(id), {
-		...options,
-		method: "GET",
-	});
-
-	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-	const data: findById4Response["data"] = body !== null ? body : "";
-	return {
-		data,
-		status: res.status,
-		headers: res.headers,
-	} as findById4Response;
-};
-
-export type delete5Response200 = {
-	data: void;
-	status: 200;
-};
-
-export type delete5ResponseSuccess = delete5Response200 & {
-	headers: Headers;
-};
-
-export type delete5Response = delete5ResponseSuccess;
-
-export const getDelete5Url = (id: string) => {
-	return `http://localhost:8080/api/addresses/${id}`;
-};
-
-/**
- * Faz soft delete preenchendo deletedAt.
- * @summary Excluir endereço
- */
-export const delete5 = async (
-	id: string,
-	options?: RequestInit,
-): Promise<delete5Response> => {
-	const res = await fetch(getDelete5Url(id), {
-		...options,
-		method: "DELETE",
-	});
-
-	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-	const data: delete5Response["data"] = body ? JSON.parse(body) : undefined;
-	return { data, status: res.status, headers: res.headers } as delete5Response;
-};
-
-export type update5Response200 = {
-	data: ApiResponseAddressResponse;
-	status: 200;
-};
-
-export type update5ResponseSuccess = update5Response200 & {
-	headers: Headers;
-};
-
-export type update5Response = update5ResponseSuccess;
-
-export const getUpdate5Url = (id: string) => {
 	return `http://localhost:8080/api/addresses/${id}`;
 };
 
 /**
  * @summary Atualizar endereço
  */
-export const update5 = async (
+export const update4 = async (
 	id: string,
 	updateAddressRequest: UpdateAddressRequest,
 	options?: RequestInit,
-): Promise<update5Response> => {
-	const res = await fetch(getUpdate5Url(id), {
+): Promise<update4Response> => {
+	const res = await fetch(getUpdate4Url(id), {
 		...options,
 		method: "PATCH",
 		headers: { "Content-Type": "application/json", ...options?.headers },
@@ -1767,8 +1778,8 @@ export const update5 = async (
 
 	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-	const data: update5Response["data"] = body !== null ? body : "";
-	return { data, status: res.status, headers: res.headers } as update5Response;
+	const data: update4Response["data"] = body !== null ? body : "";
+	return { data, status: res.status, headers: res.headers } as update4Response;
 };
 
 export type listMine1Response200 = {
@@ -2112,7 +2123,7 @@ export const me2 = async (options?: RequestInit): Promise<me2Response> => {
 };
 
 export type purchasesByClientResponse200 = {
-	data: ApiResponseClientPurchaseReportResponse;
+	data: Blob;
 	status: 200;
 };
 
@@ -2139,8 +2150,8 @@ export const getPurchasesByClientUrl = (params: PurchasesByClientParams) => {
 };
 
 /**
- * Agrupa pedidos não cancelados por cliente no período informado.
- * @summary Compras por cliente
+ * Gera PDF com total de compras por cliente em um período.
+ * @summary Relatório de compras por cliente (PDF)
  */
 export const purchasesByClient = async (
 	params: PurchasesByClientParams,
@@ -2151,9 +2162,9 @@ export const purchasesByClient = async (
 		method: "GET",
 	});
 
-	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-	const data: purchasesByClientResponse["data"] = body !== null ? body : "";
+	const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+	const data: purchasesByClientResponse["data"] =
+		body as purchasesByClientResponse["data"];
 	return {
 		data,
 		status: res.status,
@@ -2161,45 +2172,44 @@ export const purchasesByClient = async (
 	} as purchasesByClientResponse;
 };
 
-export type outOfStockSkusResponse200 = {
-	data: ApiResponseOutOfStockSkuReportResponse;
+export type outOfStockResponse200 = {
+	data: Blob;
 	status: 200;
 };
 
-export type outOfStockSkusResponseSuccess = outOfStockSkusResponse200 & {
+export type outOfStockResponseSuccess = outOfStockResponse200 & {
 	headers: Headers;
 };
 
-export type outOfStockSkusResponse = outOfStockSkusResponseSuccess;
+export type outOfStockResponse = outOfStockResponseSuccess;
 
-export const getOutOfStockSkusUrl = () => {
+export const getOutOfStockUrl = () => {
 	return `http://localhost:8080/api/admin/reports/out-of-stock-skus`;
 };
 
 /**
- * Lista SKUs ativos com estoque zerado ou negativo.
- * @summary SKUs sem estoque
+ * Gera PDF com produtos que estão faltando em estoque.
+ * @summary Relatório de produtos sem estoque (PDF)
  */
-export const outOfStockSkus = async (
+export const outOfStock = async (
 	options?: RequestInit,
-): Promise<outOfStockSkusResponse> => {
-	const res = await fetch(getOutOfStockSkusUrl(), {
+): Promise<outOfStockResponse> => {
+	const res = await fetch(getOutOfStockUrl(), {
 		...options,
 		method: "GET",
 	});
 
-	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-	const data: outOfStockSkusResponse["data"] = body !== null ? body : "";
+	const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+	const data: outOfStockResponse["data"] = body as outOfStockResponse["data"];
 	return {
 		data,
 		status: res.status,
 		headers: res.headers,
-	} as outOfStockSkusResponse;
+	} as outOfStockResponse;
 };
 
 export type dailyRevenueResponse200 = {
-	data: ApiResponseDailyRevenueReportResponse;
+	data: Blob;
 	status: 200;
 };
 
@@ -2226,8 +2236,8 @@ export const getDailyRevenueUrl = (params: DailyRevenueParams) => {
 };
 
 /**
- * Soma o valor recebido por dia considerando pedidos não cancelados no período.
- * @summary Receita diária
+ * Gera PDF com valor total recebido por dia em um período.
+ * @summary Relatório de receita diária (PDF)
  */
 export const dailyRevenue = async (
 	params: DailyRevenueParams,
@@ -2238,9 +2248,9 @@ export const dailyRevenue = async (
 		method: "GET",
 	});
 
-	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-	const data: dailyRevenueResponse["data"] = body !== null ? body : "";
+	const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+	const data: dailyRevenueResponse["data"] =
+		body as dailyRevenueResponse["data"];
 	return {
 		data,
 		status: res.status,
@@ -2248,71 +2258,71 @@ export const dailyRevenue = async (
 	} as dailyRevenueResponse;
 };
 
-export type list5Response200 = {
+export type list4Response200 = {
 	data: ApiResponseOrderListResponse;
 	status: 200;
 };
 
-export type list5ResponseSuccess = list5Response200 & {
+export type list4ResponseSuccess = list4Response200 & {
 	headers: Headers;
 };
 
-export type list5Response = list5ResponseSuccess;
+export type list4Response = list4ResponseSuccess;
 
-export const getList5Url = () => {
+export const getList4Url = () => {
 	return `http://localhost:8080/api/admin/orders`;
 };
 
 /**
  * @summary Listar pedidos
  */
-export const list5 = async (options?: RequestInit): Promise<list5Response> => {
-	const res = await fetch(getList5Url(), {
+export const list4 = async (options?: RequestInit): Promise<list4Response> => {
+	const res = await fetch(getList4Url(), {
 		...options,
 		method: "GET",
 	});
 
 	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-	const data: list5Response["data"] = body !== null ? body : "";
-	return { data, status: res.status, headers: res.headers } as list5Response;
+	const data: list4Response["data"] = body !== null ? body : "";
+	return { data, status: res.status, headers: res.headers } as list4Response;
 };
 
-export type findById5Response200 = {
+export type findById4Response200 = {
 	data: ApiResponseOrderResponse;
 	status: 200;
 };
 
-export type findById5ResponseSuccess = findById5Response200 & {
+export type findById4ResponseSuccess = findById4Response200 & {
 	headers: Headers;
 };
 
-export type findById5Response = findById5ResponseSuccess;
+export type findById4Response = findById4ResponseSuccess;
 
-export const getFindById5Url = (id: string) => {
+export const getFindById4Url = (id: string) => {
 	return `http://localhost:8080/api/admin/orders/${id}`;
 };
 
 /**
  * @summary Buscar pedido
  */
-export const findById5 = async (
+export const findById4 = async (
 	id: string,
 	options?: RequestInit,
-): Promise<findById5Response> => {
-	const res = await fetch(getFindById5Url(id), {
+): Promise<findById4Response> => {
+	const res = await fetch(getFindById4Url(id), {
 		...options,
 		method: "GET",
 	});
 
 	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-	const data: findById5Response["data"] = body !== null ? body : "";
+	const data: findById4Response["data"] = body !== null ? body : "";
 	return {
 		data,
 		status: res.status,
 		headers: res.headers,
-	} as findById5Response;
+	} as findById4Response;
 };
 
 export type cancelResponse200 = {
@@ -2347,6 +2357,37 @@ export const cancel = async (
 
 	const data: cancelResponse["data"] = body !== null ? body : "";
 	return { data, status: res.status, headers: res.headers } as cancelResponse;
+};
+
+export type list5Response200 = {
+	data: ApiResponseListClientResponse;
+	status: 200;
+};
+
+export type list5ResponseSuccess = list5Response200 & {
+	headers: Headers;
+};
+
+export type list5Response = list5ResponseSuccess;
+
+export const getList5Url = () => {
+	return `http://localhost:8080/api/admin/clients`;
+};
+
+/**
+ * Retorna a lista de todos os clientes cadastrados.
+ * @summary Listar todos os clientes
+ */
+export const list5 = async (options?: RequestInit): Promise<list5Response> => {
+	const res = await fetch(getList5Url(), {
+		...options,
+		method: "GET",
+	});
+
+	const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+	const data: list5Response["data"] = body !== null ? body : "";
+	return { data, status: res.status, headers: res.headers } as list5Response;
 };
 
 export type deleteMe1Response200 = {

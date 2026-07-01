@@ -230,6 +230,8 @@ export function AddressForm({
 					)}
 				/>
 
+				<div className="mt-5! h-px w-full bg-slate-200" />
+
 				<div className="flex justify-between pt-2">
 					<Button
 						type="button"

@@ -20,7 +20,6 @@ export interface CatalogSkuResponse {
 	stock?: number;
 	rating?: number;
 	reviewCount?: number;
-	/** Valores dos atributos do SKU. */
 	attributes?: CatalogSkuResponseAttributes;
 	category?: CatalogCategoryResponse;
 	tags?: TagResponse[];

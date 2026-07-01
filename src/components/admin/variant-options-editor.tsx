@@ -4,7 +4,7 @@ import { Plus, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { fieldInputClassName } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
-import type { ProductOption } from "./variant-matrix-utils";
+import { deriveOptionKey, type ProductOption } from "./variant-matrix-utils";
 
 interface VariantOptionsEditorProps {
 	options: ProductOption[];
@@ -21,8 +21,17 @@ export function VariantOptionsEditor({
 		onChange(options.map((o, i) => (i === index ? { ...o, ...patch } : o)));
 	}
 
+	function updateLabel(index: number, label: string) {
+		const otherKeys = options.filter((_, i) => i !== index).map((o) => o.key);
+		update(index, { label, key: deriveOptionKey(label, otherKeys) });
+	}
+
 	function addOption() {
-		onChange([...options, { name: "", values: [] }]);
+		const otherKeys = options.map((o) => o.key);
+		onChange([
+			...options,
+			{ label: "", key: deriveOptionKey("", otherKeys), values: [] },
+		]);
 	}
 
 	function removeOption(index: number) {
@@ -67,8 +76,8 @@ export function VariantOptionsEditor({
 				>
 					<div className="flex items-center gap-2">
 						<input
-							value={option.name}
-							onChange={(e) => update(index, { name: e.target.value })}
+							value={option.label}
+							onChange={(e) => updateLabel(index, e.target.value)}
 							placeholder="Nome da opção (ex.: Tamanho)"
 							className={cn(fieldInputClassName, "flex-1")}
 						/>

@@ -60,3 +60,30 @@ export function apiPatch<T>(path: string, body: unknown): Promise<T> {
 export function apiDelete<T = void>(path: string): Promise<T> {
 	return request<T>(path, { method: "DELETE" });
 }
+
+export async function apiUpload<T>(
+	path: string,
+	method: "POST" | "PATCH",
+	formData: FormData,
+): Promise<T> {
+	const res = await fetch(`${BASE}${path}`, {
+		method,
+		credentials: "include",
+		body: formData,
+	});
+
+	const json = await res.json();
+
+	if (!res.ok) {
+		const { error } = json as {
+			error: {
+				code: string;
+				message: string;
+				details?: { field: string; message: string }[];
+			};
+		};
+		throw new ApiError(error.code, error.message, error.details);
+	}
+
+	return (json as { data: T }).data;
+}

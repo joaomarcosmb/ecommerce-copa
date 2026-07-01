@@ -6,7 +6,4 @@
  * OpenAPI spec version: 1.0.0
  */
 
-/**
- * Valores dos atributos do SKU.
- */
 export type CatalogSkuResponseAttributes = { [key: string]: unknown };

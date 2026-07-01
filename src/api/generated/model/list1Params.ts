@@ -7,7 +7,8 @@
  */
 
 export type List1Params = {
-	productId?: string;
+	/**
+	 * Slug da categoria, não UUID. Exemplo: chuteiras-de-campo
+	 */
 	category?: string;
-	inStock?: boolean;
 };

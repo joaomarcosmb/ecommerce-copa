@@ -6,13 +6,10 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type PurchasesByClientParams = {
-	/**
-	 * Data inicial no formato yyyy-MM-dd
-	 */
-	startDate: string;
-	/**
-	 * Data final no formato yyyy-MM-dd
-	 */
-	endDate: string;
-};
+/**
+ * Nova ordem das fotos de uma variante/SKU.
+ */
+export interface ProductVariantPhotoOrderRequest {
+	/** Lista com exatamente as fotos atuais, na nova ordem desejada. */
+	photos?: string[];
+}

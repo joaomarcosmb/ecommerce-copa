@@ -16,10 +16,9 @@ import { Input } from "@/components/ui/input";
 import { P } from "@/components/typography";
 import type {
 	ProductListResponse,
-	ProductResponse,
+	ProductSummaryResponse,
 } from "@/api/generated/model";
 import { apiDelete, apiGet } from "@/lib/api";
-import { MOCK_PRODUCTS, PREVIEW_MOCK } from "@/lib/admin-products-mock";
 import { resolveMediaUrl } from "@/lib/format";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -32,11 +31,7 @@ const breadcrumbItems = [
 	{ label: "Produtos" },
 ];
 
-type ProductRow = ProductResponse & {
-	name?: string;
-	images?: string[];
-	variantCount?: number;
-};
+type ProductRow = ProductSummaryResponse;
 
 function ProductCard({
 	product,
@@ -45,7 +40,7 @@ function ProductCard({
 	product: ProductRow;
 	onDelete: () => void;
 }) {
-	const cover = resolveMediaUrl(product.images?.[0]);
+	const cover = resolveMediaUrl(product.coverImage);
 	const name = product.name ?? "Produto sem nome";
 
 	return (
@@ -117,13 +112,8 @@ export function AdminProductsPage() {
 	const [deleteError, setDeleteError] = useState<string | null>(null);
 
 	useEffect(() => {
-		if (PREVIEW_MOCK) {
-			setProducts(MOCK_PRODUCTS as ProductRow[]);
-			setIsLoading(false);
-			return;
-		}
 		apiGet<ProductListResponse>("/admin/products")
-			.then((res) => setProducts((res.items ?? []) as ProductRow[]))
+			.then((res) => setProducts(res.items ?? []))
 			.catch(() => {})
 			.finally(() => setIsLoading(false));
 	}, []);
@@ -134,11 +124,11 @@ export function AdminProductsPage() {
 		return products.filter((p) => (p.name ?? "").toLowerCase().includes(q));
 	}, [products, query]);
 
-	if (!PREVIEW_MOCK && !authLoading && user === null) {
+	if (!authLoading && user === null) {
 		window.location.href = "/signin";
 		return null;
 	}
-	if (!PREVIEW_MOCK && !authLoading && user?.role !== "ADMIN") {
+	if (!authLoading && user?.role !== "ADMIN") {
 		window.location.href = "/account";
 		return null;
 	}
@@ -146,11 +136,6 @@ export function AdminProductsPage() {
 	async function confirmDelete() {
 		if (!deleteTarget) return;
 		setDeleteError(null);
-		if (PREVIEW_MOCK) {
-			setProducts((prev) => prev.filter((p) => p.id !== deleteTarget.id));
-			setDeleteTarget(null);
-			return;
-		}
 		try {
 			await apiDelete(`/admin/products/${deleteTarget.id}`);
 			setProducts((prev) => prev.filter((p) => p.id !== deleteTarget.id));

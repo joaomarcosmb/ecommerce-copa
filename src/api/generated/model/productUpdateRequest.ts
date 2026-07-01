@@ -6,13 +6,10 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type PurchasesByClientParams = {
-	/**
-	 * Data inicial no formato yyyy-MM-dd
-	 */
-	startDate: string;
-	/**
-	 * Data final no formato yyyy-MM-dd
-	 */
-	endDate: string;
-};
+/**
+ * Dados editáveis do Product, sem sincronizar variantes/SKUs.
+ */
+export interface ProductUpdateRequest {
+	name?: string;
+	categoryId?: string;
+}
