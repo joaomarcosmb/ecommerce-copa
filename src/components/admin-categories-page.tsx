@@ -1,7 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
-import { useCurrentUser } from "@/hooks/use-current-user";
 import { Plus, Search, Tag } from "lucide-react";
-
+import { useEffect, useMemo, useState } from "react";
+import type {
+	CategoryListResponse,
+	CategoryResponse,
+} from "@/api/generated/model";
+import { P } from "@/components/typography";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -14,15 +17,11 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { P } from "@/components/typography";
-import type {
-	CategoryResponse,
-	CategoryListResponse,
-} from "@/api/generated/model";
+import { PageLoader } from "@/components/ui/page-loader";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useCurrentUser } from "@/hooks/use-current-user";
 import { API_BASE_URL, ApiError, apiDelete, apiGet } from "@/lib/api";
 import { resolveMediaUrl } from "@/lib/format";
-
-import { Skeleton } from "@/components/ui/skeleton";
 
 import { AdminFormDialog } from "./admin/admin-form-dialog";
 import { AdminListRow } from "./admin/admin-list-row";
@@ -124,12 +123,22 @@ export function AdminCategoriesPage() {
 		);
 	}, [categories, query]);
 
-	if (!authLoading && user === null) {
+	if (authLoading) {
+		return (
+			<AppShell>
+				<main className="mx-auto max-w-370 px-4 py-8 sm:px-6 lg:px-8">
+					<PageLoader />
+				</main>
+			</AppShell>
+		);
+	}
+
+	if (user === null) {
 		window.location.href = "/signin";
 		return null;
 	}
 
-	if (!authLoading && user?.role !== "ADMIN") {
+	if (user.role !== "ADMIN") {
 		window.location.href = "/account";
 		return null;
 	}

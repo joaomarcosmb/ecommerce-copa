@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-
-import { useCurrentUser } from "@/hooks/use-current-user";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ProductCreateForm } from "@/components/admin/product-create-form";
-import { ProductEditForm } from "@/components/admin/product-edit-form";
-import { getProduct, type AdminProductDetail } from "@/lib/admin-products";
-import { apiGet } from "@/lib/api";
 import type {
 	CategoryListResponse,
 	CategoryResponse,
 } from "@/api/generated/model";
+import { ProductCreateForm } from "@/components/admin/product-create-form";
+import { ProductEditForm } from "@/components/admin/product-edit-form";
 import { AppShell } from "@/components/ecommerce-showcase/app-shell";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { PageLoader } from "@/components/ui/page-loader";
+import { useCurrentUser } from "@/hooks/use-current-user";
+import { type AdminProductDetail, getProduct } from "@/lib/admin-products";
+import { apiGet } from "@/lib/api";
 
 interface ProductEditorProps {
 	productId?: string;
@@ -46,11 +46,20 @@ export function ProductEditor({ productId }: ProductEditorProps) {
 		load();
 	}, [resolvedId]);
 
-	if (!authLoading && user === null) {
+	if (authLoading) {
+		return (
+			<AppShell>
+				<main className="mx-auto max-w-370 px-4 py-8 sm:px-6 lg:px-8">
+					<PageLoader />
+				</main>
+			</AppShell>
+		);
+	}
+	if (user === null) {
 		window.location.href = "/signin";
 		return null;
 	}
-	if (!authLoading && user?.role !== "ADMIN") {
+	if (user.role !== "ADMIN") {
 		window.location.href = "/account";
 		return null;
 	}
@@ -71,7 +80,7 @@ export function ProductEditor({ productId }: ProductEditorProps) {
 		return (
 			<AppShell>
 				<main className="mx-auto max-w-370 px-4 py-8 sm:px-6 lg:px-8">
-					<p className="font-sans text-slate-500">Carregando…</p>
+					<PageLoader />
 				</main>
 			</AppShell>
 		);

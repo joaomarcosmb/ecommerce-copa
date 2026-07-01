@@ -1,6 +1,6 @@
 import { FileText, Package, ShoppingBag, Tag } from "lucide-react";
 import { useState } from "react";
-
+import { PageLoader } from "@/components/ui/page-loader";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { AdminEntityCard } from "./admin/admin-entity-card";
 import { ReportsDialog } from "./admin/reports-dialog";
@@ -11,12 +11,22 @@ export function AdminPage() {
 	const { user, isLoading } = useCurrentUser();
 	const [reportsOpen, setReportsOpen] = useState(false);
 
-	if (!isLoading && user === null) {
+	if (isLoading) {
+		return (
+			<AppShell>
+				<main className="mx-auto max-w-370 px-4 py-8 sm:px-6 lg:px-8">
+					<PageLoader />
+				</main>
+			</AppShell>
+		);
+	}
+
+	if (user === null) {
 		window.location.href = "/signin";
 		return null;
 	}
 
-	if (!isLoading && user?.role !== "ADMIN") {
+	if (user.role !== "ADMIN") {
 		window.location.href = "/account";
 		return null;
 	}

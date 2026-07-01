@@ -14,6 +14,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { PageLoader } from "@/components/ui/page-loader";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { apiDelete, apiGet } from "@/lib/api";
@@ -143,11 +144,20 @@ export function AdminOrdersPage() {
 		);
 	}, [orders, query]);
 
-	if (!authLoading && user === null) {
+	if (authLoading) {
+		return (
+			<AppShell>
+				<main className="mx-auto max-w-370 px-4 py-8 sm:px-6 lg:px-8">
+					<PageLoader />
+				</main>
+			</AppShell>
+		);
+	}
+	if (user === null) {
 		window.location.href = "/signin";
 		return null;
 	}
-	if (!authLoading && user?.role !== "ADMIN") {
+	if (user.role !== "ADMIN") {
 		window.location.href = "/account";
 		return null;
 	}
