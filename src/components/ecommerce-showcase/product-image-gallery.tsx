@@ -1,3 +1,5 @@
+import { Package } from "lucide-react";
+
 interface ProductImageGalleryProps {
 	images: string[];
 	title: string;
@@ -15,6 +17,14 @@ export function ProductImageGallery({
 	badge,
 	discount,
 }: ProductImageGalleryProps) {
+	if (images.length === 0) {
+		return (
+			<div className="flex aspect-square items-center justify-center bg-slate-100">
+				<Package aria-hidden="true" className="size-16 text-slate-400" />
+			</div>
+		);
+	}
+
 	const count = Math.min(images.length, 4);
 	const gridClass =
 		count === 1

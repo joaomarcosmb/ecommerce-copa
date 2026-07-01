@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, ShoppingCart } from "lucide-react";
+import { Check, Package, ShoppingCart } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -40,6 +40,7 @@ export function ProductCard({
 	const href = product.productId
 		? `/product?id=${product.productId}&sku=${product.id}`
 		: "#";
+	const cover = resolveMediaUrl(product.photo);
 
 	async function handleAddToCart(e: React.MouseEvent) {
 		e.preventDefault();
@@ -70,15 +71,24 @@ export function ProductCard({
 			<a href={href}>
 				<article>
 					<div className="relative overflow-hidden">
-						<img
-							src={resolveMediaUrl(product.photo) ?? ""}
-							alt={product.title ?? ""}
-							width={1080}
-							height={1080}
-							loading={priority ? "eager" : "lazy"}
-							fetchPriority={priority ? "high" : "auto"}
-							className="h-70 w-full object-cover transition-transform duration-300 group-hover:scale-110"
-						/>
+						{cover ? (
+							<img
+								src={cover}
+								alt={product.title ?? ""}
+								width={1080}
+								height={1080}
+								loading={priority ? "eager" : "lazy"}
+								fetchPriority={priority ? "high" : "auto"}
+								className="h-70 w-full object-cover transition-transform duration-300 group-hover:scale-110"
+							/>
+						) : (
+							<div className="flex h-70 w-full items-center justify-center bg-slate-100">
+								<Package
+									aria-hidden="true"
+									className="size-10 text-slate-400"
+								/>
+							</div>
+						)}
 
 						{badge ? (
 							<div className="absolute top-3 left-3 z-10">

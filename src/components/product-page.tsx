@@ -1,20 +1,21 @@
+import { Package, ShoppingCart } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { ShoppingCart } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { resolveMediaUrl } from "@/lib/format";
-import { QuantityStepper } from "@/components/ui/quantity-stepper";
-import { StarRating } from "@/components/ui/star-rating";
-import { Tabs } from "@/components/ui/tabs";
-import { apiGet } from "@/lib/api";
-import { useCart } from "@/contexts/cart-context";
 import type {
 	CatalogProductDetailResponse,
 	CatalogSkuListResponse,
 	CatalogSkuOptionResponse,
 	CatalogSkuResponse,
+	ReviewListResponse,
+	ReviewResponse,
 } from "@/api/generated/model";
+import { Button } from "@/components/ui/button";
+import { QuantityStepper } from "@/components/ui/quantity-stepper";
+import { StarRating } from "@/components/ui/star-rating";
+import { Tabs } from "@/components/ui/tabs";
+import { useCart } from "@/contexts/cart-context";
+import { apiGet } from "@/lib/api";
+import { resolveMediaUrl } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 import { AppShell } from "./ecommerce-showcase/app-shell";
 import { BreadcrumbNav } from "./ecommerce-showcase/breadcrumb-nav";
@@ -25,30 +26,7 @@ import { ProductPricing } from "./ecommerce-showcase/product-pricing";
 import {
 	RatingBreakdown,
 	ReviewCard,
-	type Review,
 } from "./ecommerce-showcase/product-reviews";
-
-// TODO: replace with real reviews from API
-const MOCK_REVIEWS: Review[] = [
-	{
-		name: "Larissa M.",
-		date: "há 3 dias",
-		rating: 5,
-		text: "Chegou super rápido e bem embalado. As figurinhas vieram lacradas como prometido. Já comecei a colar tudo!",
-	},
-	{
-		name: "Pedro G.",
-		date: "há 1 semana",
-		rating: 5,
-		text: "Qualidade impressionante do papel cuchê. Reclame Aqui responde rápido também, comprei sem medo.",
-	},
-	{
-		name: "Júlia A.",
-		date: "há 2 semanas",
-		rating: 4,
-		text: "Faltou um joker raro num dos pacotinhos, mas no geral vale muito a pena pelo preço. Atendimento resolveu rápido.",
-	},
-];
 
 function getUrlParams(): { productId: string; skuId: string } {
 	if (typeof window === "undefined") return { productId: "", skuId: "" };
@@ -73,8 +51,26 @@ function ProductPageContent({
 	const [quantity, setQuantity] = useState(1);
 	const [isAddingToCart, setIsAddingToCart] = useState(false);
 	const [activeTab, setActiveTab] = useState(0);
+	const [reviews, setReviews] = useState<ReviewResponse[]>([]);
 	const tabsSectionRef = useRef<HTMLElement>(null);
 	const { addItem } = useCart();
+
+	useEffect(() => {
+		if (!selectedSku.id) return;
+		let cancelled = false;
+
+		apiGet<ReviewListResponse>(`/catalog/skus/${selectedSku.id}/reviews`)
+			.then((res) => {
+				if (!cancelled) setReviews(res.items ?? []);
+			})
+			.catch(() => {
+				if (!cancelled) setReviews([]);
+			});
+
+		return () => {
+			cancelled = true;
+		};
+	}, [selectedSku.id]);
 
 	function openReviewsTab() {
 		setActiveTab(1);
@@ -148,11 +144,21 @@ function ProductPageContent({
 					<RatingBreakdown
 						rating={selectedSku.rating ?? 0}
 						reviewCount={selectedSku.reviewCount ?? 0}
+						reviews={reviews}
 					/>
 					<div className="flex flex-col gap-4">
-						{MOCK_REVIEWS.map((review) => (
-							<ReviewCard key={review.name} review={review} />
-						))}
+						{reviews.length === 0 ? (
+							<p className="text-sm text-slate-500">
+								Ainda não há avaliações para este produto.
+							</p>
+						) : (
+							reviews.map((review) => (
+								<ReviewCard
+									key={`${review.clientId}-${review.createdAt}`}
+									review={review}
+								/>
+							))
+						)}
 					</div>
 				</div>
 			),
@@ -225,33 +231,45 @@ function ProductPageContent({
 									Variante
 								</span>
 								<div className="flex flex-wrap gap-2">
-									{product.skus!.map((sku) => (
-										<button
-											key={sku.id}
-											type="button"
-											onClick={() => {
-												setSelectedSku(sku);
-												setSelectedImage(0);
-											}}
-											disabled={sku.stock === 0}
-											className={cn(
-												"flex w-25 flex-col overflow-hidden rounded-2xl border-2 transition-colors",
-												selectedSku.id === sku.id
-													? "border-blue-700"
-													: "border-slate-200 hover:border-slate-400",
-												sku.stock === 0 && "cursor-not-allowed opacity-40",
-											)}
-										>
-											<img
-												src={resolveMediaUrl(sku.photo) ?? ""}
-												alt={sku.title ?? ""}
-												className="aspect-square w-full object-cover"
-											/>
-											<span className="py-1.5 text-center text-xs font-medium">
-												{sku.title}
-											</span>
-										</button>
-									))}
+									{product.skus!.map((sku) => {
+										const skuCover = resolveMediaUrl(sku.photo);
+										return (
+											<button
+												key={sku.id}
+												type="button"
+												onClick={() => {
+													setSelectedSku(sku);
+													setSelectedImage(0);
+												}}
+												disabled={sku.stock === 0}
+												className={cn(
+													"flex w-25 flex-col overflow-hidden rounded-2xl border-2 transition-colors",
+													selectedSku.id === sku.id
+														? "border-blue-700"
+														: "border-slate-200 hover:border-slate-400",
+													sku.stock === 0 && "cursor-not-allowed opacity-40",
+												)}
+											>
+												{skuCover ? (
+													<img
+														src={skuCover}
+														alt={sku.title ?? ""}
+														className="aspect-square w-full object-cover"
+													/>
+												) : (
+													<div className="flex aspect-square w-full items-center justify-center bg-slate-100">
+														<Package
+															aria-hidden="true"
+															className="size-6 text-slate-400"
+														/>
+													</div>
+												)}
+												<span className="py-1.5 text-center text-xs font-medium">
+													{sku.title}
+												</span>
+											</button>
+										);
+									})}
 								</div>
 							</div>
 						)}

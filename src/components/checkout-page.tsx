@@ -1,70 +1,44 @@
+import { useEffect, useState } from "react";
 import { MapPin, Truck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { LabelLarge, P } from "@/components/typography";
-import { formatCurrency, formatDate } from "@/lib/format";
+import { formatCurrency, formatDate, resolveMediaUrl } from "@/lib/format";
+import { apiGet } from "@/lib/api";
+import type {
+	AddressResponse,
+	OrderItemResponse,
+	OrderResponse,
+} from "@/api/generated/model";
 
 import { AppShell } from "./ecommerce-showcase/app-shell";
 
 const SHIPPING = 20;
 
-type MockItem = {
-	id: number;
-	title: string;
-	image: string;
-	variant?: string;
-	quantity: number;
-	price: number;
-};
+function getOrderId(): string | null {
+	if (typeof window === "undefined") return null;
+	return new URLSearchParams(window.location.search).get("orderId");
+}
 
-type MockOrder = {
-	id: string;
-	date: string;
-	estimatedDelivery: string;
-	address: {
-		name: string;
-		line: string;
-	};
-	items: MockItem[];
-};
+function formatAddressLine(a: AddressResponse): string {
+	const parts = [a.street, a.number, a.complement].filter(Boolean).join(", ");
+	return `${parts} — ${a.neighborhood}, ${a.city}/${a.state} · CEP ${a.postalCode}`;
+}
 
-const MOCK_ORDER: MockOrder = {
-	id: "2026-006",
-	date: "2026-06-28",
-	estimatedDelivery: "02/07/2026 a 07/07/2026",
-	address: {
-		name: "Casa",
-		line: "Av. da Universidade, 2853, Apto 102 — Benfica, Fortaleza/CE · CEP 60020-181",
-	},
-	items: [
-		{
-			id: 1,
-			title: "Álbum Oficial FIFA Copa do Mundo 2026™",
-			image:
-				"https://images.unsplash.com/photo-1579952363873-27f3bade9f55?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
-			variant: "Capa dura",
-			quantity: 1,
-			price: 49.9,
-		},
-		{
-			id: 2,
-			title: "Envelope de Figurinhas Copa do Mundo 2026",
-			image:
-				"https://images.unsplash.com/photo-1761449021169-43e776e86179?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
-			quantity: 5,
-			price: 4.5,
-		},
-	],
-};
-
-function OrderItemRow({ item, isLast }: { item: MockItem; isLast: boolean }) {
+function OrderItemRow({
+	item,
+	isLast,
+}: {
+	item: OrderItemResponse;
+	isLast: boolean;
+}) {
 	return (
 		<li className={isLast ? "" : "border-b border-slate-100"}>
 			<div className="flex items-start gap-4 py-4">
 				<img
-					src={item.image}
-					alt={item.title}
+					src={resolveMediaUrl(item.photo) ?? ""}
+					alt={item.title ?? ""}
 					width={80}
 					height={80}
 					className="size-20 shrink-0 rounded-xl object-cover"
@@ -72,13 +46,12 @@ function OrderItemRow({ item, isLast }: { item: MockItem; isLast: boolean }) {
 				<div className="flex flex-1 items-start justify-between gap-4">
 					<div className="flex flex-col gap-1">
 						<LabelLarge className="text-slate-900">{item.title}</LabelLarge>
-						{item.variant && (
-							<P className="text-slate-500">Variação: {item.variant}</P>
-						)}
-						<P className="text-slate-500">Quantidade: {item.quantity}</P>
+						<P className="text-slate-500">Quantidade: {item.amount ?? 0}</P>
 					</div>
 					<span className="shrink-0 text-[15px] font-bold text-slate-900">
-						{formatCurrency(item.price * item.quantity)}
+						{formatCurrency(
+							item.subtotal ?? (item.price ?? 0) * (item.amount ?? 0),
+						)}
 					</span>
 				</div>
 			</div>
@@ -86,12 +59,14 @@ function OrderItemRow({ item, isLast }: { item: MockItem; isLast: boolean }) {
 	);
 }
 
-function CheckoutPageContent() {
-	const order = MOCK_ORDER;
-	const subtotal = order.items.reduce(
-		(sum, item) => sum + item.price * item.quantity,
-		0,
-	);
+function CheckoutPageContent({ order }: { order: OrderResponse }) {
+	const items = order.items ?? [];
+	const subtotal =
+		order.totalValue ??
+		items.reduce(
+			(sum, item) => sum + (item.subtotal ?? (item.price ?? 0) * (item.amount ?? 0)),
+			0,
+		);
 	const total = subtotal + SHIPPING;
 
 	return (
@@ -111,8 +86,9 @@ function CheckoutPageContent() {
 				<P className="text-slate-500">
 					Pedido{" "}
 					<span className="font-semibold text-slate-700">#{order.id}</span>{" "}
-					realizado em {formatDate(order.date)}. Enviamos os detalhes para o seu
-					e-mail.
+					realizado em{" "}
+					{order.createdAt ? formatDate(order.createdAt.slice(0, 10)) : "-"}.
+					Enviamos os detalhes para o seu e-mail.
 				</P>
 			</div>
 
@@ -126,11 +102,11 @@ function CheckoutPageContent() {
 								Itens do pedido
 							</h2>
 							<ul className="mt-2">
-								{order.items.map((item, index) => (
+								{items.map((item, index) => (
 									<OrderItemRow
-										key={item.id}
+										key={`${item.skuId}-${index}`}
 										item={item}
-										isLast={index === order.items.length - 1}
+										isLast={index === items.length - 1}
 									/>
 								))}
 							</ul>
@@ -138,41 +114,45 @@ function CheckoutPageContent() {
 					</Card>
 
 					{/* Delivery */}
-					<Card asChild flat className="px-5 py-6 sm:px-8">
-						<section>
-							<h2 className="font-big-shoulders text-xl font-bold text-slate-900">
-								Entrega
-							</h2>
+					{order.address && (
+						<Card asChild flat className="px-5 py-6 sm:px-8">
+							<section>
+								<h2 className="font-big-shoulders text-xl font-bold text-slate-900">
+									Entrega
+								</h2>
 
-							<div className="mt-4 flex items-start gap-4">
-								<MapPin
-									className="mt-0.5 size-5 shrink-0 text-blue-700"
-									aria-hidden="true"
-								/>
-								<div className="flex-1">
-									<p className="text-sm font-semibold text-slate-900">
-										{order.address.name}
-									</p>
-									<P className="mt-0.5 text-slate-500">{order.address.line}</P>
+								<div className="mt-4 flex items-start gap-4">
+									<MapPin
+										className="mt-0.5 size-5 shrink-0 text-blue-700"
+										aria-hidden="true"
+									/>
+									<div className="flex-1">
+										<p className="text-sm font-semibold text-slate-900">
+											{order.address.name}
+										</p>
+										<P className="mt-0.5 text-slate-500">
+											{formatAddressLine(order.address)}
+										</P>
+									</div>
 								</div>
-							</div>
 
-							<div className="mt-4 flex items-start gap-4 border-t border-slate-100 pt-4">
-								<Truck
-									className="mt-0.5 size-5 shrink-0 text-blue-700"
-									aria-hidden="true"
-								/>
-								<div className="flex-1">
-									<p className="text-sm font-semibold text-slate-900">
-										Previsão de entrega
-									</p>
-									<P className="mt-0.5 text-slate-500">
-										{order.estimatedDelivery}
-									</P>
+								<div className="mt-4 flex items-start gap-4 border-t border-slate-100 pt-4">
+									<Truck
+										className="mt-0.5 size-5 shrink-0 text-blue-700"
+										aria-hidden="true"
+									/>
+									<div className="flex-1">
+										<p className="text-sm font-semibold text-slate-900">
+											Previsão de entrega
+										</p>
+										<P className="mt-0.5 text-slate-500">
+											5 a 10 dias úteis após a confirmação do pagamento.
+										</P>
+									</div>
 								</div>
-							</div>
-						</section>
-					</Card>
+							</section>
+						</Card>
+					)}
 				</div>
 
 				{/* Order summary */}
@@ -219,9 +199,38 @@ function CheckoutPageContent() {
 }
 
 export function CheckoutPage() {
+	const [order, setOrder] = useState<OrderResponse | null>(null);
+	const [isLoading, setIsLoading] = useState(true);
+
+	useEffect(() => {
+		const orderId = getOrderId();
+		if (!orderId) {
+			setIsLoading(false);
+			return;
+		}
+
+		apiGet<OrderResponse>(`/orders/${orderId}`)
+			.then(setOrder)
+			.catch(() => setOrder(null))
+			.finally(() => setIsLoading(false));
+	}, []);
+
 	return (
 		<AppShell>
-			<CheckoutPageContent />
+			{isLoading ? (
+				<div className="flex min-h-96 items-center justify-center">
+					<p className="text-slate-500">Carregando pedido…</p>
+				</div>
+			) : !order ? (
+				<div className="flex min-h-96 flex-col items-center justify-center gap-3 text-center">
+					<p className="text-slate-500">Pedido não encontrado.</p>
+					<a href="/orders" className="text-sm text-blue-700 hover:underline">
+						Ver meus pedidos
+					</a>
+				</div>
+			) : (
+				<CheckoutPageContent order={order} />
+			)}
 		</AppShell>
 	);
 }

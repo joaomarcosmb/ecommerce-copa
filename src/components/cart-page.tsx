@@ -166,8 +166,8 @@ function CartPageContent() {
 					) : isAddressStep ? (
 						<div className="py-6">
 							<CartAddressForm
-								onSuccess={() => {
-									window.location.href = "/checkout";
+								onSuccess={(order) => {
+									window.location.href = `/checkout?orderId=${order.id}`;
 								}}
 							/>
 						</div>

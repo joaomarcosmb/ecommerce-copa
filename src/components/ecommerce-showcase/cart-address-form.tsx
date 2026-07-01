@@ -24,6 +24,8 @@ import type {
 	AddressListResponse,
 	AddressResponse,
 	CreateAddressRequest,
+	CreateOrderRequest,
+	OrderResponse,
 } from "@/api/generated/model";
 import { cn } from "@/lib/utils";
 import { H2, P } from "../typography";
@@ -337,13 +339,15 @@ function NewAddressForm({ onSaved, onCancel }: NewAddressFormProps) {
 // Main component
 
 interface CartAddressFormProps {
-	onSuccess: () => void;
+	onSuccess: (order: OrderResponse) => void;
 }
 
 export function CartAddressForm({ onSuccess }: CartAddressFormProps) {
 	const [addresses, setAddresses] = useState<AddressResponse[] | null>(null);
 	const [selectedId, setSelectedId] = useState<string | null>(null);
 	const [showNewForm, setShowNewForm] = useState(false);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [submitError, setSubmitError] = useState<string | null>(null);
 
 	useEffect(() => {
 		apiGet<AddressListResponse>("/addresses")
@@ -367,6 +371,21 @@ export function CartAddressForm({ onSuccess }: CartAddressFormProps) {
 		setAddresses((prev) => [...(prev ?? []), address]);
 		setSelectedId(address.id ?? null);
 		setShowNewForm(false);
+	}
+
+	async function handleFinish() {
+		if (!selectedId) return;
+		setIsSubmitting(true);
+		setSubmitError(null);
+		try {
+			const body: CreateOrderRequest = { addressId: selectedId };
+			const order = await apiPost<OrderResponse>("/orders", body);
+			onSuccess(order);
+		} catch {
+			setSubmitError("Não foi possível finalizar o pedido. Tente novamente.");
+		} finally {
+			setIsSubmitting(false);
+		}
 	}
 
 	// Loading
@@ -445,14 +464,20 @@ export function CartAddressForm({ onSuccess }: CartAddressFormProps) {
 				</button>
 			</div>
 
+			{submitError && (
+				<Alert variant="error" className="mt-6 max-w-xl mx-auto">
+					<AlertDescription>{submitError}</AlertDescription>
+				</Alert>
+			)}
+
 			<div className="mt-8 flex justify-center">
 				<Button
 					size="lg"
 					className="w-full max-w-md cursor-pointer"
-					disabled={!selectedId}
-					onClick={onSuccess}
+					disabled={!selectedId || isSubmitting}
+					onClick={handleFinish}
 				>
-					Finalizar compra
+					{isSubmitting ? "Finalizando..." : "Finalizar compra"}
 				</Button>
 			</div>
 		</div>
