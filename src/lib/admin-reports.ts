@@ -1,6 +1,6 @@
-import { ApiError } from "@/lib/api";
+import { API_BASE_URL, ApiError } from "@/lib/api";
 
-const BASE = "/api";
+const BASE = `${API_BASE_URL}/api`;
 
 async function requestBlob(path: string): Promise<Blob> {
 	const res = await fetch(`${BASE}${path}`, { credentials: "include" });

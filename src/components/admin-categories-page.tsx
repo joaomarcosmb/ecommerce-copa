@@ -19,7 +19,7 @@ import type {
 	CategoryResponse,
 	CategoryListResponse,
 } from "@/api/generated/model";
-import { ApiError, apiDelete, apiGet } from "@/lib/api";
+import { API_BASE_URL, ApiError, apiDelete, apiGet } from "@/lib/api";
 import { resolveMediaUrl } from "@/lib/format";
 
 import { Skeleton } from "@/components/ui/skeleton";
@@ -50,7 +50,7 @@ async function createCategory(
 	fd.append("title", values.title);
 	fd.append("featured", String(values.featured ?? false));
 	if (image) fd.append("image", image);
-	const res = await fetch("/api/admin/categories", {
+	const res = await fetch(`${API_BASE_URL}/api/admin/categories`, {
 		method: "POST",
 		credentials: "include",
 		body: fd,
@@ -76,7 +76,7 @@ async function updateCategory(
 	fd.append("title", values.title);
 	fd.append("featured", String(values.featured ?? false));
 	if (image) fd.append("image", image);
-	const res = await fetch(`/api/admin/categories/${id}`, {
+	const res = await fetch(`${API_BASE_URL}/api/admin/categories/${id}`, {
 		method: "PATCH",
 		credentials: "include",
 		body: fd,

@@ -1,4 +1,6 @@
-const BASE = "/api";
+export const API_BASE_URL = import.meta.env.PUBLIC_API_URL ?? "";
+
+const BASE = `${API_BASE_URL}/api`;
 
 export class ApiError extends Error {
 	constructor(
